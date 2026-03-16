@@ -1,0 +1,9 @@
+- Li et al. 2025 (2409.19998) — RepSim vs IF 在 LLM 上的表现差异
+- DDA (2410.01285) — 对比打分使 IF 超越 BM25 (AUC 91.64%)
+- RepT (2510.02334) — 表示梯度追踪 (P@10=0.97-1.00)
+- DATE-LM (2507.09424) — LLM TDA 标准 benchmark (NeurIPS 2025)
+- Better Hessians Matter (2509.23437) — Hessian 层级证据（核心对手）
+- In-the-Wild (2602.11079) — DPO 场景下的表示空间 TDA
+- Concept Influence (2602.14869) — 概念级表示空间 TDA
+- AirRep (2501.12345) — 学习的表示空间 TDA
+- Episteme 知识库: ~/Research/Episteme (49 篇 TDA 论文深度分析)
