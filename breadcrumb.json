@@ -1,10 +1,10 @@
 {
-  "ts": 1773673928.307242,
-  "stage": "pilot_experiments",
+  "ts": 1773674255.301835,
+  "stage": "idea_validation_decision",
   "action_type": "skill",
   "iteration": 0,
   "workspace_path": "/Users/jinxulin/Research/sibyl-research-system/workspaces/CRA",
   "in_loop": false,
   "loop_type": "",
-  "description": "Run pilot experiments"
+  "description": "Review pilot evidence and decide ADVANCE / REFINE / PIVOT"
 }

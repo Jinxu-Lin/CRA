@@ -1,7 +1,7 @@
 {
-  "stage": "idea_validation_decision",
+  "stage": "idea_debate",
   "started_at": 1773662442.492464,
-  "updated_at": 1773674249.1080801,
+  "updated_at": 1773674415.336003,
   "iteration": 0,
   "errors": [],
   "paused": false,
@@ -9,5 +9,5 @@
   "stop_requested": false,
   "stop_requested_at": null,
   "iteration_dirs": true,
-  "stage_started_at": 1773674249.1080792
+  "stage_started_at": 1773674415.336003
 }

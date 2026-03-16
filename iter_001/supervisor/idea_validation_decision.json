@@ -1,0 +1,106 @@
+{
+  "decision": "REFINE",
+  "selected_candidate_id": "cand_a",
+  "confidence": 0.60,
+  "reasons": [
+    "FM1 (signal dilution) has strong empirical evidence on attribution tasks: +32pp counterfact, +17pp ftrace, with compelling spectral support (85.6% variance in top-5 gradient eigenvalues)",
+    "H6 confirmed: K-FAC IF still 17.4pp below RepSim, validating that FM1/FM2 are genuine signal processing defects, not Hessian artifacts",
+    "FM2 (contrastive scoring) has ZERO empirical evidence at pilot scale due to rank-metric invariance -- half the thesis is unvalidated and would remain so without methodology change",
+    "H7 whitened attribution fails (degrades all tasks 8-11pp) due to underdetermined covariance at N/d=0.049 -- needs PCA-reduced whitening",
+    "H4 and H9 quantitative predictions are wrong (though H4 directionally strengthens FM1) -- hypotheses need revision before committing full GPU budget",
+    "Toxicity task reversal (-24pp) requires explicit scope boundary framing -- gradient norm artifact, not CRA failure",
+    "Pipeline fully validated (all methods work, 28 min runtime, 4x RTX 4090) -- infrastructure ready for full experiments once methodology is refined"
+  ],
+  "next_actions": [
+    "Add continuous metrics (Kendall-tau, Spearman-rho on raw scores) to all evaluation tasks -- CRITICAL for FM2 testing",
+    "Revise hypotheses H4 (r_eff << d << B instead of r_eff ~ O(d)) and H9 (spectral concentration instead of condition numbers)",
+    "Add PCA-reduced whitening variant (whiten in top-k eigenspace, k ~ r_eff) for H7 recovery",
+    "Update proposal.md with Evidence-Driven Revisions section documenting all pilot findings",
+    "Revise task_plan.json: increase N to 5K-10K, add continuous metrics, add PCA-whitening, add multi-seed (42, 123, 456)",
+    "Frame toxicity reversal as task-type scope boundary in methodology",
+    "Re-run planner to generate updated full-experiment task plan"
+  ],
+  "dropped_candidates": [
+    "cand_b"
+  ],
+  "demoted_candidates": [
+    {
+      "candidate_id": "cand_c",
+      "new_status": "sub_contribution_of_cand_a",
+      "reason": "H7 failed at pilot scale but SNR concept directionally validated; keep as sub-contribution if PCA-whitening works at full scale"
+    }
+  ],
+  "hypothesis_verdicts": {
+    "H1_FM1_space_gap": {
+      "verdict": "SUPPORTED_2_of_3",
+      "action": "Proceed; frame toxicity as scope boundary"
+    },
+    "H2_contrastive_asymmetry": {
+      "verdict": "UNTESTABLE_AT_PILOT",
+      "action": "CRITICAL: add continuous metrics before full experiment"
+    },
+    "H3_orthogonality": {
+      "verdict": "UNTESTABLE_AT_PILOT",
+      "action": "Depends on H2 fix; cannot evaluate without FM2 main effect"
+    },
+    "H4_gradient_r_eff": {
+      "verdict": "DIRECTIONALLY_SUPPORTED_QUANTITATIVELY_WRONG",
+      "action": "Revise to r_eff << d << B; strengthens FM1"
+    },
+    "H5_trak_saturation": {
+      "verdict": "SUPPORTED",
+      "action": "Proceed; note 30.8pp residual gap as FM1-necessary-not-sufficient"
+    },
+    "H6_kfac_control": {
+      "verdict": "CONFIRMED",
+      "action": "Proceed; this validates the diagnostic framework"
+    },
+    "H7_whitened_attribution": {
+      "verdict": "FAIL_RECOVERABLE",
+      "action": "Add PCA-reduced whitening; if still fails at full scale, frame as open direction"
+    },
+    "H8_repsim_vs_bm25": {
+      "verdict": "PARTIAL",
+      "action": "Proceed; restrict counterfact claims if BM25 remains competitive at full scale"
+    },
+    "H9_condition_numbers": {
+      "verdict": "FALSIFIED",
+      "action": "Replace with spectral concentration metrics"
+    }
+  },
+  "risk_assessment": {
+    "fm2_still_zero_with_continuous_metrics": {
+      "severity": "critical",
+      "probability": 0.25,
+      "mitigation": "Pivot to FM1-only paper; still publishable but weaker (poster tier)"
+    },
+    "h7_pca_whitening_still_fails": {
+      "severity": "high",
+      "probability": 0.35,
+      "mitigation": "Frame as open direction; drop prescriptive theory contribution"
+    },
+    "toxicity_reversal_undermines_reviewers": {
+      "severity": "medium",
+      "probability": 0.40,
+      "mitigation": "Preemptive task-type analysis framing"
+    },
+    "bm25_competitive_at_full_scale": {
+      "severity": "medium",
+      "probability": 0.30,
+      "mitigation": "Restrict claims; discuss as limitation"
+    }
+  },
+  "publication_viability": {
+    "if_fm2_works_and_h7_recovers": "spotlight potential (NeurIPS 2026)",
+    "if_fm2_works_but_h7_fails": "poster (NeurIPS 2026 / ICML 2027)",
+    "if_fm2_fails": "weak poster with FM1-only story, or pivot"
+  },
+  "metadata": {
+    "iteration": 0,
+    "pilot_tasks_completed": 14,
+    "pilot_runtime_min": 28,
+    "gpu": "4x NVIDIA RTX 4090",
+    "pilot_sample_size": 100,
+    "date": "2026-03-17"
+  }
+}
