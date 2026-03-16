@@ -1,0 +1,169 @@
+{
+  "task_id": "phase1_factorial_repsim_contrastive",
+  "method": "RepSim_contrastive",
+  "scoring": "contrastive",
+  "contrastive_protocol": "mean_subtraction_over_train",
+  "space": "representation",
+  "model": "EleutherAI/pythia-1b",
+  "hidden_dim": 2048,
+  "extraction_layer": "last_hidden_state",
+  "similarity": "cosine",
+  "pilot_n_train": 100,
+  "bootstrap_B": 1000,
+  "seed": 42,
+  "results_per_task": {
+    "toxicity": {
+      "metrics": {
+        "AUPRC": 0.685158,
+        "CI_lower": 0.471979,
+        "CI_upper": 0.844056,
+        "n_unsafe": 20,
+        "n_train": 100,
+        "score_stats": {
+          "mean": -8.642673243741683e-09,
+          "std": 0.27882450819015503,
+          "min": -0.48956912755966187,
+          "max": 0.37317126989364624
+        }
+      },
+      "runtime_sec": 0.0,
+      "n_train_pilot": 100,
+      "n_ref": 10
+    },
+    "counterfact": {
+      "metrics": {
+        "Recall@50": 0.99359,
+        "Recall@50_CI": [
+          0.979167,
+          1.0
+        ],
+        "MRR": 0.875801,
+        "MRR_CI": [
+          0.797745,
+          0.945513
+        ],
+        "refs_with_facts": 52,
+        "n_ref": 66,
+        "n_train": 100
+      },
+      "runtime_sec": 0.0,
+      "n_train_pilot": 100,
+      "n_ref": 66
+    },
+    "ftrace": {
+      "metrics": {
+        "Recall@50": 0.756321,
+        "Recall@50_CI": [
+          0.661071,
+          0.841806
+        ],
+        "MRR": 0.617514,
+        "MRR_CI": [
+          0.465883,
+          0.769108
+        ],
+        "refs_with_facts": 28,
+        "n_ref": 30,
+        "n_train": 100
+      },
+      "runtime_sec": 0.0,
+      "n_train_pilot": 100,
+      "n_ref": 30
+    }
+  },
+  "contrastive_analysis": {
+    "toxicity": {
+      "raw_sim_mean": 0.41564446687698364,
+      "raw_sim_std": 0.31730741262435913,
+      "contrastive_sim_mean": -5.7220459481754915e-09,
+      "contrastive_sim_std": 0.3035365045070648,
+      "mean_subtraction_magnitude": 0.41564449667930603,
+      "mean_subtraction_std": 0.09246396273374557,
+      "mean_per_ref_range": [
+        0.2262471318244934,
+        0.47308796644210815
+      ]
+    },
+    "counterfact": {
+      "raw_sim_mean": 0.4831351637840271,
+      "raw_sim_std": 0.12143287062644958,
+      "contrastive_sim_mean": -5.201859831771571e-09,
+      "contrastive_sim_std": 0.11098659783601761,
+      "mean_subtraction_magnitude": 0.4831351935863495,
+      "mean_subtraction_std": 0.049273889511823654,
+      "mean_per_ref_range": [
+        0.34049269556999207,
+        0.6243541240692139
+      ]
+    },
+    "ftrace": {
+      "raw_sim_mean": 0.48885759711265564,
+      "raw_sim_std": 0.11105052381753922,
+      "contrastive_sim_mean": -3.496805733860242e-09,
+      "contrastive_sim_std": 0.09350289404392242,
+      "mean_subtraction_magnitude": 0.48885756731033325,
+      "mean_subtraction_std": 0.05991184711456299,
+      "mean_per_ref_range": [
+        0.29258814454078674,
+        0.6064144372940063
+      ]
+    }
+  },
+  "h2_comparison": {
+    "toxicity": {
+      "metric": "AUPRC",
+      "repsim_standard": 0.685158,
+      "repsim_contrastive": 0.685158,
+      "repsim_gain_pp": 0.0,
+      "trak_standard": 0.925612,
+      "trak_contrastive": 0.925612,
+      "trak_gain_pp": 0.0,
+      "h2_asymmetry_check": "FAIL (rep gain >= param gain)"
+    },
+    "counterfact": {
+      "metric": "Recall@50",
+      "repsim_standard": 0.99359,
+      "repsim_contrastive": 0.99359,
+      "repsim_gain_pp": 0.0,
+      "trak_standard": 0.669872,
+      "trak_contrastive": 0.669872,
+      "trak_gain_pp": 0.0,
+      "h2_asymmetry_check": "FAIL (rep gain >= param gain)"
+    },
+    "ftrace": {
+      "metric": "Recall@50",
+      "repsim_standard": 0.756321,
+      "repsim_contrastive": 0.756321,
+      "repsim_gain_pp": 0.0,
+      "trak_standard": 0.590167,
+      "trak_contrastive": 0.590167,
+      "trak_gain_pp": 0.0,
+      "h2_asymmetry_check": "FAIL (rep gain >= param gain)"
+    }
+  },
+  "h2_asymmetry_pass": false,
+  "h2_asymmetry_passes_count": "0/3",
+  "timings": {
+    "toxicity": 0.0,
+    "counterfact": 0.0,
+    "ftrace": 0.0
+  },
+  "validity_checks": {
+    "toxicity": {
+      "AUPRC_valid": true,
+      "AUPRC_above_random": true
+    },
+    "counterfact": {
+      "Recall@50_valid": true,
+      "MRR_valid": true
+    },
+    "ftrace": {
+      "Recall@50_valid": true,
+      "MRR_valid": true
+    }
+  },
+  "all_valid": true,
+  "total_runtime_sec": 12.51,
+  "gpu": "N/A (cache-only, no GPU needed)",
+  "timestamp": "2026-03-17T01:33:40.559049"
+}

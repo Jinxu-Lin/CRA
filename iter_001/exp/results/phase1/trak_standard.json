@@ -1,0 +1,95 @@
+{
+  "task_id": "phase1_factorial_trak_standard",
+  "method": "TRAK_standard",
+  "scoring": "standard",
+  "space": "parameter",
+  "model": "EleutherAI/pythia-1b",
+  "hidden_dim": 2048,
+  "trak_k": 2048,
+  "pilot_n_train": 100,
+  "bootstrap_B": 1000,
+  "seed": 42,
+  "results_per_task": {
+    "toxicity": {
+      "metrics": {
+        "AUPRC": 0.925612,
+        "CI_lower": 0.806091,
+        "CI_upper": 0.997001,
+        "n_unsafe": 20,
+        "n_train": 100,
+        "score_stats": {
+          "mean": 0.02061079442501068,
+          "std": 0.04246281087398529,
+          "min": -0.025587523356080055,
+          "max": 0.20504161715507507
+        }
+      },
+      "runtime_sec": 10.4,
+      "n_train_pilot": 100,
+      "n_ref": 10
+    },
+    "counterfact": {
+      "metrics": {
+        "Recall@50": 0.669872,
+        "Recall@50_CI": [
+          0.542384,
+          0.77783
+        ],
+        "MRR": 0.239908,
+        "MRR_CI": [
+          0.141839,
+          0.337716
+        ],
+        "refs_with_facts": 52,
+        "n_ref": 66,
+        "n_train": 100
+      },
+      "runtime_sec": 14.58,
+      "n_train_pilot": 100,
+      "n_ref": 66
+    },
+    "ftrace": {
+      "metrics": {
+        "Recall@50": 0.590167,
+        "Recall@50_CI": [
+          0.49257,
+          0.691745
+        ],
+        "MRR": 0.364972,
+        "MRR_CI": [
+          0.216127,
+          0.526083
+        ],
+        "refs_with_facts": 28,
+        "n_ref": 30,
+        "n_train": 100
+      },
+      "runtime_sec": 11.81,
+      "n_train_pilot": 100,
+      "n_ref": 30
+    }
+  },
+  "timings": {
+    "toxicity": 10.4,
+    "counterfact": 14.58,
+    "ftrace": 11.81
+  },
+  "validity_checks": {
+    "toxicity": {
+      "AUPRC_valid": true,
+      "AUPRC_above_random": true
+    },
+    "counterfact": {
+      "Recall@50_valid": true,
+      "MRR_valid": true
+    },
+    "ftrace": {
+      "Recall@50_valid": true,
+      "MRR_valid": true
+    }
+  },
+  "all_valid": true,
+  "total_runtime_sec": 51.85,
+  "gpu": "NVIDIA GeForce RTX 4090",
+  "timestamp": "2026-03-17T01:16:41.699232"
+}

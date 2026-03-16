@@ -1,0 +1,21 @@
+{
+  "owner_id": "exp-supervisor-1773667269-40620",
+  "status": "running",
+  "started_at": 1773667269.784417,
+  "last_heartbeat_at": 1773670194.088633,
+  "workspace_path": "/Users/jinxulin/Research/sibyl-research-system/workspaces/CRA",
+  "active_workspace_path": "/Users/jinxulin/Research/sibyl-research-system/workspaces/CRA/current",
+  "last_summary": "Requeued 3 dead tasks (no remote PIDs). All 3 completed: phase0_pipeline_pilot (32s), phase0_kfac_control (19s, H6 confirmed), phase2_eigenspectrum (50s, H9 FALSIFIED). GPUs 1-3 free, dispatching next batch.",
+  "last_actions": [
+    "requeued phase0_pipeline_pilot",
+    "requeued phase0_kfac_control",
+    "requeued phase2_eigenspectrum",
+    "dispatched all 3 to GPUs 1-3",
+    "all 3 completed successfully"
+  ],
+  "last_recommendations": [
+    "H9 falsified: condition number story reversed, main system should revise narrative",
+    "dispatch phase1 tasks now",
+    "GPU 0 occupied by external process"
+  ]
+}

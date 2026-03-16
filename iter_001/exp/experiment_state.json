@@ -1,0 +1,136 @@
+{
+  "schema_version": 1,
+  "tasks": {
+    "setup_env": {
+      "status": "completed",
+      "gpu_ids": [
+        1
+      ],
+      "pid_file": "/home/jinxulin/sibyl_system/projects/CRA/exp/results/setup_env.pid",
+      "registered_at": "2026-03-17T00:07:22.640845",
+      "completed_at": "2026-03-17T00:19:09.388281"
+    },
+    "phase0_pipeline_pilot": {
+      "status": "completed",
+      "gpu_ids": [
+        1
+      ],
+      "pid_file": "/home/jinxulin/sibyl_system/projects/CRA/exp/results/phase0_pipeline_pilot.pid",
+      "registered_at": "2026-03-17T00:22:15.732393",
+      "completed_at": "2026-03-17T00:33:38.000000"
+    },
+    "phase0_kfac_control": {
+      "status": "completed",
+      "gpu_ids": [
+        2
+      ],
+      "pid_file": "/home/jinxulin/sibyl_system/projects/CRA/exp/results/phase0_kfac_control.pid",
+      "registered_at": "2026-03-17T00:22:15.732401",
+      "completed_at": "2026-03-17T01:00:20.000000"
+    },
+    "phase2_eigenspectrum": {
+      "status": "completed",
+      "gpu_ids": [
+        3
+      ],
+      "pid_file": "/home/jinxulin/sibyl_system/projects/CRA/exp/results/phase2_eigenspectrum.pid",
+      "registered_at": "2026-03-17T00:22:15.732402",
+      "completed_at": "2026-03-17T01:05:51.000000"
+    },
+    "phase1_factorial_trak_standard": {
+      "status": "completed",
+      "gpu_ids": [
+        1
+      ],
+      "pid_file": "/home/jinxulin/sibyl_system/projects/CRA/exp/results/phase1_factorial_trak_standard.pid",
+      "registered_at": "2026-03-17T01:09:48.173840",
+      "completed_at": "2026-03-17T01:50:52.000000"
+    },
+    "phase1_factorial_trak_contrastive": {
+      "status": "completed",
+      "gpu_ids": [
+        2
+      ],
+      "pid_file": "/home/jinxulin/sibyl_system/projects/CRA/exp/results/phase1_factorial_trak_contrastive.pid",
+      "registered_at": "2026-03-17T01:09:48.173848",
+      "completed_at": "2026-03-17T02:00:51.000000"
+    },
+    "phase1_factorial_repsim_standard": {
+      "status": "completed",
+      "gpu_ids": [
+        3
+      ],
+      "pid_file": "/home/jinxulin/sibyl_system/projects/CRA/exp/results/phase1_factorial_repsim_standard.pid",
+      "registered_at": "2026-03-17T01:09:48.173849",
+      "completed_at": "2026-03-17T02:10:16.000000"
+    },
+    "phase1_baselines": {
+      "status": "completed",
+      "gpu_ids": [
+        1
+      ],
+      "pid_file": "/home/jinxulin/sibyl_system/projects/CRA/exp/results/phase1_baselines.pid",
+      "registered_at": "2026-03-17T01:17:56.044856",
+      "completed_at": "2026-03-17T01:27:39.000000"
+    },
+    "phase1_factorial_repsim_contrastive": {
+      "status": "completed",
+      "gpu_ids": [
+        1
+      ],
+      "pid_file": "/home/jinxulin/sibyl_system/projects/CRA/exp/results/phase1_factorial_repsim_contrastive.pid",
+      "registered_at": "2026-03-17T01:29:41.738515",
+      "completed_at": "2026-03-17T02:20:13.000000"
+    },
+    "phase2_trak_dim_sweep": {
+      "status": "completed",
+      "gpu_ids": [
+        2,
+        3
+      ],
+      "pid_file": "/home/jinxulin/sibyl_system/projects/CRA/exp/results/phase2_trak_dim_sweep.pid",
+      "registered_at": "2026-03-17T01:29:41.738525",
+      "completed_at": "2026-03-17T01:52:29.000000"
+    },
+    "phase1_factorial_analysis": {
+      "status": "running",
+      "gpu_ids": [
+        1
+      ],
+      "pid_file": "/home/jinxulin/sibyl_system/projects/CRA/exp/results/phase1_factorial_analysis.pid",
+      "registered_at": "2026-03-17T01:34:12.355553"
+    },
+    "phase2_repsim_dim_sweep": {
+      "status": "completed",
+      "gpu_ids": [
+        1
+      ],
+      "pid_file": "/home/jinxulin/sibyl_system/projects/CRA/exp/results/phase2_repsim_dim_sweep.pid",
+      "registered_at": "2026-03-17T01:43:57.923715",
+      "completed_at": "2026-03-17T02:30:58.000000"
+    },
+    "phase3_contrastive_matrix": {
+      "status": "completed",
+      "gpu_ids": [
+        1
+      ],
+      "pid_file": "/home/jinxulin/sibyl_system/projects/CRA/exp/results/phase3_contrastive_matrix.pid",
+      "registered_at": "2026-03-17T01:54:16.588226",
+      "completed_at": "2026-03-17T02:49:04.000000"
+    },
+    "phase3_whitened_attribution": {
+      "status": "running",
+      "gpu_ids": [
+        2
+      ],
+      "pid_file": "/home/jinxulin/sibyl_system/projects/CRA/exp/results/phase3_whitened_attribution.pid",
+      "registered_at": "2026-03-17T01:56:20.412072"
+    }
+  },
+  "last_recovery_at": "2026-03-17T00:22:11.202998",
+  "recovery_log": [
+    "[2026-03-17T00:22:09.407885] phase0_pipeline_pilot: marked for retry (previous_status=running, reason=never_launched_no_remote_pid)",
+    "[2026-03-17T00:22:10.292045] phase0_kfac_control: marked for retry (previous_status=running, reason=never_launched_no_remote_pid)",
+    "[2026-03-17T00:22:11.202998] phase2_eigenspectrum: marked for retry (previous_status=running, reason=never_launched_no_remote_pid)"
+  ]
+}

@@ -1,0 +1,115 @@
+{
+  "task_id": "setup_env",
+  "status": "success",
+  "steps": {
+    "dependencies": {
+      "status": "OK",
+      "info": {
+        "torch": "2.5.1+cu121",
+        "cuda_available": true,
+        "gpu_count": 1,
+        "transformers": "5.3.0",
+        "datasets": "4.7.0",
+        "sklearn": "1.8.0",
+        "scipy": "1.17.1",
+        "numpy": "2.3.5",
+        "rank_bm25": "OK",
+        "trak": "OK",
+        "gpu_names": [
+          "NVIDIA GeForce RTX 4090"
+        ]
+      }
+    },
+    "app_datasets": {
+      "status": "OK",
+      "datasets": {
+        "toxicity_XSTest-response-Het": {
+          "repo": "DataAttributionEval/Toxicity-Bias-Filtering",
+          "subset": "XSTest-response-Het",
+          "train_size": 10187,
+          "ref_size": 10
+        },
+        "toxicity_XSTest-response-Hom": {
+          "repo": "DataAttributionEval/Toxicity-Bias-Filtering",
+          "subset": "XSTest-response-Hom",
+          "train_size": 10066,
+          "ref_size": 10
+        },
+        "counterfact_Pythia-1b": {
+          "repo": "DataAttributionEval/Counterfact",
+          "subset": "Pythia-1b",
+          "train_size": 5473,
+          "ref_size": 66
+        }
+      }
+    },
+    "checkpoints": {
+      "status": "OK",
+      "info": {
+        "pythia-70m": {
+          "path": "/home/jinxulin/sibyl_system/shared/checkpoints/pythia-70m",
+          "n_params": 70426624,
+          "hidden_dim": 512,
+          "vocab_size": 50304
+        },
+        "pythia-1b": {
+          "path": "/home/jinxulin/sibyl_system/shared/checkpoints/pythia-1b",
+          "n_params": 1011781632,
+          "hidden_dim": 2048,
+          "vocab_size": 50304
+        }
+      }
+    },
+    "date_lm_checkpoints": {
+      "status": "OK",
+      "info": {
+        "toxicity-XSTest-Het": {
+          "repo": "DataAttributionEval/Pythia-1b-XSTest-response-Het",
+          "status": "failed",
+          "error": "Unrecognized model in DataAttributionEval/Pythia-1b-XSTest-response-Het. Should have a `model_type` key in its config.json."
+        },
+        "counterfact": {
+          "repo": "DataAttributionEval/Pythia-1b-counterfactual",
+          "status": "failed",
+          "error": "Unrecognized model in DataAttributionEval/Pythia-1b-counterfactual. Should have a `model_type` key in its config.json."
+        }
+      }
+    },
+    "evaluation_protocol": {
+      "status": "OK",
+      "results": {
+        "toxicity_auprc": {
+          "status": "OK",
+          "dummy_score": 0.0058,
+          "train_size": 10187,
+          "unsafe_count": 66,
+          "ref_size": 10
+        },
+        "factual_recall_mrr": {
+          "status": "OK",
+          "dummy_recall_at_50": 0.0115,
+          "dummy_mrr": 0.0625,
+          "train_size": 5473,
+          "ref_size": 66,
+          "subset": "Pythia-1b"
+        },
+        "gpu_inference": {
+          "status": "OK",
+          "device": "cuda:0 (physical GPU 1)",
+          "logits_shape": [
+            1,
+            6,
+            50304
+          ],
+          "hidden_shape": [
+            1,
+            6,
+            512
+          ]
+        }
+      }
+    }
+  },
+  "start_time": "2026-03-17T00:16:03.748967",
+  "end_time": "2026-03-17T00:19:09.387905"
+}

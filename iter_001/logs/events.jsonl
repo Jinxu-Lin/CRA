@@ -1,0 +1,4 @@
+{"ts": 1773667335.7329779, "event": "task_dispatch", "task_ids": ["phase0_pipeline_pilot", "phase0_kfac_control", "phase2_eigenspectrum"], "gpu_ids": [1, 2, 3], "iteration": 0}
+{"ts": 1773670188.1745348, "event": "task_dispatch", "task_ids": ["phase1_factorial_trak_standard", "phase1_factorial_trak_contrastive", "phase1_factorial_repsim_standard"], "gpu_ids": [1, 2, 3], "iteration": 0}
+{"ts": 1773671381.739244, "event": "task_dispatch", "task_ids": ["phase1_factorial_repsim_contrastive", "phase2_trak_dim_sweep"], "gpu_ids": [1, 2, 3], "iteration": 0}
+{"ts": 1773672980.412831, "event": "task_dispatch", "task_ids": ["phase3_whitened_attribution"], "gpu_ids": [2], "iteration": 0}

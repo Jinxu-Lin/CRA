@@ -1,0 +1,55 @@
+{
+  "task_id": "phase2_trak_dim_sweep",
+  "go_no_go": "GO",
+  "confidence": 0.55,
+  "mode": "pilot",
+  "pilot_limitations": [
+    "N=100 caps PCA rank at 100, making all PCA projections identical (k_actual=100 for all requested k>100)",
+    "Random projection Recall@50 is noisy and non-monotonic at pilot scale (N=100, 66 ref queries)",
+    "Smoking-gun test inconclusive: PCA cannot test k=d=2048 with only 100 samples",
+    "Bootstrap CIs are wide due to small ref set (66 queries, 52 with relevant facts)"
+  ],
+  "key_findings": {
+    "random_projection": {
+      "recall_by_k": {"64": 0.686, "128": 0.705, "256": 0.785, "512": 0.750, "1024": 0.686, "2048": 0.670, "4096": 0.715},
+      "max_recall": 0.785,
+      "max_at_k": 256,
+      "saturation_90_k": 256,
+      "non_monotonic": true,
+      "interpretation": "Peak at k=256 (k/d=0.125) with decline at larger k. Non-monotonicity likely due to pilot noise. The flat/declining pattern at k>256 is consistent with signal saturation -- adding more random dimensions captures noise rather than signal."
+    },
+    "pca_projection": {
+      "all_identical": true,
+      "reason": "N=100 < all requested k, so PCA always projects to rank 100 space",
+      "recall_at_rank100": 0.686,
+      "interpretation": "PCA at rank 100 matches random projection at k=64 and k=1024, suggesting the gradient Gram matrix eigenstructure is captured. Full-scale experiment (N>>d) needed to test the smoking-gun hypothesis."
+    },
+    "repsim_vs_trak_gap": {
+      "repsim_recall": 0.994,
+      "best_trak_recall": 0.785,
+      "gap_pp": 20.9,
+      "interpretation": "Even at optimal k=256, TRAK underperforms RepSim by ~21pp. This gap persists across all projection dimensions, supporting FM1 diagnosis: parameter-space methods suffer from signal dilution that dimension tuning alone cannot fix."
+    },
+    "gradient_eigenspectrum": {
+      "top_eigenvalue": 6762.9,
+      "eigenvalue_decay": "rapid",
+      "top5_fraction_of_total": "high (eigenvalues: 6763, 3640, 3067, 2994, 2592)",
+      "interpretation": "Gradient covariance is highly concentrated in a low-rank subspace. Top eigenvalues decay by ~2.6x from 1st to 5th, consistent with H4 (gradient signal in low-rank subspace)."
+    }
+  },
+  "hypothesis_assessments": {
+    "H5": {
+      "status": "DIRECTIONALLY_SUPPORTED",
+      "evidence": "Random projection saturates early (best at k=256, k/d=0.125). No improvement from k=256 to k=4096. Consistent with signal living in low-rank subspace, but non-monotonicity and pilot noise prevent definitive claim.",
+      "full_scale_needed": true,
+      "full_scale_requirements": "N >= 2048 (at least d) to properly test PCA projection at k=d and establish clear saturation curve"
+    }
+  },
+  "recommendations_for_full": [
+    "Increase N to at least 2048 (=d for Pythia-1B) to enable meaningful PCA comparison",
+    "Add k=8192 and k=16384 to test k>2d region",
+    "Run multiple seeds to average out random projection noise",
+    "Consider also running on toxicity and ftrace tasks for cross-task validation"
+  ],
+  "timestamp": "2026-03-17T01:54:00"
+}

@@ -5,3 +5,12 @@
 {"ts": 1773663206.167016, "event": "stage_start", "stage": "idea_debate", "iteration": 0, "action_type": "team", "description": "Agent Team: 6人辩论生成研究提案（恢复：已完成 0/6） + Codex 独立审查"}
 {"ts": 1773666141.7017229, "event": "stage_end", "stage": "idea_debate", "iteration": 0, "duration_sec": 2944.993865251541, "score": null, "next_stage": "planning"}
 {"ts": 1773666150.630315, "event": "stage_start", "stage": "planning", "iteration": 0, "action_type": "skill", "description": "Design experiment plan with pilot/full configs"}
+{"ts": 1773666407.4601011, "event": "stage_end", "stage": "planning", "iteration": 0, "duration_sec": 265.817440032959, "score": null, "next_stage": "pilot_experiments"}
+{"ts": 1773666442.642158, "event": "stage_start", "stage": "pilot_experiments", "iteration": 0, "action_type": "skill", "description": "[0/14] 并行 1 任务 (PILOT), 预计 30min: setup_env→GPU[1]"}
+{"ts": 1773667257.776198, "event": "stage_start", "stage": "pilot_experiments", "iteration": 0, "action_type": "skills_parallel", "description": "[1/14] 并行 3 任务 (PILOT), 预计 10min (校准×0.1): phase0_pipeline_pilot→GPU[1], phase0_kfac_control→GPU[2], phase2_eigenspectrum→GPU[3]"}
+{"ts": 1773670219.318135, "event": "main_wake_request", "stage": "pilot_experiments", "owner_id": "exp-supervisor-1773667269-40620", "kind": "resolution", "urgency": "high", "requires_main_system": false, "summary": "Phase0 complete: H6 confirmed (K-FAC IF gap 16.7pp on counterfact). H9 FALSIFIED: representation condition 3e10 >> gradient condition 400-3600, reversed from prediction. Phase1 factorial tasks now dispatching."}
+{"ts": 1773670557.5049422, "event": "main_wake_drain", "stage": "pilot_experiments", "event_count": 1, "requires_main_system": true}
+{"ts": 1773670676.045599, "event": "task_dispatch", "task_ids": ["phase1_baselines"], "gpu_ids": [1], "iteration": 0}
+{"ts": 1773671652.356341, "event": "task_dispatch", "task_ids": ["phase1_factorial_analysis"], "gpu_ids": [1], "iteration": 0}
+{"ts": 1773672237.924578, "event": "task_dispatch", "task_ids": ["phase2_repsim_dim_sweep"], "gpu_ids": [1], "iteration": 0}
+{"ts": 1773672856.589033, "event": "task_dispatch", "task_ids": ["phase3_contrastive_matrix"], "gpu_ids": [1], "iteration": 0}
