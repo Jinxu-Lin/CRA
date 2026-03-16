@@ -1,53 +1,39 @@
 {
-  "resume_action_type": "experiment_wait",
+  "resume_action_type": "skill",
   "resume_action": {
-    "action_type": "experiment_wait",
+    "action_type": "skill",
     "agents": null,
-    "skills": null,
+    "skills": [
+      {
+        "name": "sibyl-experimenter",
+        "args": "/Users/jinxulin/Research/sibyl-research-system/workspaces/CRA/current PILOT default /home/jinxulin/sibyl_system '/home/jinxulin/sibyl_system/miniconda3/bin/conda run -n sibyl_CRA' 1,2,3"
+      }
+    ],
     "team": null,
     "bash_command": null,
     "gpu_poll": null,
-    "description": "实验运行中（3 个任务），预计剩余 ~56min，每 5min 轮询一次\n  phase1_factorial_trak_standard -> GPU[1] (elapsed 4min, ~56min left); phase1_factorial_trak_contrastive -> GPU[2] (elapsed 4min, ~56min left); phase1_factorial_repsim_standard -> GPU[3] (elapsed 4min, ~41min left)",
+    "description": "Run pilot experiments",
     "stage": "pilot_experiments",
     "iteration": 0,
-    "estimated_minutes": 56,
+    "estimated_minutes": 0,
     "checkpoint_info": null,
     "experiment_monitor": {
-      "ssh_connection": "default",
-      "check_cmd": "test -f /home/jinxulin/sibyl_system/projects/CRA/exp/results/phase1_factorial_trak_standard_DONE && echo \"phase1_factorial_trak_standard:DONE\" || echo \"phase1_factorial_trak_standard:PENDING\" && test -f /home/jinxulin/sibyl_system/projects/CRA/exp/results/phase1_factorial_trak_contrastive_DONE && echo \"phase1_factorial_trak_contrastive:DONE\" || echo \"phase1_factorial_trak_contrastive:PENDING\" && test -f /home/jinxulin/sibyl_system/projects/CRA/exp/results/phase1_factorial_repsim_standard_DONE && echo \"phase1_factorial_repsim_standard:DONE\" || echo \"phase1_factorial_repsim_standard:PENDING\"",
-      "pid_check_cmd": "pid=$(cat /home/jinxulin/sibyl_system/projects/CRA/exp/results/phase1_factorial_trak_standard.pid 2>/dev/null) && (ps -p $pid > /dev/null 2>&1 && echo \"phase1_factorial_trak_standard:ALIVE:$pid\" || echo \"phase1_factorial_trak_standard:DEAD:$pid\") || echo \"phase1_factorial_trak_standard:NO_PID\" && pid=$(cat /home/jinxulin/sibyl_system/projects/CRA/exp/results/phase1_factorial_trak_contrastive.pid 2>/dev/null) && (ps -p $pid > /dev/null 2>&1 && echo \"phase1_factorial_trak_contrastive:ALIVE:$pid\" || echo \"phase1_factorial_trak_contrastive:DEAD:$pid\") || echo \"phase1_factorial_trak_contrastive:NO_PID\" && pid=$(cat /home/jinxulin/sibyl_system/projects/CRA/exp/results/phase1_factorial_repsim_standard.pid 2>/dev/null) && (ps -p $pid > /dev/null 2>&1 && echo \"phase1_factorial_repsim_standard:ALIVE:$pid\" || echo \"phase1_factorial_repsim_standard:DEAD:$pid\") || echo \"phase1_factorial_repsim_standard:NO_PID\"",
-      "progress_check_cmd": "cat /home/jinxulin/sibyl_system/projects/CRA/exp/results/phase1_factorial_trak_standard_PROGRESS.json 2>/dev/null || echo \"null\" && cat /home/jinxulin/sibyl_system/projects/CRA/exp/results/phase1_factorial_trak_contrastive_PROGRESS.json 2>/dev/null || echo \"null\" && cat /home/jinxulin/sibyl_system/projects/CRA/exp/results/phase1_factorial_repsim_standard_PROGRESS.json 2>/dev/null || echo \"null\"",
-      "remote_dir": "/home/jinxulin/sibyl_system/projects/CRA",
-      "task_ids": [
-        "phase1_factorial_trak_standard",
-        "phase1_factorial_trak_contrastive",
-        "phase1_factorial_repsim_standard"
-      ],
-      "poll_interval_sec": 300,
+      "poll_interval_sec": 120,
       "wake_check_interval_sec": 90,
-      "max_remaining_min": 56,
-      "task_status": [
-        "phase1_factorial_trak_standard -> GPU[1] (elapsed 4min, ~56min left)",
-        "phase1_factorial_trak_contrastive -> GPU[2] (elapsed 4min, ~56min left)",
-        "phase1_factorial_repsim_standard -> GPU[3] (elapsed 4min, ~41min left)"
-      ],
-      "dynamic_dispatch": true,
       "wake_cmd": "cd /Users/jinxulin/Research/sibyl-research-system && /Users/jinxulin/Research/sibyl-research-system/.venv/bin/python3 -m sibyl.cli experiment-supervisor-drain-wake /Users/jinxulin/Research/sibyl-research-system/workspaces/CRA/current",
-      "dispatch_cmd": "cd /Users/jinxulin/Research/sibyl-research-system && /Users/jinxulin/Research/sibyl-research-system/.venv/bin/python3 -m sibyl.cli dispatch /Users/jinxulin/Research/sibyl-research-system/workspaces/CRA/current",
-      "status_cmd": "cd /Users/jinxulin/Research/sibyl-research-system && /Users/jinxulin/Research/sibyl-research-system/.venv/bin/python3 -m sibyl.cli experiment_status /Users/jinxulin/Research/sibyl-research-system/workspaces/CRA/current",
       "background_agent": {
         "name": "sibyl-experiment-supervisor",
-        "args": "/Users/jinxulin/Research/sibyl-research-system/workspaces/CRA/current PILOT default /home/jinxulin/sibyl_system '/home/jinxulin/sibyl_system/miniconda3/bin/conda run -n sibyl_CRA' phase1_factorial_trak_standard,phase1_factorial_trak_contrastive,phase1_factorial_repsim_standard 300 600 2000 4 true 25"
+        "args": "/Users/jinxulin/Research/sibyl-research-system/workspaces/CRA/current PILOT default /home/jinxulin/sibyl_system '/home/jinxulin/sibyl_system/miniconda3/bin/conda run -n sibyl_CRA' 120 600 2000 4 true 25"
       }
     },
     "language": "zh"
   },
   "background_agent_required": true,
-  "pending_sync_count": 3,
+  "pending_sync_count": 4,
   "pending_hooks": [
     {
       "name": "lark_sync",
-      "pending_count": 3,
+      "pending_count": 4,
       "path": "/Users/jinxulin/Research/sibyl-research-system/workspaces/CRA/lark_sync/pending_sync.jsonl",
       "resume_hint": "restart the sibyl-lark-sync background agent before continuing the loop"
     }
@@ -55,24 +41,23 @@
   "pending_background_agents": [
     {
       "name": "sibyl-experiment-supervisor",
-      "args": "/Users/jinxulin/Research/sibyl-research-system/workspaces/CRA/current PILOT default /home/jinxulin/sibyl_system '/home/jinxulin/sibyl_system/miniconda3/bin/conda run -n sibyl_CRA' phase1_factorial_trak_standard,phase1_factorial_trak_contrastive,phase1_factorial_repsim_standard 300 600 2000 4 true 25",
-      "action_type": "experiment_wait",
+      "args": "/Users/jinxulin/Research/sibyl-research-system/workspaces/CRA/current PILOT default /home/jinxulin/sibyl_system '/home/jinxulin/sibyl_system/miniconda3/bin/conda run -n sibyl_CRA' 120 600 2000 4 true 25",
+      "action_type": "skill",
       "stage": "pilot_experiments",
       "resume_hint": "restart this background agent with run_in_background=true before resuming the main loop"
     }
   ],
   "breadcrumb": {
-    "ts": 1773667257.776073,
+    "ts": 1773673917.662262,
     "stage": "pilot_experiments",
-    "action_type": "skills_parallel",
-    "iteration": 0,
+    "action_type": "completed",
     "workspace_path": "/Users/jinxulin/Research/sibyl-research-system/workspaces/CRA",
     "in_loop": false,
     "loop_type": "",
-    "description": "[1/14] 并行 3 任务 (PILOT), 预计 10min (校准×0.1): phase0_pipeline_pilot→GPU[1], phase0_kfac_control→GPU[2], phase2_eigenspectrum→GPU[3]"
+    "description": "Stage 'pilot_experiments' completed, advancing to next"
   },
   "recovery_state_path": "/Users/jinxulin/Research/sibyl-research-system/workspaces/CRA/.sibyl/recovery_state.json",
   "source": "cli_next",
-  "saved_at": 1773670444.0429282,
+  "saved_at": 1773673928.3069172,
   "path": "/Users/jinxulin/Research/sibyl-research-system/workspaces/CRA/.sibyl/recovery_state.json"
 }

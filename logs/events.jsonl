@@ -14,3 +14,6 @@
 {"ts": 1773671652.356341, "event": "task_dispatch", "task_ids": ["phase1_factorial_analysis"], "gpu_ids": [1], "iteration": 0}
 {"ts": 1773672237.924578, "event": "task_dispatch", "task_ids": ["phase2_repsim_dim_sweep"], "gpu_ids": [1], "iteration": 0}
 {"ts": 1773672856.589033, "event": "task_dispatch", "task_ids": ["phase3_contrastive_matrix"], "gpu_ids": [1], "iteration": 0}
+{"ts": 1773673917.6623821, "event": "stage_end", "stage": "pilot_experiments", "iteration": 0, "duration_sec": 7510.2546100616455, "score": null, "next_stage": "pilot_experiments"}
+{"ts": 1773673928.30736, "event": "stage_start", "stage": "pilot_experiments", "iteration": 0, "action_type": "skill", "description": "Run pilot experiments"}
+{"ts": 1773674086.2137432, "event": "main_wake_request", "stage": "pilot_experiments", "owner_id": "exp-supervisor-1773667269-40620", "kind": "resolution", "urgency": "high", "requires_main_system": true, "summary": "All 14/14 pilot tasks completed. Key findings: H1 confirmed (RepSim>TRAK 2/3 tasks), H6 confirmed (16.7pp gap), H9 falsified (condition reversed), H7 failed (whitened degrades -10pp), contrastive scoring zero gain on rank metrics. Pilot stage ready for analysis/transition."}

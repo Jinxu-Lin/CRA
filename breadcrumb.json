@@ -1,10 +1,10 @@
 {
-  "ts": 1773670444.043523,
+  "ts": 1773673928.307242,
   "stage": "pilot_experiments",
-  "action_type": "experiment_wait",
+  "action_type": "skill",
   "iteration": 0,
   "workspace_path": "/Users/jinxulin/Research/sibyl-research-system/workspaces/CRA",
-  "in_loop": true,
-  "loop_type": "experiment_wait",
-  "description": "实验运行中（3 个任务），预计剩余 ~56min，每 5min 轮询一次\n  phase1_factorial_trak_standard -> GPU[1] (elapsed 4min, ~56min left); phase1_factorial_trak_contrastive -> GPU[2] (elapsed 4min, ~56min left); phase1_factorial_r"
+  "in_loop": false,
+  "loop_type": "",
+  "description": "Run pilot experiments"
 }

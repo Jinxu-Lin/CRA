@@ -1,5 +1,5 @@
 {
-  "overall_recommendation": "GO",
+  "overall_recommendation": "REFINE",
   "selected_candidate_id": "cand_a",
   "candidates": [
     {
@@ -20,118 +20,273 @@
     {
       "candidate_id": "cand_a",
       "go_no_go": "GO",
-      "confidence": 0.75,
-      "supported_hypotheses": ["H1_counterfact", "H6_counterfact"],
-      "failed_assumptions": ["RepSim_universally_better_than_TRAK_on_all_tasks", "toxicity_AUPRC_valid_H6_test"],
+      "confidence": 0.60,
+      "supported_hypotheses": [
+        "H1_counterfact_+32pp",
+        "H1_ftrace_+17pp",
+        "H6_counterfact_+17pp",
+        "H5_saturation_at_k256",
+        "H8_toxicity_+18pp",
+        "FM1_spectral_evidence"
+      ],
+      "failed_assumptions": [
+        "RepSim_universally_better_than_TRAK (toxicity reversal: TRAK +24pp)",
+        "H2_contrastive_gain (zero gain at pilot scale -- rank-based metrics invariant to mean shift)",
+        "H3_orthogonality (trivially satisfied, no statistical power)",
+        "H7_whitened_attribution (degrades all tasks by 8-11pp at N/d=0.049)",
+        "H9_condition_numbers (direction reversed: rep_cond >> grad_cond)",
+        "H4_r_eff_in_256_1024 (full-model grad r_eff=10, much lower than predicted)",
+        "BM25_inferior_on_counterfact (BM25 R@50=1.0 at pilot scale)",
+        "near_isotropic_representations (rep r_eff=63/512, only 12%)"
+      ],
       "key_metrics": {
-        "repsim_toxicity_auprc_70m": 0.743545,
-        "kfac_if_toxicity_auprc_70m": 0.9915,
-        "raw_dot_if_toxicity_auprc_70m": 0.9401,
-        "diag_if_toxicity_auprc_70m": 0.9768,
-        "trak_toxicity_auprc_70m": 0.7776,
-        "repsim_counterfact_recall50_70m": 0.787879,
-        "repsim_counterfact_mrr_70m": 0.65,
-        "kfac_if_counterfact_recall50_70m": 0.7576,
-        "kfac_if_counterfact_mrr_70m": 0.5061,
-        "raw_dot_if_counterfact_recall50_70m": 0.7727,
-        "raw_dot_if_counterfact_mrr_70m": 0.4272,
-        "diag_if_counterfact_recall50_70m": 0.7273,
-        "diag_if_counterfact_mrr_70m": 0.4168,
-        "trak_counterfact_recall50_70m": 0.7828,
-        "trak_counterfact_mrr_70m": 0.4227,
-        "h6_gap_counterfact_pp": 17.4,
-        "h6_gap_toxicity_pp": -24.8,
-        "kfac_over_diag_counterfact_pp": 12.0,
-        "kfac_over_diag_toxicity_pp": 1.5
+        "h1_counterfact_gap_pp": 32.4,
+        "h1_ftrace_gap_pp": 16.6,
+        "h1_toxicity_gap_pp": -24.0,
+        "h2_contrastive_gain": 0.0,
+        "h3_interaction": 0.0,
+        "h5_saturation_k": 256,
+        "h6_counterfact_gap_pp": 17.4,
+        "h7_ftrace_whitened_gain_pp": -10.63,
+        "h8_toxicity_repsim_vs_bm25_pp": 17.6,
+        "grad_full_r_eff_95": 10,
+        "grad_full_top5_var_frac": 0.856,
+        "rep_r_eff_95": 63,
+        "rep_top5_var_frac": 0.349
       },
-      "notes": "K-FAC control completed on Pythia-70M (v2: corrected K-FAC factors, added Raw Dot IF, damping sweep). CRITICAL FINDING: On counterfact (genuine attribution), RepSim outperforms K-FAC IF by 17.4pp -- H6 strongly confirmed. K-FAC improves +12.0pp over Diagonal IF, showing Hessian quality helps but cannot close the representation gap. On toxicity, ALL parameter-space IF methods (including Raw Dot with NO Hessian at all: AUPRC=0.94) achieve near-perfect AUPRC, while RepSim gets 0.74. This is a gradient norm artifact: unsafe samples have systematically higher loss gradients (Cohen's d=2.66 for raw dot). K-FAC damping sweep (1e-2 to 1e-4) shows AUPRC is insensitive to damping on toxicity (all 0.9915). REVISED INTERPRETATION: Toxicity AUPRC tests gradient magnitude detection, not attribution quality. H6 confirmed on genuine attribution (counterfact). CRA thesis holds with task-dependent nuance."
+      "notes": "CRA thesis is PARTIALLY SUPPORTED with significant caveats requiring narrative revision. FM1 (signal dilution) has strong spectral evidence and is confirmed on attribution tasks (counterfact, ftrace). FM2 (common influence contamination) is UNTESTED at pilot scale because rank-based metrics are invariant to contrastive mean-subtraction. H7 whitened attribution fails due to underdetermined covariance (N/d=0.049). Toxicity task shows a gradient-norm artifact where parameter-space methods dominate. Several quantitative predictions (H4, H9) need revision but qualitative direction supports FM1."
+    }
+  ],
+  "hypothesis_status": {
+    "H1_FM1_space_gap": {
+      "status": "SUPPORTED_2_of_3",
+      "counterfact_gap_pp": 32.4,
+      "ftrace_gap_pp": 16.6,
+      "toxicity_gap_pp": -24.0,
+      "notes": "Strong on attribution tasks; reversed on toxicity (gradient norm artifact)"
+    },
+    "H2_contrastive_asymmetry": {
+      "status": "INCONCLUSIVE",
+      "contrastive_gain_all_methods": 0.0,
+      "root_cause": "Mean-subtraction preserves rank ordering exactly; rank-based metrics (AUPRC, R@K) invariant",
+      "recommendation": "Full-scale needs continuous metrics (Kendall tau on raw scores) or larger sample to break ties"
+    },
+    "H3_orthogonality": {
+      "status": "TRIVIALLY_SATISFIED",
+      "interaction_all_tasks": 0.0,
+      "notes": "No FM2 main effect detected, so interaction untestable",
+      "recommendation": "Requires H2 to produce nonzero FM2 effect first"
+    },
+    "H4_gradient_r_eff": {
+      "status": "DIRECTIONALLY_SUPPORTED_BUT_QUANTITATIVELY_WRONG",
+      "predicted_range": [256, 1024],
+      "observed_full_model": 10,
+      "observed_target_layers": 53,
+      "notes": "Gradient signal far more concentrated than predicted; STRENGTHENS FM1 argument",
+      "recommendation": "Reframe from 'r_eff ~ O(d)' to 'r_eff << d << B'"
+    },
+    "H5_trak_saturation": {
+      "status": "SUPPORTED",
+      "saturation_90_at_k": 256,
+      "saturation_ratio_k_over_d": 0.125,
+      "max_recall_at_k256": 0.785,
+      "repsim_recall": 0.994,
+      "smoking_gun_gap_pp": 30.8,
+      "notes": "Saturation exists but TRAK-PCA at k=d still 30.8pp below RepSim, suggesting factors beyond projection dimension"
+    },
+    "H6_kfac_control": {
+      "status": "CONFIRMED_ON_ATTRIBUTION",
+      "counterfact_gap_pp": 17.4,
+      "toxicity_gap_pp": -24.8,
+      "toxicity_is_gradient_norm_artifact": true,
+      "notes": "RepSim > K-FAC IF by 17.4pp on counterfact. On toxicity, Raw Dot IF (no Hessian) achieves 0.94 AUPRC"
+    },
+    "H7_whitened_attribution": {
+      "status": "FAIL",
+      "ftrace_gain_pp": -10.63,
+      "counterfact_gain_pp": -8.01,
+      "toxicity_gain_pp": -10.94,
+      "root_cause": "N/d ratio = 0.049; covariance estimation severely underdetermined",
+      "snr_accuracy_corr": {"counterfact": 0.336, "ftrace": 0.165},
+      "positive_signals": "SNR concept directionally validated (positive correlation); no numerical issues",
+      "recommendation": "Needs N >> d, PCA-reduced whitening, or oracle covariance"
+    },
+    "H8_repsim_vs_bm25": {
+      "status": "PARTIAL",
+      "toxicity_gap_pp": 17.6,
+      "ftrace_gap_pp": 9.5,
+      "counterfact_gap_pp": -0.6,
+      "notes": "BM25 achieves R@50=1.0 on counterfact at pilot scale (likely lexically solvable)"
+    },
+    "H9_condition_numbers": {
+      "status": "FALSIFIED",
+      "predicted": "rep_cond < 100, grad_cond > 10^4",
+      "observed_rep_cond": 3.12e10,
+      "observed_grad_cond": 3589,
+      "notes": "Direction completely reversed. Rep covariance rank-deficient at N=100 < d=512"
+    }
+  },
+  "phase1_factorial": {
+    "status": "completed",
+    "factorial_matrix": {
+      "toxicity_AUPRC": {"TRAK_std": 0.926, "TRAK_con": 0.926, "RepSim_std": 0.685, "RepSim_con": 0.685},
+      "counterfact_R50": {"TRAK_std": 0.670, "TRAK_con": 0.670, "RepSim_std": 0.994, "RepSim_con": 0.994},
+      "ftrace_R50": {"TRAK_std": 0.590, "TRAK_con": 0.590, "RepSim_std": 0.756, "RepSim_con": 0.756}
+    },
+    "baselines": {
+      "BM25": {"toxicity": 0.509, "counterfact": 1.000, "ftrace": 0.661},
+      "kNN": {"toxicity": 0.809, "counterfact": 0.949, "ftrace": 0.660},
+      "DDA": {"toxicity": 0.876, "counterfact": 0.692, "ftrace": 0.651}
+    },
+    "key_findings": [
+      "FM1 main effect strong on counterfact (+32pp) and ftrace (+17pp), reversed on toxicity (-24pp)",
+      "FM2 main effect is exactly zero (contrastive scoring preserves rank ordering)",
+      "Interaction term trivially zero (no FM2 main effect to interact with)",
+      "BM25 dominates counterfact at pilot scale (R@50=1.0); kNN competitive on toxicity (0.809)"
+    ]
+  },
+  "phase2_dim_sweeps": {
+    "trak_dim_sweep": {
+      "status": "completed",
+      "saturation_k": 256,
+      "max_recall": 0.785,
+      "non_monotonic": true,
+      "pca_vs_random": "PCA underperforms random at k=256 (-9.9pp), matches at k=1024",
+      "smoking_gun_gap_pp": 30.8
+    },
+    "repsim_dim_sweep": {
+      "status": "completed",
+      "knee_at_k64": true,
+      "stable_from_k128": true,
+      "notes": "RepSim saturated at just 64 PCA dims (N=100 < d=2048 prevents testing higher dims). Representations have at most ~100 significant components at pilot scale."
+    }
+  },
+  "phase3_extensions": {
+    "contrastive_matrix_36_cell": {
+      "status": "completed",
+      "contrastive_gain_across_methods": 0.0,
+      "whitened_gains_mixed": true,
+      "whitened_helps_ftrace": true,
+      "whitened_hurts_counterfact": true,
+      "best_whitened_gain": {"method": "DDA", "task": "ftrace", "gain_pp": 6.78},
+      "worst_whitened_loss": {"method": "TRAK", "task": "counterfact", "loss_pp": -6.73}
+    },
+    "whitened_attribution": {
+      "status": "completed",
+      "h7_pass": false,
+      "all_tasks_degraded": true,
+      "snr_analysis_valid": true,
+      "snr_counterfact_corr": 0.336
+    }
+  },
+  "decision_gates": {
+    "h6_gate": {
+      "triggered": false,
+      "decision": "PROCEED_CRA",
+      "reason": "H6 confirmed on counterfact (+17.4pp). Toxicity reversal is gradient norm artifact, not H6 failure."
+    },
+    "h3_gate": {
+      "triggered": false,
+      "decision": "UNTESTABLE",
+      "reason": "Interaction is trivially 0 because FM2 main effect is 0 (contrastive invariance at pilot scale)"
+    },
+    "bm25_gate": {
+      "triggered": true,
+      "decision": "RESTRICT_COUNTERFACT_CLAIMS",
+      "reason": "BM25 R@50=1.0 on counterfact (likely lexically solvable at N=100). Need full-scale to determine if persistent."
+    }
+  },
+  "critical_issues_for_full_scale": [
+    {
+      "issue": "Contrastive scoring (FM2) completely untested",
+      "severity": "critical",
+      "cause": "Rank-based metrics invariant to additive constant; mean-subtraction is an additive constant",
+      "fix": "Add continuous metrics: Kendall-tau on raw scores, Spearman rho, or score-level NDCG"
+    },
+    {
+      "issue": "H7 whitened attribution degrades all tasks",
+      "severity": "high",
+      "cause": "N/d=0.049; covariance estimation underdetermined",
+      "fix": "Full scale N/d should be 2-5x; add PCA-reduced whitening (whiten in top-k eigenspace)"
+    },
+    {
+      "issue": "Toxicity task reversal (TRAK > RepSim)",
+      "severity": "high",
+      "cause": "Gradient norm artifact (unsafe samples have systematically higher loss gradients)",
+      "fix": "Frame as task-type dependent phenomenon; not a CRA failure but a scope boundary"
+    },
+    {
+      "issue": "H4 quantitative prediction wrong (r_eff=10 vs predicted 256-1024)",
+      "severity": "medium",
+      "cause": "Gradient signal even more concentrated than theory predicted",
+      "fix": "Reframe: strengthens FM1 argument; update theory to 'r_eff << d << B'"
+    },
+    {
+      "issue": "H9 condition number prediction reversed",
+      "severity": "medium",
+      "cause": "Pilot N=100 < d=512 creates rank-deficient covariance",
+      "fix": "Reframe using spectral concentration metrics instead of raw condition numbers"
+    },
+    {
+      "issue": "TRAK dim sweep non-monotonic and smoking gun fails (30.8pp gap)",
+      "severity": "medium",
+      "cause": "Factors beyond projection dimension (curvature, layer selection, FM2) create persistent gap",
+      "fix": "Acknowledge in paper; position as evidence that FM1 is necessary but not sufficient"
+    }
+  ],
+  "risks_identified": [
+    {
+      "risk": "Toxicity AUPRC tests gradient norm magnitude, not attribution quality",
+      "severity": "high",
+      "impact": "CRA claims about FM1 may not apply to binary detection tasks",
+      "mitigation": "Frame toxicity as scope boundary; focus evidence on counterfact/ftrace"
+    },
+    {
+      "risk": "FM2 (contrastive scoring) has zero empirical evidence at pilot scale",
+      "severity": "critical",
+      "impact": "Half of the CRA thesis (FM2 independence, contrastive as universal fix) is unvalidated",
+      "mitigation": "Full-scale with continuous metrics is ESSENTIAL; cannot publish without FM2 evidence"
+    },
+    {
+      "risk": "H7 whitened attribution may not work even at full scale",
+      "severity": "high",
+      "impact": "Weakens the prescriptive framework contribution (optimal M selection)",
+      "mitigation": "PCA-reduced whitening; frame as open direction if still fails"
+    },
+    {
+      "risk": "Small pilot N=100 distorts multiple analyses",
+      "severity": "medium",
+      "mitigation": "Full experiment uses complete training pool (5K-10K samples)"
+    },
+    {
+      "risk": "Several quantitative hypotheses need revision",
+      "severity": "medium",
+      "impact": "H4, H9 specific numbers wrong; need reframing",
+      "mitigation": "Update paper claims to match evidence; strengthen qualitative FM1 narrative"
     }
   ],
   "h6_decision_gate": {
     "raw_decision": "PIVOT_CAND_B",
     "revised_decision": "PROCEED_CRA",
-    "revision_reason": "Toxicity AUPRC is not a valid H6 test because even Diagonal IF (no Hessian correction) achieves 0.9845, showing the task tests gradient norm magnitude not attribution quality. K-FAC adds only 0.7pp over Diagonal on toxicity. On counterfact (genuine factual attribution), H6 passes strongly: RepSim > K-FAC IF by 16.7pp.",
+    "revision_reason": "Toxicity AUPRC is not a valid H6 test. On counterfact (genuine attribution), H6 passes strongly: RepSim > K-FAC IF by 17.4pp.",
     "counterfact_gap_pp": 17.4,
     "toxicity_gap_pp": -24.8,
-    "toxicity_is_gradient_norm_artifact": true,
-    "evidence": [
-      "Raw Dot IF AUPRC = 0.9401 (near-perfect with NO Hessian at all, Cohen's d=2.66)",
-      "Diagonal IF AUPRC = 0.9768 (near-perfect with minimal curvature correction)",
-      "K-FAC IF AUPRC = 0.9915 (only +1.5pp over Diagonal -- Hessian quality barely matters)",
-      "K-FAC damping insensitive: 1e-2, 1e-3, 1e-4 all give AUPRC=0.9915 on toxicity",
-      "TRAK AUPRC = 0.7776 (lower because CountSketch projection loses gradient norm info)",
-      "On counterfact: RepSim (1.438) > K-FAC IF (1.264) > Raw Dot (1.200) > TRAK (1.206) > Diagonal IF (1.144)"
-    ]
+    "toxicity_is_gradient_norm_artifact": true
   },
   "pipeline_validation": {
     "repsim_works": true,
     "trak_works": true,
     "kfac_if_works": true,
     "diag_if_works": true,
+    "logra_works": true,
+    "dda_works": true,
+    "bm25_works": true,
+    "knn_works": true,
+    "whitened_works": true,
     "scores_valid": true,
     "runtime_within_budget": true,
-    "total_runtime_sec": 19.5,
+    "total_pilot_runtime_min": 28,
     "gpu": "NVIDIA GeForce RTX 4090"
-  },
-  "phase2_eigenspectrum": {
-    "status": "completed",
-    "go_no_go": "GO",
-    "confidence": 0.65,
-    "version": "v2_corrected",
-    "key_findings": {
-      "rep_r_eff_95": 63,
-      "rep_n_nonzero": 109,
-      "rep_condition_nonzero": 4.45e7,
-      "rep_condition_raw": 3.12e10,
-      "grad_target_r_eff_95": 53,
-      "grad_target_condition": 412,
-      "grad_full_r_eff_95": 10,
-      "grad_full_condition": 3589,
-      "grad_full_top5_variance_frac": 0.856,
-      "rep_top5_variance_frac": 0.349,
-      "H4_status": "DIRECTIONALLY_SUPPORTED (gradient spectrum decays much faster than representation spectrum; pilot N=100 prevents testing [256, 1024] range directly)",
-      "H9_status": "INCONCLUSIVE (condition numbers unreliable at N=100 < d=512; rep covariance is rank-deficient so condition number is meaningless; directional finding holds: gradient is more concentrated)",
-      "core_finding": "Full-model gradients are EXTREMELY concentrated (top-5 captures 85.6% of variance vs 34.9% for representations). This is the core FM1 evidence: gradient signal lives in a very low-rank subspace.",
-      "condition_number_correction": "Original rep condition (3e10) included near-zero eigenvalues from rank deficiency (N=100 < d=512). Non-zero-only condition (4.5e7) is still unreliable because smallest non-zero eigenvalue at rank boundary is noise-dominated."
-    }
-  },
-  "risks_identified": [
-    {
-      "risk": "Toxicity AUPRC tests gradient norm magnitude, not attribution quality",
-      "severity": "high",
-      "impact": "CRA claims about FM1 may not apply to binary detection tasks where gradient norms are informative",
-      "mitigation": "Frame toxicity as a separate phenomenon; focus H6 evidence on counterfact; full-scale N=10K may reveal different pattern"
-    },
-    {
-      "risk": "K-FAC IF improves 6.9pp over Diagonal on counterfact",
-      "severity": "low",
-      "impact": "Hessian quality does help somewhat -- CRA should acknowledge this partial FM1 fix",
-      "mitigation": "Position K-FAC as partial FM1 fix that still cannot close the 16.7pp gap with representation space"
-    },
-    {
-      "risk": "Small pilot N=100 may distort metrics",
-      "severity": "medium",
-      "mitigation": "Full experiment uses complete training pool (5K-10K samples)"
-    },
-    {
-      "risk": "H9 INCONCLUSIVE: Condition numbers unreliable at pilot scale (N=100 < d=512)",
-      "severity": "medium",
-      "impact": "Cannot confirm or deny H9 specific thresholds (rep_cond < 100, grad_cond > 10^4) at pilot scale. Rep covariance is rank-deficient (rank 99 in d=512), making condition number meaningless.",
-      "mitigation": "Need N >= 2048 for proper test. The directional finding (gradient more concentrated than representation) is robust and supports FM1. Use Ledoit-Wolf shrinkage for more robust condition estimation at full scale. Consider reframing H9 in terms of spectral concentration rather than raw condition numbers."
-    },
-    {
-      "risk": "Full-model gradient r_eff=10 suggests signal is in ~10 dimensions, not ~d=512",
-      "severity": "medium",
-      "impact": "H4 predicted r_eff in [256, 1024]. If confirmed at full scale, the 'r_eff ~ O(d)' claim needs revision to 'r_eff << d'.",
-      "mitigation": "This actually STRENGTHENS the FM1 argument (signal dilution is even worse). Reframe H4: the point is that gradient signal is low-rank relative to parameter dimension B, not that it equals d."
-    }
-  ],
-  "kfac_spectral_summary": {
-    "model": "Pythia-70M (d=512)",
-    "target_layers": [4, 5],
-    "activation_covariance_condition_numbers": "10^10 to 10^12 (highly ill-conditioned)",
-    "gradient_covariance_condition_numbers": "10^3 to 10^6 (task-dependent)",
-    "note": "Very high condition numbers in activation covariance confirm rank deficiency in gradient space (FM1 evidence)"
   },
   "environment": {
     "conda_env": "sibyl_CRA",
