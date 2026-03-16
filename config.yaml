@@ -1,0 +1,102 @@
+# Sibyl Research System — Project Configuration
+# Edit this file to customize project behavior.
+# Config priority: --config flag > project config.yaml > system config.yaml > defaults
+
+# ── Language ─────────────────────────────────────────────────────────
+# Agent output language ("zh" | "en"). Papers are always English.
+language: zh
+
+# ── Remote Server ────────────────────────────────────────────────────
+ssh_server: default                       # SSH MCP connection name
+remote_base: /home/jinxulin/sibyl_system    # [CHANGE ME] remote GPU server path
+remote_env_type: conda                    # "conda" | "venv"
+remote_conda_path: ""                   # empty = auto
+remote_conda_env_name: ""              # empty = auto: sibyl_{project}
+
+# ── GPU Scheduling ──────────────────────────────────────────────────
+max_gpus: 4
+gpus_per_task: 1
+
+# GPU polling (shared servers)
+gpu_poll_enabled: true
+gpu_free_threshold_mb: 2000             # VRAM threshold (MB)
+gpu_poll_interval_sec: 600              # poll interval (seconds)
+gpu_poll_max_attempts: 0                # 0 = infinite
+
+# Aggressive mode: claim GPUs with low utilization
+gpu_aggressive_mode: true
+gpu_aggressive_threshold_pct: 25        # VRAM usage % threshold
+
+# ── Experiment Pipeline ─────────────────────────────────────────────
+idea_exp_cycles: 6                     # idea→experiment cycles
+idea_validation_rounds: 4            # pilot decision debate rounds
+max_iterations: 10                     # soft iteration limit
+max_iterations_cap: 100                 # hard cap
+experiment_timeout: 300                 # per-experiment timeout (seconds)
+iteration_dirs: true                 # default: true (current -> iter_001/ subdirectories)
+
+# ── Pilot Experiments ───────────────────────────────────────────────
+# Use 100+ samples for reliable signal (n=16 causes signal reversal)
+pilot_samples: 100
+pilot_timeout: 900                      # seconds
+pilot_seeds: [42]
+
+# ── Full Experiments ────────────────────────────────────────────────
+full_seeds: [42, 123, 456]
+
+# ── Experiment Execution ────────────────────────────────────────────
+experiment_mode: ssh_mcp              # "ssh_mcp" | "server_codex" | "server_claude"
+server_codex_path: codex                # Codex CLI path on server
+server_claude_path: claude              # Claude CLI path on server
+
+# ── Multi-Agent Debate ──────────────────────────────────────────────
+debate_rounds: 2
+writing_revision_rounds: 2
+max_parallel_tasks: 4
+
+# ── Writing ─────────────────────────────────────────────────────────
+# "sequential" (best coherence) | "parallel" (faster) | "codex" (gpt-5.4)
+writing_mode: parallel
+review_enabled: true
+
+# ── Codex Integration ───────────────────────────────────────────────
+codex_enabled: true
+codex_model: ""                         # empty = Codex default
+codex_writing_model: ""                 # empty = Codex default
+
+# ── Integrations ────────────────────────────────────────────────────
+lark_enabled: true                     # Feishu/Lark doc sync
+evolution_enabled: true                # auto prompt evolution
+self_heal_enabled: true                # auto error fix
+self_heal_interval_sec: 300             # scan interval (seconds)
+self_heal_max_attempts: 3               # circuit breaker threshold
+
+# ── Orchestra External Skills ──────────────────────────────────────
+# Inject external skill index into agent prompts for on-demand invocation
+orchestra_skills_enabled: true
+orchestra_skills_dir: /Users/jinxulin/.orchestra/skills
+orchestra_skills_max: 15                 # max skills per agent prompt
+
+# ── Model Routing ───────────────────────────────────────────────────
+model_tiers:
+  heavy: claude-opus-4-6
+  standard: claude-opus-4-6
+  light: claude-sonnet-4-6
+
+agent_tier_map:
+  synthesizer: heavy
+  supervisor: heavy
+  supervisor_decision: heavy
+  editor: heavy
+  final_critic: heavy
+  critic: heavy
+  reflection: heavy
+  literature_researcher: standard
+  optimist: light
+  skeptic: light
+  strategist: light
+  section_critic: light
+  idea_critique: light
+
+# ── Workspace root (parent directory that contains all projects) ────
+workspaces_dir: /Users/jinxulin/Research/sibyl-research-system/workspaces
