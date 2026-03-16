@@ -1,0 +1,1 @@
+{"error_type": "MCPNotConfigured", "category": "config", "message": "Feishu/Lark MCP servers not configured. Neither feishu nor lark MCP is available. Run: claude mcp add feishu ... and claude mcp add lark ... to enable sync.", "context": {"source": "lark_sync", "stage": "literature_search"}, "timestamp": "2026-03-16T12:15:01.943722+00:00"}

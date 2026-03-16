@@ -1,0 +1,15 @@
+{
+  "last_sync_at": "2026-03-16T12:15:01.943722+00:00",
+  "last_sync_success": false,
+  "last_trigger_stage": "literature_search",
+  "last_synced_line": 0,
+  "history": [
+    {
+      "at": "2026-03-16T12:15:01.943722+00:00",
+      "success": false,
+      "stages_synced": [],
+      "error": "Feishu/Lark MCP servers not configured",
+      "duration_sec": 0
+    }
+  ]
+}
