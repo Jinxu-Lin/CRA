@@ -1,0 +1,156 @@
+{
+  "pilot_config": {
+    "samples": 100,
+    "seeds": [42],
+    "timeout_sec": 900,
+    "model_primary": "EleutherAI/pythia-1b",
+    "model_spectral": "EleutherAI/pythia-70m",
+    "benchmark": "DATE-LM",
+    "evaluation_task": "data_selection"
+  },
+  "pilot_phases": [
+    {
+      "phase": 0,
+      "name": "Foundation & Critical Control",
+      "tasks": [
+        {
+          "task_id": "setup_env",
+          "pilot_purpose": "Verify all dependencies install, data downloads, checkpoints load",
+          "samples": 100,
+          "seed": 42,
+          "timeout_sec": 900,
+          "pass_criteria": "All deps install; DATE-LM loads; Pythia-70M and Pythia-1B load; dummy eval returns valid metric",
+          "estimated_time_min": 30,
+          "fail_action": "Debug dependency issues; try alternative package versions; check disk space"
+        },
+        {
+          "task_id": "phase0_pipeline_pilot",
+          "pilot_purpose": "Validate RepSim + TRAK pipeline produces valid LDS; confirm RepSim > TRAK sanity check",
+          "samples": 100,
+          "seed": 42,
+          "timeout_sec": 900,
+          "pass_criteria": "RepSim LDS > TRAK LDS; both in [0, 1]; runtime < 15 min each",
+          "estimated_time_min": 45,
+          "fail_action": "Check DATE-LM API; verify representation extraction; debug TRAK random projection"
+        },
+        {
+          "task_id": "phase0_kfac_control",
+          "pilot_purpose": "CRITICAL: Test H6 (FM1/FM2 independent of Hessian quality). K-FAC IF on Pythia-70M vs RepSim.",
+          "samples": 100,
+          "seed": 42,
+          "timeout_sec": 900,
+          "pass_criteria": "K-FAC IF LDS < RepSim LDS - 5pp (H6 not falsified)",
+          "falsification_criteria": "K-FAC IF LDS >= RepSim LDS - 5pp → PIVOT to cand_b",
+          "estimated_time_min": 60,
+          "fail_action": "If H6 falsified: document evidence, generate cand_b plan. If OOM: reduce batch size, use gradient checkpointing. If K-FAC diverges: add damping, increase regularization."
+        }
+      ],
+      "phase_pass_criteria": "Pipeline works AND H6 not falsified (K-FAC IF still worse than RepSim by >= 5pp)",
+      "phase_fail_action": "If pipeline fails: debug and retry. If H6 falsified: pivot to cand_b."
+    },
+    {
+      "phase": 1,
+      "name": "Core 2x2 Factorial Pilot",
+      "tasks": [
+        {
+          "task_id": "phase1_factorial_trak_standard",
+          "pilot_purpose": "Cell A: TRAK standard on data_selection pilot",
+          "samples": 100,
+          "seed": 42,
+          "timeout_sec": 900,
+          "pass_criteria": "Valid LDS score; runtime reasonable",
+          "estimated_time_min": 20
+        },
+        {
+          "task_id": "phase1_factorial_trak_contrastive",
+          "pilot_purpose": "Cell B: TRAK-C (mean-subtracted) on data_selection pilot; check H2 directional",
+          "samples": 100,
+          "seed": 42,
+          "timeout_sec": 900,
+          "pass_criteria": "TRAK-C LDS > TRAK standard LDS",
+          "estimated_time_min": 20
+        },
+        {
+          "task_id": "phase1_factorial_repsim_standard",
+          "pilot_purpose": "Cell C: RepSim standard on data_selection pilot",
+          "samples": 100,
+          "seed": 42,
+          "timeout_sec": 900,
+          "pass_criteria": "RepSim LDS > 0.3; representations cached",
+          "estimated_time_min": 15
+        },
+        {
+          "task_id": "phase1_factorial_repsim_contrastive",
+          "pilot_purpose": "Cell D: RepSim-C on data_selection pilot; check H2 asymmetry",
+          "samples": 100,
+          "seed": 42,
+          "timeout_sec": 900,
+          "pass_criteria": "RepSim-C improvement < TRAK-C improvement (H2 asymmetry)",
+          "estimated_time_min": 10
+        },
+        {
+          "task_id": "phase1_baselines",
+          "pilot_purpose": "BM25 + k-NN + DDA baselines on data_selection pilot; check H8",
+          "samples": 100,
+          "seed": 42,
+          "timeout_sec": 900,
+          "pass_criteria": "BM25 LDS < RepSim LDS (H8 directional); all baselines produce valid scores",
+          "estimated_time_min": 20
+        }
+      ],
+      "phase_pass_criteria": "H1 direction confirmed (RepSim > TRAK); H2 direction confirmed (contrastive helps more in param space); H8 direction confirmed (RepSim > BM25). Quantitative thresholds evaluated at full scale.",
+      "phase_fail_action": "If H1 reversed: check implementation bugs first. If H2 asymmetry absent: weaken FM2 narrative. If BM25 > RepSim: restrict scope."
+    },
+    {
+      "phase": 2,
+      "name": "Mechanistic Evidence Pilot",
+      "tasks": [
+        {
+          "task_id": "phase2_eigenspectrum",
+          "pilot_purpose": "Compute eigenspectrum on Pythia-70M with 100 samples; test H4 and H9",
+          "samples": 100,
+          "seed": 42,
+          "timeout_sec": 900,
+          "pass_criteria": "Lanczos converges; r_eff(95%) in [256, 1024]; condition number ratio > 100x",
+          "estimated_time_min": 45,
+          "fail_action": "If Lanczos slow: reduce to top-200 eigenvalues. If r_eff out of range: document and revise H4."
+        },
+        {
+          "task_id": "phase2_trak_dim_sweep",
+          "pilot_purpose": "Run TRAK dim sweep pilot with subset of k values {128, 512, 2048} on 100 samples",
+          "samples": 100,
+          "seed": 42,
+          "timeout_sec": 900,
+          "pass_criteria": "LDS increases with k; visible saturation trend",
+          "estimated_time_min": 30
+        }
+      ],
+      "phase_pass_criteria": "Eigenspectrum shows clear low-rank structure; TRAK shows saturation trend",
+      "phase_fail_action": "If no low-rank structure: H4 falsified, weaken mechanistic claims. If TRAK keeps improving: H5 falsified, revise signal dilution story."
+    },
+    {
+      "phase": 3,
+      "name": "Framework Extension Pilot",
+      "tasks": [
+        {
+          "task_id": "phase3_whitened_attribution",
+          "pilot_purpose": "Whitened RepSim pilot on data_selection with 100 samples; test H7 directional",
+          "samples": 100,
+          "seed": 42,
+          "timeout_sec": 900,
+          "pass_criteria": "Whitened RepSim produces valid scores (no NaN); improvement over standard RepSim on at least 1 task",
+          "estimated_time_min": 30,
+          "fail_action": "If NaN: increase Ledoit-Wolf shrinkage. If whitened worse: document negative result; common influence may be near-isotropic (H9 confirms)."
+        }
+      ],
+      "phase_pass_criteria": "Whitened attribution is numerically stable and shows improvement direction",
+      "phase_fail_action": "If whitening fails completely: drop H7 from main claims; report as negative result."
+    }
+  ],
+  "overall_pilot_budget": {
+    "total_estimated_minutes": 295,
+    "total_gpu_hours": 5.0,
+    "critical_path_minutes": 180,
+    "critical_path": ["setup_env", "phase0_pipeline_pilot", "phase0_kfac_control", "phase1_factorial_analysis"]
+  }
+}

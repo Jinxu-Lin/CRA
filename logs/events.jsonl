@@ -3,3 +3,5 @@
 {"ts": 1773662814.167941, "event": "stage_start", "stage": "literature_search", "iteration": 0, "action_type": "skill", "description": "文献调研：arXiv 搜索 + Web 搜索，建立领域现状基础"}
 {"ts": 1773663196.774048, "event": "stage_end", "stage": "literature_search", "iteration": 0, "duration_sec": 387.7892632484436, "score": null, "next_stage": "idea_debate"}
 {"ts": 1773663206.167016, "event": "stage_start", "stage": "idea_debate", "iteration": 0, "action_type": "team", "description": "Agent Team: 6人辩论生成研究提案（恢复：已完成 0/6） + Codex 独立审查"}
+{"ts": 1773666141.7017229, "event": "stage_end", "stage": "idea_debate", "iteration": 0, "duration_sec": 2944.993865251541, "score": null, "next_stage": "planning"}
+{"ts": 1773666150.630315, "event": "stage_start", "stage": "planning", "iteration": 0, "action_type": "skill", "description": "Design experiment plan with pilot/full configs"}

@@ -1,102 +1,47 @@
 {
-  "resume_action_type": "team",
+  "resume_action_type": "skill",
   "resume_action": {
-    "action_type": "team",
+    "action_type": "skill",
     "agents": null,
-    "skills": null,
-    "team": {
-      "team_name": "sibyl-idea-debate",
-      "teammates": [
-        {
-          "name": "innovator",
-          "skill": "sibyl-innovator",
-          "args": "/Users/jinxulin/Research/sibyl-research-system/workspaces/CRA/current '诊断参数空间 TDA 的两个信号处理缺陷（信号稀释 FM1 + 公共影响污染 FM2），将 5 种表示空间 TDA 方法统一为 φ^T·ψ 双线性框架，并在 DATE-LM 标准 benchmark 上系统验证。'"
-        },
-        {
-          "name": "pragmatist",
-          "skill": "sibyl-pragmatist",
-          "args": "/Users/jinxulin/Research/sibyl-research-system/workspaces/CRA/current '诊断参数空间 TDA 的两个信号处理缺陷（信号稀释 FM1 + 公共影响污染 FM2），将 5 种表示空间 TDA 方法统一为 φ^T·ψ 双线性框架，并在 DATE-LM 标准 benchmark 上系统验证。'"
-        },
-        {
-          "name": "theoretical",
-          "skill": "sibyl-theoretical",
-          "args": "/Users/jinxulin/Research/sibyl-research-system/workspaces/CRA/current '诊断参数空间 TDA 的两个信号处理缺陷（信号稀释 FM1 + 公共影响污染 FM2），将 5 种表示空间 TDA 方法统一为 φ^T·ψ 双线性框架，并在 DATE-LM 标准 benchmark 上系统验证。'"
-        },
-        {
-          "name": "contrarian",
-          "skill": "sibyl-contrarian",
-          "args": "/Users/jinxulin/Research/sibyl-research-system/workspaces/CRA/current '诊断参数空间 TDA 的两个信号处理缺陷（信号稀释 FM1 + 公共影响污染 FM2），将 5 种表示空间 TDA 方法统一为 φ^T·ψ 双线性框架，并在 DATE-LM 标准 benchmark 上系统验证。'"
-        },
-        {
-          "name": "interdisciplinary",
-          "skill": "sibyl-interdisciplinary",
-          "args": "/Users/jinxulin/Research/sibyl-research-system/workspaces/CRA/current '诊断参数空间 TDA 的两个信号处理缺陷（信号稀释 FM1 + 公共影响污染 FM2），将 5 种表示空间 TDA 方法统一为 φ^T·ψ 双线性框架，并在 DATE-LM 标准 benchmark 上系统验证。'"
-        },
-        {
-          "name": "empiricist",
-          "skill": "sibyl-empiricist",
-          "args": "/Users/jinxulin/Research/sibyl-research-system/workspaces/CRA/current '诊断参数空间 TDA 的两个信号处理缺陷（信号稀释 FM1 + 公共影响污染 FM2），将 5 种表示空间 TDA 方法统一为 φ^T·ψ 双线性框架，并在 DATE-LM 标准 benchmark 上系统验证。'"
-        }
-      ],
-      "post_steps": [
-        {
-          "type": "skill",
-          "skill": "sibyl-synthesizer",
-          "args": "/Users/jinxulin/Research/sibyl-research-system/workspaces/CRA/current"
-        },
-        {
-          "type": "codex",
-          "skill": "sibyl-codex-reviewer",
-          "args": "/Users/jinxulin/Research/sibyl-research-system/workspaces/CRA/current idea_debate"
-        }
-      ],
-      "prompt": "# Compiled Sibyl Team Prompt\n\n## Objective\nIdea debate for 诊断参数空间 TDA 的两个信号处理缺陷（信号稀释 FM1 + 公共影响污染 FM2），将 5 种表示空间 TDA 方法统一为 φ^T·ψ 双线性框架，并在 DATE-LM 标准 benchmark 上系统验证。\n\n## Workspace\nWorkspace: /Users/jinxulin/Research/sibyl-research-system/workspaces/CRA/current\n\n## Output Contract\nAll non-paper outputs must use Chinese.\n\n## Execution\nGenerate and debate research ideas for: 诊断参数空间 TDA 的两个信号处理缺陷（信号稀释 FM1 + 公共影响污染 FM2），将 5 种表示空间 TDA 方法统一为 φ^T·ψ 双线性框架，并在 DATE-LM 标准 benchmark 上系统验证。\n\nMaintain a small candidate pool: keep 2-3 serious ideas alive until pilot evidence separates them. Do not collapse to a single idea too early unless the evidence is overwhelming.\n\nSpawn teammates for remaining perspectives:\n- innovator\n- pragmatist\n- theoretical\n- contrarian\n- interdisciplinary\n- empiricist\n\nEach reads /Users/jinxulin/Research/sibyl-research-system/workspaces/CRA/current/context/idea_context.md for background and writes to /Users/jinxulin/Research/sibyl-research-system/workspaces/CRA/current/idea/perspectives/<role>.md\n\nAfter generating ideas, have teammates critique each other's work (score 1-10). Write critiques to /Users/jinxulin/Research/sibyl-research-system/workspaces/CRA/current/idea/debate/CRITIC_on_AUTHOR.md\n\nFinally, synthesize all ideas and critiques into a final proposal at /Users/jinxulin/Research/sibyl-research-system/workspaces/CRA/current/idea/proposal.md. Pick the strongest idea, incorporating feedback.\n\nRun exactly 2 critique rounds before final synthesis.\nAll non-paper output must be written in Chinese. Use Sonnet for teammates.\n"
-    },
+    "skills": [
+      {
+        "name": "sibyl-planner",
+        "args": "/Users/jinxulin/Research/sibyl-research-system/workspaces/CRA/current plan 'samples=100, seeds=[42], timeout=900s'"
+      }
+    ],
+    "team": null,
     "bash_command": null,
     "gpu_poll": null,
-    "description": "Agent Team: 6人辩论生成研究提案（恢复：已完成 0/6） + Codex 独立审查",
-    "stage": "idea_debate",
+    "description": "Design experiment plan with pilot/full configs",
+    "stage": "planning",
     "iteration": 0,
     "estimated_minutes": 0,
-    "checkpoint_info": {
-      "resuming": true,
-      "completed_steps": [],
-      "remaining_steps": [
-        "innovator",
-        "pragmatist",
-        "theoretical",
-        "contrarian",
-        "interdisciplinary",
-        "empiricist"
-      ],
-      "all_complete": false,
-      "checkpoint_dir": "idea"
-    },
+    "checkpoint_info": null,
     "experiment_monitor": null,
     "language": "zh"
   },
   "background_agent_required": false,
-  "pending_sync_count": 1,
+  "pending_sync_count": 2,
   "pending_hooks": [
     {
       "name": "lark_sync",
-      "pending_count": 1,
+      "pending_count": 2,
       "path": "/Users/jinxulin/Research/sibyl-research-system/workspaces/CRA/lark_sync/pending_sync.jsonl",
       "resume_hint": "restart the sibyl-lark-sync background agent before continuing the loop"
     }
   ],
   "pending_background_agents": [],
   "breadcrumb": {
-    "ts": 1773663196.7739258,
-    "stage": "literature_search",
+    "ts": 1773666141.7015848,
+    "stage": "idea_debate",
     "action_type": "completed",
     "workspace_path": "/Users/jinxulin/Research/sibyl-research-system/workspaces/CRA",
     "in_loop": false,
     "loop_type": "",
-    "description": "Stage 'literature_search' completed, advancing to next"
+    "description": "Stage 'idea_debate' completed, advancing to next"
   },
   "recovery_state_path": "/Users/jinxulin/Research/sibyl-research-system/workspaces/CRA/.sibyl/recovery_state.json",
   "source": "cli_next",
-  "saved_at": 1773663206.166463,
+  "saved_at": 1773666150.629736,
   "path": "/Users/jinxulin/Research/sibyl-research-system/workspaces/CRA/.sibyl/recovery_state.json"
 }
