@@ -1,10 +1,10 @@
 {
-  "ts": 1773662799.112512,
-  "stage": "init",
-  "action_type": "bash",
+  "ts": 1773662814.16782,
+  "stage": "literature_search",
+  "action_type": "skill",
   "iteration": 0,
   "workspace_path": "/Users/jinxulin/Research/sibyl-research-system/workspaces/CRA",
   "in_loop": false,
   "loop_type": "",
-  "description": "项目初始化完成，推进到 literature_search 后再执行文献调研"
+  "description": "文献调研：arXiv 搜索 + Web 搜索，建立领域现状基础"
 }
