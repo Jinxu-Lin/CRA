@@ -1,0 +1,53 @@
+{
+  "tasks": {
+    "p1_fm2_continuous_metrics": {
+      "status": "completed",
+      "task_id": "p1_fm2_continuous_metrics"
+    },
+    "p1_fm2_contamination_injection": {
+      "status": "completed",
+      "task_id": "p1_fm2_contamination_injection"
+    },
+    "p1_fm2_interaction_analysis": {
+      "status": "completed",
+      "task_id": "p1_fm2_interaction_analysis"
+    },
+    "p2_eigenspectrum_fullscale": {
+      "status": "completed",
+      "task_id": "p2_eigenspectrum_fullscale"
+    },
+    "p2_trak_dim_sweep_fullscale": {
+      "status": "completed",
+      "task_id": "p2_trak_dim_sweep_fullscale"
+    },
+    "p2_repsim_dim_sweep_fullscale": {
+      "status": "completed",
+      "task_id": "p2_repsim_dim_sweep_fullscale"
+    },
+    "p3_retrieval_baselines": {
+      "status": "completed",
+      "task_id": "p3_retrieval_baselines"
+    },
+    "p4_gap_decomposition": {
+      "status": "completed",
+      "task_id": "p4_gap_decomposition"
+    },
+    "p4_layer_sweep": {
+      "status": "completed",
+      "task_id": "p4_layer_sweep"
+    },
+    "p4_cosine_vs_euclidean": {
+      "status": "completed",
+      "task_id": "p4_cosine_vs_euclidean"
+    },
+    "p5_pca_whitened_attribution": {
+      "status": "completed",
+      "task_id": "p5_pca_whitened_attribution"
+    },
+    "final_analysis": {
+      "status": "completed",
+      "task_id": "final_analysis"
+    }
+  },
+  "version": 2
+}

@@ -16,28 +16,28 @@
     "language": "zh"
   },
   "background_agent_required": false,
-  "pending_sync_count": 11,
+  "pending_sync_count": 12,
   "pending_hooks": [
     {
       "name": "lark_sync",
-      "pending_count": 11,
+      "pending_count": 12,
       "path": "/Users/jinxulin/Research/sibyl-research-system/workspaces/CRA/lark_sync/pending_sync.jsonl",
       "resume_hint": "restart the sibyl-lark-sync background agent before continuing the loop"
     }
   ],
   "pending_background_agents": [],
   "breadcrumb": {
-    "ts": 1773735161.92475,
+    "ts": 1773741021.163609,
     "stage": "experiment_cycle",
-    "action_type": "gpu_poll",
+    "action_type": "bash",
     "iteration": 0,
     "workspace_path": "/Users/jinxulin/Research/sibyl-research-system/workspaces/CRA",
-    "in_loop": true,
-    "loop_type": "gpu_poll",
-    "description": "轮询等待空闲 GPU（最多 4 张，每 10min 通过 SSH MCP 检查，无限等待）（流氓模式：<25% 显存占用也抢）"
+    "in_loop": false,
+    "loop_type": "",
+    "description": "实验任务被依赖阻塞"
   },
   "recovery_state_path": "/Users/jinxulin/Research/sibyl-research-system/workspaces/CRA/.sibyl/recovery_state.json",
-  "source": "cli_next",
-  "saved_at": 1773741021.1629848,
+  "source": "cli_record",
+  "saved_at": 1773741038.564439,
   "path": "/Users/jinxulin/Research/sibyl-research-system/workspaces/CRA/.sibyl/recovery_state.json"
 }
