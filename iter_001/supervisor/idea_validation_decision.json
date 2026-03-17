@@ -1,106 +1,97 @@
 {
-  "decision": "REFINE",
+  "decision": "ADVANCE",
   "selected_candidate_id": "cand_a",
-  "confidence": 0.60,
+  "confidence": 0.75,
   "reasons": [
-    "FM1 (signal dilution) has strong empirical evidence on attribution tasks: +32pp counterfact, +17pp ftrace, with compelling spectral support (85.6% variance in top-5 gradient eigenvalues)",
-    "H6 confirmed: K-FAC IF still 17.4pp below RepSim, validating that FM1/FM2 are genuine signal processing defects, not Hessian artifacts",
-    "FM2 (contrastive scoring) has ZERO empirical evidence at pilot scale due to rank-metric invariance -- half the thesis is unvalidated and would remain so without methodology change",
-    "H7 whitened attribution fails (degrades all tasks 8-11pp) due to underdetermined covariance at N/d=0.049 -- needs PCA-reduced whitening",
-    "H4 and H9 quantitative predictions are wrong (though H4 directionally strengthens FM1) -- hypotheses need revision before committing full GPU budget",
-    "Toxicity task reversal (-24pp) requires explicit scope boundary framing -- gradient norm artifact, not CRA failure",
-    "Pipeline fully validated (all methods work, 28 min runtime, 4x RTX 4090) -- infrastructure ready for full experiments once methodology is refined"
+    "All 7 REFINE actions from iteration 0 have been completed: continuous metrics added (P1), hypotheses H4/H9 revised, PCA-reduced whitening designed (P5), proposal updated with Evidence-Driven Revisions, task_plan.json fully redesigned with 12 tasks across 5 phases, toxicity framed as task-type boundary (RQ3 new), planner re-run with parallelization plan",
+    "FM1 spectral diagnosis has strong Tier 1 evidence: gradient r_eff=10 (top-5 captures 85.6% variance) vs representation r_eff=63 (34.9%), RepSim > TRAK by +32pp (counterfact) and +17pp (ftrace), H6 K-FAC control confirmed (+17.4pp gap)",
+    "Task-type boundary discovery is a genuine new contribution: toxicity reversal (-24pp) is systematic and mechanistically explained (gradient norm artifact, Cohen's d=2.66)",
+    "Remaining uncertainties (FM2 detectability, whitening effectiveness, gap decomposition, retrieval boundary) are empirical questions that require experimental data -- no further refinement without new data would resolve them",
+    "Task plan has 4 explicit decision gates (after P1, P3, P4, P5) enabling graceful scope narrowing: paper is viable under FM2-fails, retrieval-matches, whitening-fails, and gap-doesnt-decompose scenarios",
+    "Infrastructure fully validated: all 8+ methods functional, pipeline tested (28 min pilot), 4x RTX 4090 available, ~4h wall-clock with 4-GPU parallelism"
   ],
   "next_actions": [
-    "Add continuous metrics (Kendall-tau, Spearman-rho on raw scores) to all evaluation tasks -- CRITICAL for FM2 testing",
-    "Revise hypotheses H4 (r_eff << d << B instead of r_eff ~ O(d)) and H9 (spectral concentration instead of condition numbers)",
-    "Add PCA-reduced whitening variant (whiten in top-k eigenspace, k ~ r_eff) for H7 recovery",
-    "Update proposal.md with Evidence-Driven Revisions section documenting all pilot findings",
-    "Revise task_plan.json: increase N to 5K-10K, add continuous metrics, add PCA-whitening, add multi-seed (42, 123, 456)",
-    "Frame toxicity reversal as task-type scope boundary in methodology",
-    "Re-run planner to generate updated full-experiment task plan"
+    "Execute full-scale experiments following task_plan.json wave parallelization: Wave 1 (P1 continuous metrics + P2 eigenspectrum + P3 retrieval, 60 min), Wave 2 (P1 injection + P4 layer sweep + P2 TRAK sweep, 60 min), Wave 3 (P2 RepSim sweep + P4 cosine/gap, 45 min), Wave 4 (P5 PCA whitening, 45 min), Wave 5 (final analysis, 15 min)",
+    "Evaluate P1 decision gate after FM2 verification: if Kendall tau gain >= 0.05 AND contamination injection recovery >= 90%, FM2 is Tier 1; otherwise demote to theoretical hypothesis",
+    "Evaluate P3 decision gate after retrieval baselines: if Contriever/GTR < 3pp gap with RepSim on 2+ tasks, reposition paper",
+    "Evaluate P4 decision gate after gap decomposition: if combined TRAK-PCA closes to within 10pp of RepSim, FM1 is dominant mechanism",
+    "Evaluate P5 decision gate after PCA whitening: if any k outperforms RepSim by >= 3pp, framework is prescriptive",
+    "Proceed to result_debate stage after final_analysis task completes"
   ],
   "dropped_candidates": [
     "cand_b"
   ],
-  "demoted_candidates": [
+  "backup_candidates": [
     {
       "candidate_id": "cand_c",
-      "new_status": "sub_contribution_of_cand_a",
-      "reason": "H7 failed at pilot scale but SNR concept directionally validated; keep as sub-contribution if PCA-whitening works at full scale"
+      "status": "backup",
+      "promotion_criterion": "PCA-whitened attribution outperforms RepSim by >= 5pp on >= 2 tasks",
+      "subsumed_into": "cand_a Priority 5"
+    },
+    {
+      "candidate_id": "cand_d",
+      "status": "backup",
+      "promotion_criterion": "Contriever/GTR matches RepSim (< 3pp gap) on >= 2 tasks",
+      "subsumed_into": "cand_a Priority 3"
     }
   ],
-  "hypothesis_verdicts": {
-    "H1_FM1_space_gap": {
-      "verdict": "SUPPORTED_2_of_3",
-      "action": "Proceed; frame toxicity as scope boundary"
-    },
-    "H2_contrastive_asymmetry": {
-      "verdict": "UNTESTABLE_AT_PILOT",
-      "action": "CRITICAL: add continuous metrics before full experiment"
-    },
-    "H3_orthogonality": {
-      "verdict": "UNTESTABLE_AT_PILOT",
-      "action": "Depends on H2 fix; cannot evaluate without FM2 main effect"
-    },
-    "H4_gradient_r_eff": {
-      "verdict": "DIRECTIONALLY_SUPPORTED_QUANTITATIVELY_WRONG",
-      "action": "Revise to r_eff << d << B; strengthens FM1"
-    },
-    "H5_trak_saturation": {
-      "verdict": "SUPPORTED",
-      "action": "Proceed; note 30.8pp residual gap as FM1-necessary-not-sufficient"
-    },
-    "H6_kfac_control": {
-      "verdict": "CONFIRMED",
-      "action": "Proceed; this validates the diagnostic framework"
-    },
-    "H7_whitened_attribution": {
-      "verdict": "FAIL_RECOVERABLE",
-      "action": "Add PCA-reduced whitening; if still fails at full scale, frame as open direction"
-    },
-    "H8_repsim_vs_bm25": {
-      "verdict": "PARTIAL",
-      "action": "Proceed; restrict counterfact claims if BM25 remains competitive at full scale"
-    },
-    "H9_condition_numbers": {
-      "verdict": "FALSIFIED",
-      "action": "Replace with spectral concentration metrics"
-    }
+  "confidence_breakdown": {
+    "fm1_thesis": 0.85,
+    "fm2_thesis": 0.55,
+    "task_type_boundary": 0.90,
+    "whitened_attribution_recovery": 0.50,
+    "publication_viability": 0.70,
+    "overall": 0.75
+  },
+  "confidence_delta": {
+    "previous": 0.60,
+    "current": 0.75,
+    "increase_reasons": [
+      "+5: All REFINE actions completed, no remaining methodology gaps",
+      "+5: Robust decision gates built into experimental plan",
+      "+3: New H10 (gap decomposition) and H11 (contamination injection) add high-probability contributions",
+      "+2: Validated infrastructure and realistic wall-clock estimates"
+    ]
   },
   "risk_assessment": {
-    "fm2_still_zero_with_continuous_metrics": {
-      "severity": "critical",
+    "fm2_undetectable": {
       "probability": 0.25,
-      "mitigation": "Pivot to FM1-only paper; still publishable but weaker (poster tier)"
+      "impact": "Narrow to FM1-only paper (poster tier)",
+      "mitigation": "P1 decision gate; contamination injection as independent validation"
     },
-    "h7_pca_whitening_still_fails": {
-      "severity": "high",
+    "retrieval_matches_repsim": {
+      "probability": 0.20,
+      "impact": "Reposition from attribution quality to attribution-vs-retrieval boundary",
+      "mitigation": "P3 decision gate; cand_d promotion path"
+    },
+    "pca_whitening_fails": {
       "probability": 0.35,
-      "mitigation": "Frame as open direction; drop prescriptive theory contribution"
+      "impact": "Framework is taxonomic only, not prescriptive",
+      "mitigation": "P5 decision gate; honest negative result"
     },
-    "toxicity_reversal_undermines_reviewers": {
-      "severity": "medium",
-      "probability": 0.40,
-      "mitigation": "Preemptive task-type analysis framing"
-    },
-    "bm25_competitive_at_full_scale": {
-      "severity": "medium",
+    "gap_doesnt_decompose": {
       "probability": 0.30,
-      "mitigation": "Restrict claims; discuss as limitation"
-    }
+      "impact": "Weaker mechanistic narrative",
+      "mitigation": "P4 results publishable either way"
+    },
+    "worst_case_probability": 0.02,
+    "worst_case_outcome": "FM1 spectral diagnosis + task-type boundary + systematic benchmark (weak poster)"
   },
   "publication_viability": {
-    "if_fm2_works_and_h7_recovers": "spotlight potential (NeurIPS 2026)",
-    "if_fm2_works_but_h7_fails": "poster (NeurIPS 2026 / ICML 2027)",
-    "if_fm2_fails": "weak poster with FM1-only story, or pivot"
+    "best_case": "NeurIPS 2026 spotlight (FM2 validated + whitening works, P=0.25)",
+    "base_case": "NeurIPS 2026 poster (FM2 partially works OR whitening marginal, P=0.50)",
+    "worst_case": "Weak poster / workshop (all Tier 2 experiments fail, P=0.02)"
   },
   "metadata": {
-    "iteration": 0,
+    "iteration": 1,
+    "previous_decision": "REFINE",
+    "previous_confidence": 0.60,
     "pilot_tasks_completed": 14,
     "pilot_runtime_min": 28,
+    "full_scale_tasks_planned": 12,
+    "full_scale_gpu_hours": 24,
+    "full_scale_wall_clock_hours": 4,
     "gpu": "4x NVIDIA RTX 4090",
-    "pilot_sample_size": 100,
     "date": "2026-03-17"
   }
 }

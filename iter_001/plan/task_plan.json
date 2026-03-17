@@ -13,8 +13,16 @@
       "estimated_minutes": 60,
       "comment_gpu": "Full training pool attribution requires computing pairwise scores. 2 GPUs parallelize method evaluation (RepSim+baselines on GPU0, TRAK+LoGra on GPU1). N=5473 fits in 24GB with batch processing.",
       "shared_resources": [
-        {"type": "dataset", "name": "DATE-LM", "path": "shared/datasets/date_lm"},
-        {"type": "checkpoint", "name": "pythia-1b", "path": "shared/checkpoints/pythia-1b"}
+        {
+          "type": "dataset",
+          "name": "DATE-LM",
+          "path": "shared/datasets/date_lm"
+        },
+        {
+          "type": "checkpoint",
+          "name": "pythia-1b",
+          "path": "shared/checkpoints/pythia-1b"
+        }
       ],
       "pilot": {
         "samples": 100,
@@ -26,13 +34,28 @@
         {
           "type": "table",
           "description": "Full method tournament: rank-based and continuous metrics",
-          "columns": ["Method", "Scoring", "Task", "R@50_or_AUPRC", "Kendall_tau", "Spearman_rho", "NDCG"],
+          "columns": [
+            "Method",
+            "Scoring",
+            "Task",
+            "R@50_or_AUPRC",
+            "Kendall_tau",
+            "Spearman_rho",
+            "NDCG"
+          ],
           "paper_section": "experiments"
         },
         {
           "type": "table",
           "description": "2x2 factorial with continuous metrics",
-          "columns": ["Cell", "Space", "Scoring", "counterfact_tau", "toxicity_tau", "ftrace_tau"],
+          "columns": [
+            "Cell",
+            "Space",
+            "Scoring",
+            "counterfact_tau",
+            "toxicity_tau",
+            "ftrace_tau"
+          ],
           "paper_section": "experiments"
         }
       ]
@@ -42,7 +65,9 @@
       "name": "P1: Controlled Contamination Injection (H11)",
       "description": "For each method M in {RepSim, TRAK}: (1) compute raw attribution scores s_i, (2) compute mean mu = mean(s_i), (3) inject contamination: s_contaminated = s + alpha * mu for alpha in {0, 0.1, 0.5, 1.0, 2.0, 5.0}, (4) apply contrastive correction: s_corrected = s_contaminated - mean(s_contaminated), (5) evaluate contaminated and corrected scores on both rank-based AND continuous metrics. This provides causal FM2 validation independent of any metric choice. Run on counterfact (full N=5473) and toxicity (full N=10187) tasks on Pythia-1B.",
       "type": "experiment",
-      "depends_on": ["p1_fm2_continuous_metrics"],
+      "depends_on": [
+        "p1_fm2_continuous_metrics"
+      ],
       "expected_output": "exp/results/full/p1_fm2_contamination_injection.json",
       "candidate_id": "cand_a",
       "gpu_count": 1,
@@ -77,7 +102,10 @@
       "name": "P1: FM1/FM2 Interaction Analysis (H3-revised)",
       "description": "Aggregate results from p1_fm2_continuous_metrics. Compute 2-way ANOVA on Kendall tau: Factor A = space (parameter vs representation), Factor B = scoring (standard vs contrastive). Compute interaction term as fraction of minimum main effect. Report per-task: main effect FM1, main effect FM2, interaction, eta-squared. CONTINGENT: only meaningful if H2-revised passes (Kendall tau gain >= 0.05 for parameter-space methods).",
       "type": "analysis",
-      "depends_on": ["p1_fm2_continuous_metrics", "p1_fm2_contamination_injection"],
+      "depends_on": [
+        "p1_fm2_continuous_metrics",
+        "p1_fm2_contamination_injection"
+      ],
       "expected_output": "exp/results/full/p1_fm2_interaction_analysis.json",
       "candidate_id": "cand_a",
       "gpu_count": 0,
@@ -93,7 +121,14 @@
         {
           "type": "table",
           "description": "2-way ANOVA: FM1 x FM2 interaction on continuous metrics",
-          "columns": ["Task", "FM1_main_effect", "FM2_main_effect", "Interaction", "Interaction_pct", "eta_sq"],
+          "columns": [
+            "Task",
+            "FM1_main_effect",
+            "FM2_main_effect",
+            "Interaction",
+            "Interaction_pct",
+            "eta_sq"
+          ],
           "paper_section": "experiments"
         }
       ]
@@ -111,7 +146,11 @@
       "estimated_minutes": 60,
       "comment_gpu": "Pythia-70M is small enough for single GPU. Lanczos at N=5000 with top-500 eigenvalues ~30 min. Representation eigendecomp ~10 min. Total ~50 min with 4 N values (earlier N values are faster).",
       "shared_resources": [
-        {"type": "checkpoint", "name": "pythia-70m", "path": "shared/checkpoints/pythia-70m"}
+        {
+          "type": "checkpoint",
+          "name": "pythia-70m",
+          "path": "shared/checkpoints/pythia-70m"
+        }
       ],
       "pilot": {
         "samples": 100,
@@ -137,7 +176,14 @@
         {
           "type": "table",
           "description": "Spectral statistics across N values",
-          "columns": ["N", "Space", "r_eff_95", "r_eff_99", "condition_number", "top5_var_frac"],
+          "columns": [
+            "N",
+            "Space",
+            "r_eff_95",
+            "r_eff_99",
+            "condition_number",
+            "top5_var_frac"
+          ],
           "paper_section": "experiments"
         }
       ]
@@ -147,7 +193,9 @@
       "name": "P2: TRAK Dimension Sweep at Full Scale (H5-revised)",
       "description": "Run TRAK on Pythia-1B with full counterfact training set (N=5473). Random projection at k in {32, 64, 128, 256, 512, 1024, 2048, 4096}. PCA projection (onto top-k gradient eigenvectors) at k in {32, 64, 128, 256, 512, 1024, 2048}. Evaluate with BOTH rank-based (R@50, MRR) AND continuous (Kendall tau) metrics. Smoking gun: TRAK-PCA at k=d=2048 vs RepSim gap. Pilot showed peak at k=256, non-monotonic after, and 30.8pp gap at k=d.",
       "type": "experiment",
-      "depends_on": ["p2_eigenspectrum_fullscale"],
+      "depends_on": [
+        "p2_eigenspectrum_fullscale"
+      ],
       "expected_output": "exp/results/full/p2_trak_dim_sweep_fullscale.json",
       "candidate_id": "cand_a",
       "gpu_count": 2,
@@ -218,8 +266,16 @@
       "estimated_minutes": 45,
       "comment_gpu": "Contriever and GTR-T5 are small encoder models (<500M params). Encoding N=10K samples takes ~10 min each. BM25 is CPU-only. Total ~40 min on 1 GPU.",
       "shared_resources": [
-        {"type": "checkpoint", "name": "contriever", "path": "shared/checkpoints/contriever"},
-        {"type": "checkpoint", "name": "gtr-t5-base", "path": "shared/checkpoints/gtr-t5-base"}
+        {
+          "type": "checkpoint",
+          "name": "contriever",
+          "path": "shared/checkpoints/contriever"
+        },
+        {
+          "type": "checkpoint",
+          "name": "gtr-t5-base",
+          "path": "shared/checkpoints/gtr-t5-base"
+        }
       ],
       "pilot": {
         "samples": 100,
@@ -231,7 +287,14 @@
         {
           "type": "table",
           "description": "Retrieval baselines vs RepSim comparison",
-          "columns": ["Method", "Type", "counterfact_R50", "toxicity_AUPRC", "ftrace_R50", "counterfact_tau"],
+          "columns": [
+            "Method",
+            "Type",
+            "counterfact_R50",
+            "toxicity_AUPRC",
+            "ftrace_R50",
+            "counterfact_tau"
+          ],
           "paper_section": "experiments"
         }
       ]
@@ -241,7 +304,9 @@
       "name": "P4: Gap Decomposition -- TRAK-PCA vs RepSim (H10)",
       "description": "Systematically decompose the 30.8pp gap between TRAK-PCA at k=d and RepSim. Factor (a): Last-layer-only TRAK-PCA -- restrict gradients to final transformer layer only, then random/PCA project. Factor (b): Cosine-normalized TRAK-PCA -- L2-normalize gradient vectors before projection. Factor (c): Combined -- last-layer-only + cosine-normalized. Factor (d): Residual -- whatever gap remains is attributed to nonlinear semantic features / method architecture. All on Pythia-1B, full counterfact (N=5473). Report residual gap after each factor.",
       "type": "experiment",
-      "depends_on": ["p2_trak_dim_sweep_fullscale"],
+      "depends_on": [
+        "p2_trak_dim_sweep_fullscale"
+      ],
       "expected_output": "exp/results/full/p4_gap_decomposition.json",
       "candidate_id": "cand_a",
       "gpu_count": 1,
@@ -265,7 +330,12 @@
         {
           "type": "table",
           "description": "Gap decomposition detail",
-          "columns": ["Configuration", "R@50", "Gap_to_RepSim_pp", "Factor_contribution_pp"],
+          "columns": [
+            "Configuration",
+            "R@50",
+            "Gap_to_RepSim_pp",
+            "Factor_contribution_pp"
+          ],
           "paper_section": "experiments"
         }
       ]
@@ -327,7 +397,12 @@
         {
           "type": "table",
           "description": "Similarity function comparison: cosine vs Euclidean vs dot product",
-          "columns": ["Similarity", "counterfact_R50", "toxicity_AUPRC", "ftrace_R50"],
+          "columns": [
+            "Similarity",
+            "counterfact_R50",
+            "toxicity_AUPRC",
+            "ftrace_R50"
+          ],
           "paper_section": "experiments"
         }
       ]
@@ -337,7 +412,9 @@
       "name": "P5: PCA-Reduced Whitened Attribution (H7-revised)",
       "description": "Implement whitened RepSim in PCA-reduced subspace: project representations to top-k PCA components, then whiten with the k x k covariance matrix in that subspace. k in {16, 32, 64, 128, 256, 512}. At N=5473 and k=64, N/k=85 (well-determined). Also test ridge-regularized whitening: M = (Sigma + lambda*I)^{-1} with lambda from 5-fold cross-validation. Compare against standard RepSim (M=I) on all 3 tasks. Pilot showed M=Sigma^{-1} fails at full d=2048 (N/d=0.049) but SNR-accuracy correlation was positive (r=0.34), suggesting the concept is sound at feasible N/k ratios.",
       "type": "experiment",
-      "depends_on": ["p2_repsim_dim_sweep_fullscale"],
+      "depends_on": [
+        "p2_repsim_dim_sweep_fullscale"
+      ],
       "expected_output": "exp/results/full/p5_pca_whitened_attribution.json",
       "candidate_id": "cand_a",
       "gpu_count": 1,
@@ -361,7 +438,14 @@
         {
           "type": "table",
           "description": "PCA-whitened vs standard RepSim comparison",
-          "columns": ["k", "N_over_k", "counterfact_R50", "toxicity_AUPRC", "ftrace_R50", "gain_over_standard"],
+          "columns": [
+            "k",
+            "N_over_k",
+            "counterfact_R50",
+            "toxicity_AUPRC",
+            "ftrace_R50",
+            "gain_over_standard"
+          ],
           "paper_section": "experiments"
         },
         {
@@ -403,7 +487,13 @@
         {
           "type": "table",
           "description": "Final hypothesis scorecard: H1-H11 status after full experiments",
-          "columns": ["Hypothesis", "Pilot_Status", "FullScale_Status", "Key_Evidence", "Paper_Tier"],
+          "columns": [
+            "Hypothesis",
+            "Pilot_Status",
+            "FullScale_Status",
+            "Key_Evidence",
+            "Paper_Tier"
+          ],
           "paper_section": "experiments"
         }
       ]
@@ -419,35 +509,51 @@
     "phases": [
       {
         "phase": "P1",
-        "tasks": ["p1_fm2_continuous_metrics", "p1_fm2_contamination_injection", "p1_fm2_interaction_analysis"],
+        "tasks": [
+          "p1_fm2_continuous_metrics",
+          "p1_fm2_contamination_injection",
+          "p1_fm2_interaction_analysis"
+        ],
         "purpose": "FM2 Verification Suite -- test FM2 with continuous metrics and controlled injection",
         "gpu_hours": 3,
         "wall_clock_hours": 1
       },
       {
         "phase": "P2",
-        "tasks": ["p2_eigenspectrum_fullscale", "p2_trak_dim_sweep_fullscale", "p2_repsim_dim_sweep_fullscale"],
+        "tasks": [
+          "p2_eigenspectrum_fullscale",
+          "p2_trak_dim_sweep_fullscale",
+          "p2_repsim_dim_sweep_fullscale"
+        ],
         "purpose": "FM1 Diagnostic Suite -- full-scale eigenspectrum and dimension sweeps",
         "gpu_hours": 10,
         "wall_clock_hours": 3
       },
       {
         "phase": "P3",
-        "tasks": ["p3_retrieval_baselines"],
+        "tasks": [
+          "p3_retrieval_baselines"
+        ],
         "purpose": "Retrieval Baselines -- test attribution vs retrieval boundary",
         "gpu_hours": 2.5,
         "wall_clock_hours": 1
       },
       {
         "phase": "P4",
-        "tasks": ["p4_gap_decomposition", "p4_layer_sweep", "p4_cosine_vs_euclidean"],
+        "tasks": [
+          "p4_gap_decomposition",
+          "p4_layer_sweep",
+          "p4_cosine_vs_euclidean"
+        ],
         "purpose": "Mechanism Suite -- decompose TRAK-PCA vs RepSim gap",
         "gpu_hours": 5,
         "wall_clock_hours": 1.5
       },
       {
         "phase": "P5",
-        "tasks": ["p5_pca_whitened_attribution"],
+        "tasks": [
+          "p5_pca_whitened_attribution"
+        ],
         "purpose": "Framework Validation -- PCA-reduced whitened attribution",
         "gpu_hours": 3.5,
         "wall_clock_hours": 1

@@ -5,50 +5,34 @@
     "agents": null,
     "skills": [
       {
-        "name": "sibyl-experimenter",
-        "args": "/Users/jinxulin/Research/sibyl-research-system/workspaces/CRA/current PILOT default /home/jinxulin/sibyl_system '/home/jinxulin/sibyl_system/miniconda3/bin/conda run -n sibyl_CRA' 2"
+        "name": "sibyl-idea-validation-decision",
+        "args": "/Users/jinxulin/Research/sibyl-research-system/workspaces/CRA/current"
       }
     ],
     "team": null,
     "bash_command": null,
     "gpu_poll": null,
-    "description": "Run pilot experiments",
-    "stage": "pilot_experiments",
+    "description": "Review pilot evidence and decide ADVANCE / REFINE / PIVOT",
+    "stage": "idea_validation_decision",
     "iteration": 0,
     "estimated_minutes": 0,
     "checkpoint_info": null,
-    "experiment_monitor": {
-      "poll_interval_sec": 120,
-      "wake_check_interval_sec": 90,
-      "wake_cmd": "cd /Users/jinxulin/Research/sibyl-research-system && /Users/jinxulin/Research/sibyl-research-system/.venv/bin/python3 -m sibyl.cli experiment-supervisor-drain-wake /Users/jinxulin/Research/sibyl-research-system/workspaces/CRA/current",
-      "background_agent": {
-        "name": "sibyl-experiment-supervisor",
-        "args": "/Users/jinxulin/Research/sibyl-research-system/workspaces/CRA/current PILOT default /home/jinxulin/sibyl_system '/home/jinxulin/sibyl_system/miniconda3/bin/conda run -n sibyl_CRA' 120 600 2000 4 true 25"
-      }
-    },
+    "experiment_monitor": null,
     "language": "zh"
   },
-  "background_agent_required": true,
-  "pending_sync_count": 9,
+  "background_agent_required": false,
+  "pending_sync_count": 10,
   "pending_hooks": [
     {
       "name": "lark_sync",
-      "pending_count": 9,
+      "pending_count": 10,
       "path": "/Users/jinxulin/Research/sibyl-research-system/workspaces/CRA/lark_sync/pending_sync.jsonl",
       "resume_hint": "restart the sibyl-lark-sync background agent before continuing the loop"
     }
   ],
-  "pending_background_agents": [
-    {
-      "name": "sibyl-experiment-supervisor",
-      "args": "/Users/jinxulin/Research/sibyl-research-system/workspaces/CRA/current PILOT default /home/jinxulin/sibyl_system '/home/jinxulin/sibyl_system/miniconda3/bin/conda run -n sibyl_CRA' 120 600 2000 4 true 25",
-      "action_type": "skill",
-      "stage": "pilot_experiments",
-      "resume_hint": "restart this background agent with run_in_background=true before resuming the main loop"
-    }
-  ],
+  "pending_background_agents": [],
   "breadcrumb": {
-    "ts": 1773734882.117598,
+    "ts": 1773734978.94901,
     "stage": "pilot_experiments",
     "action_type": "completed",
     "workspace_path": "/Users/jinxulin/Research/sibyl-research-system/workspaces/CRA",
@@ -58,6 +42,6 @@
   },
   "recovery_state_path": "/Users/jinxulin/Research/sibyl-research-system/workspaces/CRA/.sibyl/recovery_state.json",
   "source": "cli_next",
-  "saved_at": 1773734888.486927,
+  "saved_at": 1773734984.489931,
   "path": "/Users/jinxulin/Research/sibyl-research-system/workspaces/CRA/.sibyl/recovery_state.json"
 }
