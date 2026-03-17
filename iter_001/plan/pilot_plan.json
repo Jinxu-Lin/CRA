@@ -6,151 +6,166 @@
     "model_primary": "EleutherAI/pythia-1b",
     "model_spectral": "EleutherAI/pythia-70m",
     "benchmark": "DATE-LM",
-    "evaluation_task": "data_selection"
+    "evaluation_tasks": ["data_selection", "toxicity_filtering", "factual_attribution"],
+    "note": "Full-scale plan with pilot checkpoints. Each task has a pilot pass_criteria evaluated at N=100 before committing to full-scale N=5473/10187."
   },
   "pilot_phases": [
     {
-      "phase": 0,
-      "name": "Foundation & Critical Control",
+      "phase": "P1",
+      "name": "FM2 Verification Pilot",
       "tasks": [
         {
-          "task_id": "setup_env",
-          "pilot_purpose": "Verify all dependencies install, data downloads, checkpoints load",
+          "task_id": "p1_fm2_continuous_metrics",
+          "pilot_purpose": "Verify Kendall tau and Spearman rho are computable on raw attribution scores; confirm continuous metrics CAN detect differences between standard and contrastive scoring even at small N",
           "samples": 100,
           "seed": 42,
           "timeout_sec": 900,
-          "pass_criteria": "All deps install; DATE-LM loads; Pythia-70M and Pythia-1B load; dummy eval returns valid metric",
-          "estimated_time_min": 30,
-          "fail_action": "Debug dependency issues; try alternative package versions; check disk space"
+          "pass_criteria": "Kendall tau computable for all method-task pairs; at least one method shows Kendall tau difference > 0.01 between standard and contrastive (confirms metric sensitivity)",
+          "estimated_time_min": 15,
+          "fail_action": "If Kendall tau identical for all pairs: check that raw scores (not ranks) are used; verify contrastive subtraction changes score magnitudes. If metric computation errors: debug scipy.stats.kendalltau call."
         },
         {
-          "task_id": "phase0_pipeline_pilot",
-          "pilot_purpose": "Validate RepSim + TRAK pipeline produces valid LDS; confirm RepSim > TRAK sanity check",
+          "task_id": "p1_fm2_contamination_injection",
+          "pilot_purpose": "Validate contamination injection protocol at small scale; confirm injection degrades performance and correction recovers it",
           "samples": 100,
           "seed": 42,
           "timeout_sec": 900,
-          "pass_criteria": "RepSim LDS > TRAK LDS; both in [0, 1]; runtime < 15 min each",
-          "estimated_time_min": 45,
-          "fail_action": "Check DATE-LM API; verify representation extraction; debug TRAK random projection"
+          "pass_criteria": "At alpha=1.0: contaminated performance drops by >= 5pp; contrastive correction recovers >= 80% of alpha=0; Kendall tau shows monotonic degradation with alpha",
+          "estimated_time_min": 10,
+          "fail_action": "If injection has no effect: alpha values may be too small relative to score variance; increase alpha range. If correction fails: check mean computation correctness."
         },
         {
-          "task_id": "phase0_kfac_control",
-          "pilot_purpose": "CRITICAL: Test H6 (FM1/FM2 independent of Hessian quality). K-FAC IF on Pythia-70M vs RepSim.",
+          "task_id": "p1_fm2_interaction_analysis",
+          "pilot_purpose": "Verify ANOVA computation is correct with nonzero inputs",
           "samples": 100,
           "seed": 42,
           "timeout_sec": 900,
-          "pass_criteria": "K-FAC IF LDS < RepSim LDS - 5pp (H6 not falsified)",
-          "falsification_criteria": "K-FAC IF LDS >= RepSim LDS - 5pp → PIVOT to cand_b",
-          "estimated_time_min": 60,
-          "fail_action": "If H6 falsified: document evidence, generate cand_b plan. If OOM: reduce batch size, use gradient checkpointing. If K-FAC diverges: add damping, increase regularization."
+          "pass_criteria": "ANOVA computable; interaction term quantifiable",
+          "estimated_time_min": 5,
+          "fail_action": "If ANOVA fails: check that continuous metrics provide nonzero FM2 main effect. If FM2 main effect still zero at pilot: ANOVA is degenerate; report and proceed to full scale."
         }
       ],
-      "phase_pass_criteria": "Pipeline works AND H6 not falsified (K-FAC IF still worse than RepSim by >= 5pp)",
-      "phase_fail_action": "If pipeline fails: debug and retry. If H6 falsified: pivot to cand_b."
+      "phase_pass_criteria": "Continuous metrics show nonzero FM2 effect; contamination injection protocol works",
+      "phase_fail_action": "If continuous metrics still show zero FM2 effect at pilot: proceed to full scale anyway (N=100 may lack statistical power). If injection protocol fails mechanically: debug before full scale."
     },
     {
-      "phase": 1,
-      "name": "Core 2x2 Factorial Pilot",
+      "phase": "P2",
+      "name": "FM1 Diagnostic Pilot",
       "tasks": [
         {
-          "task_id": "phase1_factorial_trak_standard",
-          "pilot_purpose": "Cell A: TRAK standard on data_selection pilot",
+          "task_id": "p2_eigenspectrum_fullscale",
+          "pilot_purpose": "Run eigenspectrum at N=500 only (smallest new N) to verify Lanczos convergence and scaling trend from N=100 (already done in iter_001)",
           "samples": 100,
           "seed": 42,
           "timeout_sec": 900,
-          "pass_criteria": "Valid LDS score; runtime reasonable",
-          "estimated_time_min": 20
+          "pass_criteria": "Lanczos converges at N=500; r_eff(95%) for full-model gradients remains < 100; representation eigenspectrum stable",
+          "estimated_time_min": 20,
+          "fail_action": "If Lanczos fails at N=500: reduce to top-200 eigenvalues; increase max iterations. If OOM: use gradient accumulation for covariance estimation."
         },
         {
-          "task_id": "phase1_factorial_trak_contrastive",
-          "pilot_purpose": "Cell B: TRAK-C (mean-subtracted) on data_selection pilot; check H2 directional",
+          "task_id": "p2_trak_dim_sweep_fullscale",
+          "pilot_purpose": "Run TRAK at k in {128, 512, 2048} only (3 checkpoints) at N=100 to verify consistency with iter_001 results",
           "samples": 100,
           "seed": 42,
           "timeout_sec": 900,
-          "pass_criteria": "TRAK-C LDS > TRAK standard LDS",
-          "estimated_time_min": 20
+          "pass_criteria": "Results consistent with iter_001 pilot (within 5pp); saturation trend visible",
+          "estimated_time_min": 15,
+          "fail_action": "If inconsistent with iter_001: check random seed, TRAK library version. If worse: may indicate code regression."
         },
         {
-          "task_id": "phase1_factorial_repsim_standard",
-          "pilot_purpose": "Cell C: RepSim standard on data_selection pilot",
+          "task_id": "p2_repsim_dim_sweep_fullscale",
+          "pilot_purpose": "Run RepSim PCA sweep at k in {64, 256, 1024, 2048} at N=100 to verify consistency",
           "samples": 100,
           "seed": 42,
           "timeout_sec": 900,
-          "pass_criteria": "RepSim LDS > 0.3; representations cached",
-          "estimated_time_min": 15
-        },
-        {
-          "task_id": "phase1_factorial_repsim_contrastive",
-          "pilot_purpose": "Cell D: RepSim-C on data_selection pilot; check H2 asymmetry",
-          "samples": 100,
-          "seed": 42,
-          "timeout_sec": 900,
-          "pass_criteria": "RepSim-C improvement < TRAK-C improvement (H2 asymmetry)",
-          "estimated_time_min": 10
-        },
-        {
-          "task_id": "phase1_baselines",
-          "pilot_purpose": "BM25 + k-NN + DDA baselines on data_selection pilot; check H8",
-          "samples": 100,
-          "seed": 42,
-          "timeout_sec": 900,
-          "pass_criteria": "BM25 LDS < RepSim LDS (H8 directional); all baselines produce valid scores",
-          "estimated_time_min": 20
+          "pass_criteria": "Results consistent with iter_001; saturation at k=64 confirmed",
+          "estimated_time_min": 10,
+          "fail_action": "If regression: check PCA implementation and cached representations."
         }
       ],
-      "phase_pass_criteria": "H1 direction confirmed (RepSim > TRAK); H2 direction confirmed (contrastive helps more in param space); H8 direction confirmed (RepSim > BM25). Quantitative thresholds evaluated at full scale.",
-      "phase_fail_action": "If H1 reversed: check implementation bugs first. If H2 asymmetry absent: weaken FM2 narrative. If BM25 > RepSim: restrict scope."
+      "phase_pass_criteria": "Eigenspectrum scales correctly; TRAK and RepSim dim sweeps reproduce pilot trends",
+      "phase_fail_action": "If eigenspectrum fails: fall back to simpler spectral analysis (e.g., top-100 eigenvalues via power iteration). If dim sweeps regress: debug code changes."
     },
     {
-      "phase": 2,
-      "name": "Mechanistic Evidence Pilot",
+      "phase": "P3",
+      "name": "Retrieval Baseline Pilot",
       "tasks": [
         {
-          "task_id": "phase2_eigenspectrum",
-          "pilot_purpose": "Compute eigenspectrum on Pythia-70M with 100 samples; test H4 and H9",
+          "task_id": "p3_retrieval_baselines",
+          "pilot_purpose": "Download Contriever and GTR-T5; verify encoding pipeline works; get directional comparison with RepSim at N=100",
           "samples": 100,
           "seed": 42,
           "timeout_sec": 900,
-          "pass_criteria": "Lanczos converges; r_eff(95%) in [256, 1024]; condition number ratio > 100x",
-          "estimated_time_min": 45,
-          "fail_action": "If Lanczos slow: reduce to top-200 eigenvalues. If r_eff out of range: document and revise H4."
-        },
-        {
-          "task_id": "phase2_trak_dim_sweep",
-          "pilot_purpose": "Run TRAK dim sweep pilot with subset of k values {128, 512, 2048} on 100 samples",
-          "samples": 100,
-          "seed": 42,
-          "timeout_sec": 900,
-          "pass_criteria": "LDS increases with k; visible saturation trend",
-          "estimated_time_min": 30
+          "pass_criteria": "Both models load and encode text; cosine similarity scores produced; at least one shows > 5pp gap below RepSim on >= 1 task",
+          "estimated_time_min": 15,
+          "fail_action": "If model download fails: check HuggingFace access. If encoding OOM: reduce batch size. If retrieval matches RepSim at N=100: this is expected (small N); proceed to full scale."
         }
       ],
-      "phase_pass_criteria": "Eigenspectrum shows clear low-rank structure; TRAK shows saturation trend",
-      "phase_fail_action": "If no low-rank structure: H4 falsified, weaken mechanistic claims. If TRAK keeps improving: H5 falsified, revise signal dilution story."
+      "phase_pass_criteria": "Retrieval pipeline functional; directional results available",
+      "phase_fail_action": "If both retrieval models fail to load: use only BM25 as retrieval baseline."
     },
     {
-      "phase": 3,
-      "name": "Framework Extension Pilot",
+      "phase": "P4",
+      "name": "Mechanism Suite Pilot",
       "tasks": [
         {
-          "task_id": "phase3_whitened_attribution",
-          "pilot_purpose": "Whitened RepSim pilot on data_selection with 100 samples; test H7 directional",
+          "task_id": "p4_gap_decomposition",
+          "pilot_purpose": "Verify last-layer-only TRAK and cosine-normalized TRAK implementations work at N=100",
           "samples": 100,
           "seed": 42,
           "timeout_sec": 900,
-          "pass_criteria": "Whitened RepSim produces valid scores (no NaN); improvement over standard RepSim on at least 1 task",
-          "estimated_time_min": 30,
-          "fail_action": "If NaN: increase Ledoit-Wolf shrinkage. If whitened worse: document negative result; common influence may be near-isotropic (H9 confirms)."
+          "pass_criteria": "All 3 TRAK variants produce valid scores; at least one factor shows >= 3pp gap reduction vs standard TRAK-PCA",
+          "estimated_time_min": 15,
+          "fail_action": "If last-layer gradient extraction fails: debug model layer access. If cosine normalization produces NaN: check for zero-norm gradients."
+        },
+        {
+          "task_id": "p4_layer_sweep",
+          "pilot_purpose": "Extract representations at layers {0, 12, 23} only (3 checkpoints) to verify layer access works",
+          "samples": 100,
+          "seed": 42,
+          "timeout_sec": 900,
+          "pass_criteria": "Representations extracted at all 3 layers; RepSim scores vary by layer",
+          "estimated_time_min": 10,
+          "fail_action": "If layer access fails: check transformers hook API. If all layers identical: verify hook placement."
+        },
+        {
+          "task_id": "p4_cosine_vs_euclidean",
+          "pilot_purpose": "Verify Euclidean distance and dot product RepSim implementations at N=100",
+          "samples": 100,
+          "seed": 42,
+          "timeout_sec": 900,
+          "pass_criteria": "All 3 similarity functions produce valid scores; results differ by > 1pp on at least 1 task",
+          "estimated_time_min": 5,
+          "fail_action": "If identical results: check normalization bug. If Euclidean produces invalid scores: check distance-to-similarity conversion."
         }
       ],
-      "phase_pass_criteria": "Whitened attribution is numerically stable and shows improvement direction",
-      "phase_fail_action": "If whitening fails completely: drop H7 from main claims; report as negative result."
+      "phase_pass_criteria": "All mechanism implementations functional; directional results available",
+      "phase_fail_action": "Debug implementation issues before full scale."
+    },
+    {
+      "phase": "P5",
+      "name": "Framework Validation Pilot",
+      "tasks": [
+        {
+          "task_id": "p5_pca_whitened_attribution",
+          "pilot_purpose": "Test PCA-reduced whitening at k=64 (N/k=1.56 at N=100, still underdetermined but tests implementation). Verify no NaN/Inf. Compare degradation at k=64 vs full-dimensional whitening (which lost 8-11pp in iter_001).",
+          "samples": 100,
+          "seed": 42,
+          "timeout_sec": 900,
+          "pass_criteria": "PCA-whitened produces valid scores at k=64; degradation < 8pp (less than full-dimensional whitening); ridge regularization produces valid scores",
+          "estimated_time_min": 10,
+          "fail_action": "If NaN: increase ridge lambda. If degradation >= 8pp at k=64: N/k=1.56 too small; full scale N/k=85 should help. Proceed to full scale regardless."
+        }
+      ],
+      "phase_pass_criteria": "PCA-whitened attribution is numerically stable; degradation less severe than full-dimensional",
+      "phase_fail_action": "If whitening crashes: debug covariance estimation. If degradation severe: focus on documenting negative result clearly."
     }
   ],
   "overall_pilot_budget": {
-    "total_estimated_minutes": 295,
-    "total_gpu_hours": 5.0,
-    "critical_path_minutes": 180,
-    "critical_path": ["setup_env", "phase0_pipeline_pilot", "phase0_kfac_control", "phase1_factorial_analysis"]
+    "total_estimated_minutes": 130,
+    "total_gpu_hours": 2.2,
+    "critical_path_minutes": 50,
+    "critical_path": ["p1_fm2_continuous_metrics", "p1_fm2_contamination_injection", "p1_fm2_interaction_analysis"],
+    "note": "Pilots are lightweight verification of new implementations. Most pilot data from iter_001 is reusable. Focus pilot effort on NEW tasks: continuous metrics (P1), retrieval models (P3), gap decomposition variants (P4)."
   }
 }

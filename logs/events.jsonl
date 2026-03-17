@@ -21,3 +21,5 @@
 {"ts": 1773674255.30198, "event": "stage_start", "stage": "idea_validation_decision", "iteration": 0, "action_type": "skill", "description": "Review pilot evidence and decide ADVANCE / REFINE / PIVOT"}
 {"ts": 1773674415.3913379, "event": "stage_end", "stage": "idea_validation_decision", "iteration": 0, "duration_sec": 166.28324580192566, "score": null, "next_stage": "idea_debate"}
 {"ts": 1773674421.801356, "event": "stage_start", "stage": "idea_debate", "iteration": 0, "action_type": "team", "description": "Agent Team: 6人辩论生成研究提案（恢复：已完成 0/6） + Codex 独立审查"}
+{"ts": 1773719774.659775, "event": "stage_end", "stage": "idea_debate", "iteration": 0, "duration_sec": 45359.323759794235, "score": null, "next_stage": "planning"}
+{"ts": 1773719779.488496, "event": "stage_start", "stage": "planning", "iteration": 0, "action_type": "skill", "description": "Design experiment plan with pilot/full configs"}
