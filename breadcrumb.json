@@ -1,10 +1,10 @@
 {
-  "ts": 1773720650.654593,
+  "ts": 1773734888.487253,
   "stage": "pilot_experiments",
   "action_type": "skill",
   "iteration": 0,
   "workspace_path": "/Users/jinxulin/Research/sibyl-research-system/workspaces/CRA",
   "in_loop": false,
   "loop_type": "",
-  "description": "[0/12] 并行 1 任务 (PILOT), 预计 60min: p1_fm2_continuous_metrics→GPU[2]"
+  "description": "Run pilot experiments"
 }

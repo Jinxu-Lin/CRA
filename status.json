@@ -1,7 +1,7 @@
 {
-  "stage": "pilot_experiments",
+  "stage": "idea_validation_decision",
   "started_at": 1773662442.492464,
-  "updated_at": 1773734882.019617,
+  "updated_at": 1773734978.900786,
   "iteration": 0,
   "errors": [],
   "paused": false,
@@ -9,5 +9,5 @@
   "stop_requested": false,
   "stop_requested_at": null,
   "iteration_dirs": true,
-  "stage_started_at": 1773734882.019617
+  "stage_started_at": 1773734978.900786
 }

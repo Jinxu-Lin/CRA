@@ -36,3 +36,5 @@
 {"ts": 1773733131.968363, "event": "task_dispatch", "task_ids": ["p4_cosine_vs_euclidean"], "gpu_ids": [2], "iteration": 0}
 {"ts": 1773734110.443769, "event": "task_dispatch", "task_ids": ["p5_pca_whitened_attribution"], "gpu_ids": [2], "iteration": 0}
 {"ts": 1773734595.8047512, "event": "task_dispatch", "task_ids": ["final_analysis"], "gpu_ids": [2], "iteration": 0}
+{"ts": 1773734882.117731, "event": "stage_end", "stage": "pilot_experiments", "iteration": 0, "duration_sec": 14649.652028083801, "score": null, "next_stage": "pilot_experiments"}
+{"ts": 1773734888.487367, "event": "stage_start", "stage": "pilot_experiments", "iteration": 0, "action_type": "skill", "description": "Run pilot experiments"}
