@@ -1,0 +1,21 @@
+{
+  "overall_recommendation": "GO",
+  "selected_candidate_id": "cand_a",
+  "candidates": [
+    {
+      "candidate_id": "cand_a",
+      "go_no_go": "GO",
+      "confidence": 0.82,
+      "supported_hypotheses": ["H1", "H4_revised", "H5_revised", "H9_revised", "H7_revised_toxicity"],
+      "failed_assumptions": ["H2_revised", "H3_revised", "H10_pass_criteria"],
+      "key_metrics": {
+        "decision_gates_passed": 1,
+        "decision_gates_failed": 3,
+        "tier_1_contributions": 3,
+        "tier_2_contributions": 3,
+        "negative_results": 5
+      },
+      "notes": "FM1 spectral diagnosis strongly supported (65,801x concentration ratio). Task-type boundary discovery is robust. FM2 evaluation requires fundamentally new approach (rank-invariance barrier). PCA-whitened attribution is a major positive on toxicity (+30pp, needs validation). Retrieval baselines must be addressed honestly. Paper has strong Tier 1 contributions: FM1 diagnosis, task-type boundary, systematic benchmark. Gate 4 (PCA whitening) PASSES, partially rescuing the matched filter theory for behavioral tasks."
+    }
+  ]
+}

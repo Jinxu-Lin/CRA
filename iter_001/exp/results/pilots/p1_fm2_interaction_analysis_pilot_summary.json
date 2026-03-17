@@ -1,0 +1,23 @@
+{
+  "overall_recommendation": "PASS_WITH_CAVEAT",
+  "selected_candidate_id": "cand_a",
+  "candidates": [
+    {
+      "candidate_id": "cand_a",
+      "go_no_go": "GO",
+      "confidence": 0.55,
+      "supported_hypotheses": ["H1_FM1_dominates"],
+      "failed_assumptions": ["H2_FM2_detectable_with_continuous_metrics", "H3_FM1xFM2_interaction_measurable"],
+      "key_metrics": {
+        "fm1_eta_sq_toxicity": 0.7966,
+        "fm1_eta_sq_counterfact": 0.5445,
+        "fm1_eta_sq_ftrace": 0.8783,
+        "fm2_effect_all_tasks": 0.0,
+        "interaction_all_tasks": 0.0,
+        "h2_best_gain": 0.0,
+        "decision_gate_1_passes": false
+      },
+      "notes": "ANOVA is computable and FM1 (space) main effect is large (eta^2 = 0.55-0.88), confirming parameter vs representation space matters enormously. However, FM2 (scoring) main effect is EXACTLY zero because Kendall tau (and all rank-correlation metrics) are mathematically invariant to mean subtraction. This makes the FM1xFM2 interaction analysis vacuous -- there IS no FM2 signal to interact with. Decision Gate 1 FAILS: FM2 demoted to theoretical hypothesis. The 2-way ANOVA degenerates to a 1-way analysis of FM1. Contamination injection shows structured contamination degrades performance (35-56pp on RepSim) but contrastive correction does NOT recover it because non-uniform perturbations change pairwise orderings irreversibly. GO recommendation is for proceeding with FM1-focused analysis only."
+    }
+  ]
+}

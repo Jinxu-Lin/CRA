@@ -1,0 +1,1935 @@
+{
+  "task_id": "p1_fm2_continuous_metrics",
+  "candidate_id": "cand_a",
+  "mode": "pilot",
+  "n_train": 100,
+  "seed": 42,
+  "model": "EleutherAI/pythia-1b",
+  "hidden_dim": 2048,
+  "gradient_params_D": 20971520,
+  "trak_k": 2048,
+  "logra_k": 256,
+  "bootstrap_B": 1000,
+  "methods": [
+    "RepSim",
+    "TRAK",
+    "LoGra",
+    "DDA",
+    "RawDotIF",
+    "DiagIF",
+    "kNN",
+    "BM25"
+  ],
+  "scorings": [
+    "standard",
+    "contrastive"
+  ],
+  "tasks": [
+    "toxicity",
+    "counterfact",
+    "ftrace"
+  ],
+  "results": {
+    "RepSim": {
+      "standard": {
+        "toxicity": {
+          "rank_based": {
+            "AUPRC": 0.809212,
+            "CI_lower": 0.652062,
+            "CI_upper": 0.937057,
+            "n_unsafe": 20,
+            "n_train": 100
+          },
+          "score_stats": {
+            "mean": 0.6443581581115723,
+            "std": 0.10438942164182663,
+            "min": 0.19483916461467743,
+            "max": 0.818468451499939
+          },
+          "continuous": {
+            "kendall_tau": 0.4647775616552308,
+            "kendall_p": 1.743509453359617e-08,
+            "spearman_rho": 0.5664089352298308,
+            "spearman_p": 8.139854570676756e-10,
+            "ndcg_at_50": 0.9041513829638967
+          },
+          "runtime_sec": 0.0
+        },
+        "counterfact": {
+          "rank_based": {
+            "Recall_at_50": 0.948718,
+            "Recall_at_50_CI": [
+              0.895823,
+              0.986673
+            ],
+            "MRR": 0.623001,
+            "MRR_CI": [
+              0.515343,
+              0.732473
+            ],
+            "refs_with_facts": 52,
+            "n_ref": 66,
+            "n_train": 100
+          },
+          "continuous": {
+            "kendall_tau": 0.14325314626905133,
+            "kendall_tau_std": 0.05385853061439713,
+            "spearman_rho": 0.1745778383913586,
+            "spearman_rho_std": 0.06563559753121874,
+            "ndcg_at_50": 0.6634073739650268,
+            "ndcg_at_50_std": 0.3188932235456998,
+            "n_evaluated_refs": 52
+          },
+          "runtime_sec": 0.0
+        },
+        "ftrace": {
+          "rank_based": {
+            "Recall_at_50": 0.660451,
+            "Recall_at_50_CI": [
+              0.573168,
+              0.753816
+            ],
+            "MRR": 0.403189,
+            "MRR_CI": [
+              0.245446,
+              0.573587
+            ],
+            "refs_with_facts": 28,
+            "n_ref": 30,
+            "n_train": 100
+          },
+          "continuous": {
+            "kendall_tau": 0.030242116705813508,
+            "kendall_tau_std": 0.11078082750485649,
+            "spearman_rho": 0.0368550604324195,
+            "spearman_rho_std": 0.13500490498603473,
+            "ndcg_at_50": 0.32932060833452065,
+            "ndcg_at_50_std": 0.2322325578979813,
+            "n_evaluated_refs": 28
+          },
+          "runtime_sec": 0.0
+        }
+      },
+      "contrastive": {
+        "toxicity": {
+          "rank_based": {
+            "AUPRC": 0.809212,
+            "CI_lower": 0.652062,
+            "CI_upper": 0.937057,
+            "n_unsafe": 20,
+            "n_train": 100
+          },
+          "score_stats": {
+            "mean": 1.5199184133507515e-08,
+            "std": 0.10438943654298782,
+            "min": -0.44951897859573364,
+            "max": 0.1741102635860443
+          },
+          "continuous": {
+            "kendall_tau": 0.4647775616552308,
+            "kendall_p": 1.743509453359617e-08,
+            "spearman_rho": 0.5664089352298308,
+            "spearman_p": 8.139854570676756e-10,
+            "ndcg_at_50": 0.9041513829638967
+          },
+          "runtime_sec": 0.0
+        },
+        "counterfact": {
+          "rank_based": {
+            "Recall_at_50": 0.948718,
+            "Recall_at_50_CI": [
+              0.895823,
+              0.986673
+            ],
+            "MRR": 0.623001,
+            "MRR_CI": [
+              0.515343,
+              0.732473
+            ],
+            "refs_with_facts": 52,
+            "n_ref": 66,
+            "n_train": 100
+          },
+          "continuous": {
+            "kendall_tau": 0.14325314626905133,
+            "kendall_tau_std": 0.05385853061439713,
+            "spearman_rho": 0.1745778383913586,
+            "spearman_rho_std": 0.06563559753121874,
+            "ndcg_at_50": 0.6634073739650268,
+            "ndcg_at_50_std": 0.3188932235456998,
+            "n_evaluated_refs": 52
+          },
+          "runtime_sec": 0.0
+        },
+        "ftrace": {
+          "rank_based": {
+            "Recall_at_50": 0.660451,
+            "Recall_at_50_CI": [
+              0.573168,
+              0.753816
+            ],
+            "MRR": 0.403189,
+            "MRR_CI": [
+              0.245446,
+              0.573587
+            ],
+            "refs_with_facts": 28,
+            "n_ref": 30,
+            "n_train": 100
+          },
+          "continuous": {
+            "kendall_tau": 0.030242116705813508,
+            "kendall_tau_std": 0.11078082750485649,
+            "spearman_rho": 0.0368550604324195,
+            "spearman_rho_std": 0.13500490498603473,
+            "ndcg_at_50": 0.32932060833452065,
+            "ndcg_at_50_std": 0.2322325578979813,
+            "n_evaluated_refs": 28
+          },
+          "runtime_sec": 0.0
+        }
+      }
+    },
+    "TRAK": {
+      "standard": {
+        "toxicity": {
+          "rank_based": {
+            "AUPRC": 0.925612,
+            "CI_lower": 0.806091,
+            "CI_upper": 0.997001,
+            "n_unsafe": 20,
+            "n_train": 100
+          },
+          "score_stats": {
+            "mean": 0.02061079442501068,
+            "std": 0.04246281087398529,
+            "min": -0.025587523356080055,
+            "max": 0.20504161715507507
+          },
+          "continuous": {
+            "kendall_tau": 0.5280271075073952,
+            "kendall_p": 1.5271777873358312e-10,
+            "spearman_rho": 0.6434890502687527,
+            "spearman_p": 5.18652787474386e-13,
+            "ndcg_at_50": 0.9583988007414836
+          },
+          "runtime_sec": 4.89
+        },
+        "counterfact": {
+          "rank_based": {
+            "Recall_at_50": 0.669872,
+            "Recall_at_50_CI": [
+              0.542384,
+              0.77783
+            ],
+            "MRR": 0.239908,
+            "MRR_CI": [
+              0.141839,
+              0.337716
+            ],
+            "refs_with_facts": 52,
+            "n_ref": 66,
+            "n_train": 100
+          },
+          "continuous": {
+            "kendall_tau": 0.05559235033708847,
+            "kendall_tau_std": 0.08822797704597242,
+            "spearman_rho": 0.06774854588335663,
+            "spearman_rho_std": 0.10752049724199242,
+            "ndcg_at_50": 0.3157564141354377,
+            "ndcg_at_50_std": 0.32634503484374716,
+            "n_evaluated_refs": 52
+          },
+          "runtime_sec": 7.13
+        },
+        "ftrace": {
+          "rank_based": {
+            "Recall_at_50": 0.590167,
+            "Recall_at_50_CI": [
+              0.494256,
+              0.678111
+            ],
+            "MRR": 0.364972,
+            "MRR_CI": [
+              0.213334,
+              0.523583
+            ],
+            "refs_with_facts": 28,
+            "n_ref": 30,
+            "n_train": 100
+          },
+          "continuous": {
+            "kendall_tau": 0.011378525289065062,
+            "kendall_tau_std": 0.0959484127630932,
+            "spearman_rho": 0.013866629814297772,
+            "spearman_rho_std": 0.11692913512560982,
+            "ndcg_at_50": 0.2890132540952367,
+            "ndcg_at_50_std": 0.16417451598202534,
+            "n_evaluated_refs": 28
+          },
+          "runtime_sec": 5.51
+        }
+      },
+      "contrastive": {
+        "toxicity": {
+          "rank_based": {
+            "AUPRC": 0.925612,
+            "CI_lower": 0.806091,
+            "CI_upper": 0.997001,
+            "n_unsafe": 20,
+            "n_train": 100
+          },
+          "score_stats": {
+            "mean": 7.450580707946131e-10,
+            "std": 0.04246281087398529,
+            "min": -0.04619831591844559,
+            "max": 0.1844308227300644
+          },
+          "continuous": {
+            "kendall_tau": 0.5280271075073952,
+            "kendall_p": 1.5271777873358312e-10,
+            "spearman_rho": 0.6434890502687527,
+            "spearman_p": 5.18652787474386e-13,
+            "ndcg_at_50": 0.9583988007414836
+          },
+          "runtime_sec": 4.89
+        },
+        "counterfact": {
+          "rank_based": {
+            "Recall_at_50": 0.669872,
+            "Recall_at_50_CI": [
+              0.542384,
+              0.77783
+            ],
+            "MRR": 0.239908,
+            "MRR_CI": [
+              0.141839,
+              0.337716
+            ],
+            "refs_with_facts": 52,
+            "n_ref": 66,
+            "n_train": 100
+          },
+          "continuous": {
+            "kendall_tau": 0.05559235033708847,
+            "kendall_tau_std": 0.08822797704597242,
+            "spearman_rho": 0.06774854588335663,
+            "spearman_rho_std": 0.10752049724199242,
+            "ndcg_at_50": 0.3157564141354377,
+            "ndcg_at_50_std": 0.32634503484374716,
+            "n_evaluated_refs": 52
+          },
+          "runtime_sec": 7.13
+        },
+        "ftrace": {
+          "rank_based": {
+            "Recall_at_50": 0.590167,
+            "Recall_at_50_CI": [
+              0.494256,
+              0.678111
+            ],
+            "MRR": 0.364972,
+            "MRR_CI": [
+              0.213334,
+              0.523583
+            ],
+            "refs_with_facts": 28,
+            "n_ref": 30,
+            "n_train": 100
+          },
+          "continuous": {
+            "kendall_tau": 0.011378525289065062,
+            "kendall_tau_std": 0.0959484127630932,
+            "spearman_rho": 0.013866629814297772,
+            "spearman_rho_std": 0.11692913512560982,
+            "ndcg_at_50": 0.2890132540952367,
+            "ndcg_at_50_std": 0.16417451598202534,
+            "n_evaluated_refs": 28
+          },
+          "runtime_sec": 5.51
+        }
+      }
+    },
+    "LoGra": {
+      "standard": {
+        "toxicity": {
+          "rank_based": {
+            "AUPRC": 0.922158,
+            "CI_lower": 0.805992,
+            "CI_upper": 0.993833,
+            "n_unsafe": 20,
+            "n_train": 100
+          },
+          "score_stats": {
+            "mean": 0.053795553743839264,
+            "std": 0.0969490334391594,
+            "min": -0.033750373870134354,
+            "max": 0.46583446860313416
+          },
+          "continuous": {
+            "kendall_tau": 0.5344231289980635,
+            "kendall_p": 9.160677154241828e-11,
+            "spearman_rho": 0.6512836686434752,
+            "spearman_p": 2.1884759310822194e-13,
+            "ndcg_at_50": 0.9565898510339146
+          },
+          "runtime_sec": 18.67
+        },
+        "counterfact": {
+          "rank_based": {
+            "Recall_at_50": 0.798077,
+            "Recall_at_50_CI": [
+              0.702091,
+              0.882385
+            ],
+            "MRR": 0.268564,
+            "MRR_CI": [
+              0.172196,
+              0.367876
+            ],
+            "refs_with_facts": 52,
+            "n_ref": 66,
+            "n_train": 100
+          },
+          "continuous": {
+            "kendall_tau": 0.0764304697124815,
+            "kendall_tau_std": 0.0786160495683434,
+            "spearman_rho": 0.0931432679641179,
+            "spearman_rho_std": 0.09580676134492959,
+            "ndcg_at_50": 0.3542085043236454,
+            "ndcg_at_50_std": 0.3008944427113047,
+            "n_evaluated_refs": 52
+          },
+          "runtime_sec": 21.95
+        },
+        "ftrace": {
+          "rank_based": {
+            "Recall_at_50": 0.582862,
+            "Recall_at_50_CI": [
+              0.488665,
+              0.672044
+            ],
+            "MRR": 0.363213,
+            "MRR_CI": [
+              0.212042,
+              0.524311
+            ],
+            "refs_with_facts": 28,
+            "n_ref": 30,
+            "n_train": 100
+          },
+          "continuous": {
+            "kendall_tau": 0.013852132754126128,
+            "kendall_tau_std": 0.09344845691279904,
+            "spearman_rho": 0.016881132849840413,
+            "spearman_rho_std": 0.113882522190502,
+            "ndcg_at_50": 0.2838673997117071,
+            "ndcg_at_50_std": 0.16165951126721756,
+            "n_evaluated_refs": 28
+          },
+          "runtime_sec": 18.79
+        }
+      },
+      "contrastive": {
+        "toxicity": {
+          "rank_based": {
+            "AUPRC": 0.922158,
+            "CI_lower": 0.805992,
+            "CI_upper": 0.993833,
+            "n_unsafe": 20,
+            "n_train": 100
+          },
+          "score_stats": {
+            "mean": -2.9802322831784522e-09,
+            "std": 0.0969490259885788,
+            "min": -0.08754591643810272,
+            "max": 0.4120388925075531
+          },
+          "continuous": {
+            "kendall_tau": 0.5344231289980635,
+            "kendall_p": 9.160677154241828e-11,
+            "spearman_rho": 0.6512836686434752,
+            "spearman_p": 2.1884759310822194e-13,
+            "ndcg_at_50": 0.9565898510339146
+          },
+          "runtime_sec": 18.67
+        },
+        "counterfact": {
+          "rank_based": {
+            "Recall_at_50": 0.798077,
+            "Recall_at_50_CI": [
+              0.702091,
+              0.882385
+            ],
+            "MRR": 0.268564,
+            "MRR_CI": [
+              0.172196,
+              0.367876
+            ],
+            "refs_with_facts": 52,
+            "n_ref": 66,
+            "n_train": 100
+          },
+          "continuous": {
+            "kendall_tau": 0.0764304697124815,
+            "kendall_tau_std": 0.0786160495683434,
+            "spearman_rho": 0.0931432679641179,
+            "spearman_rho_std": 0.09580676134492959,
+            "ndcg_at_50": 0.3542085043236454,
+            "ndcg_at_50_std": 0.3008944427113047,
+            "n_evaluated_refs": 52
+          },
+          "runtime_sec": 21.95
+        },
+        "ftrace": {
+          "rank_based": {
+            "Recall_at_50": 0.582862,
+            "Recall_at_50_CI": [
+              0.488665,
+              0.672044
+            ],
+            "MRR": 0.363213,
+            "MRR_CI": [
+              0.212042,
+              0.524311
+            ],
+            "refs_with_facts": 28,
+            "n_ref": 30,
+            "n_train": 100
+          },
+          "continuous": {
+            "kendall_tau": 0.013852132754126128,
+            "kendall_tau_std": 0.09344845691279904,
+            "spearman_rho": 0.016881132849840413,
+            "spearman_rho_std": 0.113882522190502,
+            "ndcg_at_50": 0.2838673997117071,
+            "ndcg_at_50_std": 0.16165951126721756,
+            "n_evaluated_refs": 28
+          },
+          "runtime_sec": 18.79
+        }
+      }
+    },
+    "DDA": {
+      "standard": {
+        "toxicity": {
+          "rank_based": {
+            "AUPRC": 0.876384,
+            "CI_lower": 0.724385,
+            "CI_upper": 0.974768,
+            "n_unsafe": 20,
+            "n_train": 100
+          },
+          "score_stats": {
+            "mean": 0.0009364885045215487,
+            "std": 0.10669589787721634,
+            "min": -0.16663751006126404,
+            "max": 0.4057360291481018
+          },
+          "continuous": {
+            "kendall_tau": 0.5045750287082781,
+            "kendall_p": 9.45995753699829e-10,
+            "spearman_rho": 0.6149087828947705,
+            "spearman_p": 1.003231422407439e-11,
+            "ndcg_at_50": 0.9460861269645204
+          },
+          "runtime_sec": 12.26
+        },
+        "counterfact": {
+          "rank_based": {
+            "Recall_at_50": 0.692308,
+            "Recall_at_50_CI": [
+              0.564613,
+              0.798614
+            ],
+            "MRR": 0.184874,
+            "MRR_CI": [
+              0.104464,
+              0.276344
+            ],
+            "refs_with_facts": 52,
+            "n_ref": 66,
+            "n_train": 100
+          },
+          "continuous": {
+            "kendall_tau": 0.05189416337261839,
+            "kendall_tau_std": 0.09916409451319269,
+            "spearman_rho": 0.06324168859582653,
+            "spearman_rho_std": 0.12084797937795552,
+            "ndcg_at_50": 0.2828447485773171,
+            "ndcg_at_50_std": 0.29052776691525944,
+            "n_evaluated_refs": 52
+          },
+          "runtime_sec": 10.48
+        },
+        "ftrace": {
+          "rank_based": {
+            "Recall_at_50": 0.651381,
+            "Recall_at_50_CI": [
+              0.550219,
+              0.749748
+            ],
+            "MRR": 0.337731,
+            "MRR_CI": [
+              0.183425,
+              0.500832
+            ],
+            "refs_with_facts": 28,
+            "n_ref": 30,
+            "n_train": 100
+          },
+          "continuous": {
+            "kendall_tau": 0.008526495286826603,
+            "kendall_tau_std": 0.10559215061362355,
+            "spearman_rho": 0.010390955835850159,
+            "spearman_rho_std": 0.12868163726470067,
+            "ndcg_at_50": 0.2735841725383688,
+            "ndcg_at_50_std": 0.14398317055943824,
+            "n_evaluated_refs": 28
+          },
+          "runtime_sec": 11.84
+        }
+      },
+      "contrastive": {
+        "toxicity": {
+          "rank_based": {
+            "AUPRC": 0.876384,
+            "CI_lower": 0.724385,
+            "CI_upper": 0.974768,
+            "n_unsafe": 20,
+            "n_train": 100
+          },
+          "score_stats": {
+            "mean": -1.4901161415892261e-09,
+            "std": 0.10669589787721634,
+            "min": -0.1675739884376526,
+            "max": 0.40479961037635803
+          },
+          "continuous": {
+            "kendall_tau": 0.5045750287082781,
+            "kendall_p": 9.45995753699829e-10,
+            "spearman_rho": 0.6149087828947705,
+            "spearman_p": 1.003231422407439e-11,
+            "ndcg_at_50": 0.9460861269645204
+          },
+          "runtime_sec": 12.26
+        },
+        "counterfact": {
+          "rank_based": {
+            "Recall_at_50": 0.692308,
+            "Recall_at_50_CI": [
+              0.564613,
+              0.798614
+            ],
+            "MRR": 0.184874,
+            "MRR_CI": [
+              0.104464,
+              0.276344
+            ],
+            "refs_with_facts": 52,
+            "n_ref": 66,
+            "n_train": 100
+          },
+          "continuous": {
+            "kendall_tau": 0.05189416337261839,
+            "kendall_tau_std": 0.09916409451319269,
+            "spearman_rho": 0.06324168859582653,
+            "spearman_rho_std": 0.12084797937795552,
+            "ndcg_at_50": 0.2828447485773171,
+            "ndcg_at_50_std": 0.29052776691525944,
+            "n_evaluated_refs": 52
+          },
+          "runtime_sec": 10.48
+        },
+        "ftrace": {
+          "rank_based": {
+            "Recall_at_50": 0.651381,
+            "Recall_at_50_CI": [
+              0.550219,
+              0.749748
+            ],
+            "MRR": 0.337731,
+            "MRR_CI": [
+              0.183425,
+              0.500832
+            ],
+            "refs_with_facts": 28,
+            "n_ref": 30,
+            "n_train": 100
+          },
+          "continuous": {
+            "kendall_tau": 0.008526495286826603,
+            "kendall_tau_std": 0.10559215061362355,
+            "spearman_rho": 0.010390955835850159,
+            "spearman_rho_std": 0.12868163726470067,
+            "ndcg_at_50": 0.2735841725383688,
+            "ndcg_at_50_std": 0.14398317055943824,
+            "n_evaluated_refs": 28
+          },
+          "runtime_sec": 11.84
+        }
+      }
+    },
+    "RawDotIF": {
+      "standard": {
+        "toxicity": {
+          "rank_based": {
+            "AUPRC": 0.954206,
+            "CI_lower": 0.864721,
+            "CI_upper": 0.995866,
+            "n_unsafe": 20,
+            "n_train": 100
+          },
+          "score_stats": {
+            "mean": 0.04567677900195122,
+            "std": 0.10219281166791916,
+            "min": -0.02264716848731041,
+            "max": 0.7517163157463074
+          },
+          "continuous": {
+            "kendall_tau": 0.5550325315791058,
+            "kendall_p": 1.6955624906366082e-11,
+            "spearman_rho": 0.6763996611842475,
+            "spearman_p": 1.1348740343397657e-14,
+            "ndcg_at_50": 0.9899460216323029
+          },
+          "runtime_sec": 1.51
+        },
+        "counterfact": {
+          "rank_based": {
+            "Recall_at_50": 0.753205,
+            "Recall_at_50_CI": [
+              0.645824,
+              0.851532
+            ],
+            "MRR": 0.266336,
+            "MRR_CI": [
+              0.16752,
+              0.369535
+            ],
+            "refs_with_facts": 52,
+            "n_ref": 66,
+            "n_train": 100
+          },
+          "continuous": {
+            "kendall_tau": 0.07420873630061696,
+            "kendall_tau_std": 0.07982231626223986,
+            "spearman_rho": 0.09043571544867997,
+            "spearman_rho_std": 0.09727679839073673,
+            "ndcg_at_50": 0.3418517059649818,
+            "ndcg_at_50_std": 0.3078051338422959,
+            "n_evaluated_refs": 52
+          },
+          "runtime_sec": 1.41
+        },
+        "ftrace": {
+          "rank_based": {
+            "Recall_at_50": 0.643465,
+            "Recall_at_50_CI": [
+              0.543632,
+              0.743739
+            ],
+            "MRR": 0.330299,
+            "MRR_CI": [
+              0.175772,
+              0.495672
+            ],
+            "refs_with_facts": 28,
+            "n_ref": 30,
+            "n_train": 100
+          },
+          "continuous": {
+            "kendall_tau": 0.004417447335258399,
+            "kendall_tau_std": 0.10137135257217281,
+            "spearman_rho": 0.0053833959468413215,
+            "spearman_rho_std": 0.12353789126292687,
+            "ndcg_at_50": 0.265023708237089,
+            "ndcg_at_50_std": 0.14092475388114625,
+            "n_evaluated_refs": 28
+          },
+          "runtime_sec": 1.12
+        }
+      },
+      "contrastive": {
+        "toxicity": {
+          "rank_based": {
+            "AUPRC": 0.954206,
+            "CI_lower": 0.864721,
+            "CI_upper": 0.995866,
+            "n_unsafe": 20,
+            "n_train": 100
+          },
+          "score_stats": {
+            "mean": -1.19209286886246e-09,
+            "std": 0.10219280421733856,
+            "min": -0.06832395493984222,
+            "max": 0.706039547920227
+          },
+          "continuous": {
+            "kendall_tau": 0.5550325315791058,
+            "kendall_p": 1.6955624906366082e-11,
+            "spearman_rho": 0.6763996611842475,
+            "spearman_p": 1.1348740343397657e-14,
+            "ndcg_at_50": 0.9899460216323029
+          },
+          "runtime_sec": 1.51
+        },
+        "counterfact": {
+          "rank_based": {
+            "Recall_at_50": 0.753205,
+            "Recall_at_50_CI": [
+              0.645824,
+              0.851532
+            ],
+            "MRR": 0.266336,
+            "MRR_CI": [
+              0.16752,
+              0.369535
+            ],
+            "refs_with_facts": 52,
+            "n_ref": 66,
+            "n_train": 100
+          },
+          "continuous": {
+            "kendall_tau": 0.07420873630061696,
+            "kendall_tau_std": 0.07982231626223986,
+            "spearman_rho": 0.09043571544867997,
+            "spearman_rho_std": 0.09727679839073673,
+            "ndcg_at_50": 0.3418517059649818,
+            "ndcg_at_50_std": 0.3078051338422959,
+            "n_evaluated_refs": 52
+          },
+          "runtime_sec": 1.41
+        },
+        "ftrace": {
+          "rank_based": {
+            "Recall_at_50": 0.643465,
+            "Recall_at_50_CI": [
+              0.543632,
+              0.743739
+            ],
+            "MRR": 0.330299,
+            "MRR_CI": [
+              0.175772,
+              0.495672
+            ],
+            "refs_with_facts": 28,
+            "n_ref": 30,
+            "n_train": 100
+          },
+          "continuous": {
+            "kendall_tau": 0.004417447335258399,
+            "kendall_tau_std": 0.10137135257217281,
+            "spearman_rho": 0.0053833959468413215,
+            "spearman_rho_std": 0.12353789126292687,
+            "ndcg_at_50": 0.265023708237089,
+            "ndcg_at_50_std": 0.14092475388114625,
+            "n_evaluated_refs": 28
+          },
+          "runtime_sec": 1.12
+        }
+      }
+    },
+    "DiagIF": {
+      "standard": {
+        "toxicity": {
+          "rank_based": {
+            "AUPRC": 0.981868,
+            "CI_lower": 0.930376,
+            "CI_upper": 1.0,
+            "n_unsafe": 20,
+            "n_train": 100
+          },
+          "score_stats": {
+            "mean": 304067.96875,
+            "std": 599514.625,
+            "min": -150336.03125,
+            "max": 4095860.0
+          },
+          "continuous": {
+            "kendall_tau": 0.5635605602333302,
+            "kendall_p": 8.286810245160573e-12,
+            "spearman_rho": 0.6867924856838774,
+            "spearman_p": 3.058112003655582e-15,
+            "ndcg_at_50": 0.9961631807660264
+          },
+          "runtime_sec": 3.37
+        },
+        "counterfact": {
+          "rank_based": {
+            "Recall_at_50": 0.964744,
+            "Recall_at_50_CI": [
+              0.913462,
+              1.0
+            ],
+            "MRR": 0.570385,
+            "MRR_CI": [
+              0.462796,
+              0.678463
+            ],
+            "refs_with_facts": 52,
+            "n_ref": 66,
+            "n_train": 100
+          },
+          "continuous": {
+            "kendall_tau": 0.14687729600762675,
+            "kendall_tau_std": 0.05778421297218615,
+            "spearman_rho": 0.17899446897745971,
+            "spearman_rho_std": 0.07041969587797847,
+            "ndcg_at_50": 0.6480279203960838,
+            "ndcg_at_50_std": 0.3121282780042808,
+            "n_evaluated_refs": 52
+          },
+          "runtime_sec": 2.92
+        },
+        "ftrace": {
+          "rank_based": {
+            "Recall_at_50": 0.654628,
+            "Recall_at_50_CI": [
+              0.553516,
+              0.75324
+            ],
+            "MRR": 0.341998,
+            "MRR_CI": [
+              0.187235,
+              0.507516
+            ],
+            "refs_with_facts": 28,
+            "n_ref": 30,
+            "n_train": 100
+          },
+          "continuous": {
+            "kendall_tau": 0.010689079749010682,
+            "kendall_tau_std": 0.1018934995409356,
+            "spearman_rho": 0.013026425496235549,
+            "spearman_rho_std": 0.12417421438394236,
+            "ndcg_at_50": 0.28003917860202354,
+            "ndcg_at_50_std": 0.15711064050024076,
+            "n_evaluated_refs": 28
+          },
+          "runtime_sec": 2.58
+        }
+      },
+      "contrastive": {
+        "toxicity": {
+          "rank_based": {
+            "AUPRC": 0.981868,
+            "CI_lower": 0.930376,
+            "CI_upper": 1.0,
+            "n_unsafe": 20,
+            "n_train": 100
+          },
+          "score_stats": {
+            "mean": -0.008750000037252903,
+            "std": 599514.625,
+            "min": -454404.0,
+            "max": 3791791.5
+          },
+          "continuous": {
+            "kendall_tau": 0.5635605602333302,
+            "kendall_p": 8.286810245160573e-12,
+            "spearman_rho": 0.6867924856838774,
+            "spearman_p": 3.058112003655582e-15,
+            "ndcg_at_50": 0.9961631807660264
+          },
+          "runtime_sec": 3.37
+        },
+        "counterfact": {
+          "rank_based": {
+            "Recall_at_50": 0.964744,
+            "Recall_at_50_CI": [
+              0.913462,
+              1.0
+            ],
+            "MRR": 0.570385,
+            "MRR_CI": [
+              0.462796,
+              0.678463
+            ],
+            "refs_with_facts": 52,
+            "n_ref": 66,
+            "n_train": 100
+          },
+          "continuous": {
+            "kendall_tau": 0.14687729600762675,
+            "kendall_tau_std": 0.05778421297218615,
+            "spearman_rho": 0.17899446897745971,
+            "spearman_rho_std": 0.07041969587797847,
+            "ndcg_at_50": 0.6480279203960838,
+            "ndcg_at_50_std": 0.3121282780042808,
+            "n_evaluated_refs": 52
+          },
+          "runtime_sec": 2.92
+        },
+        "ftrace": {
+          "rank_based": {
+            "Recall_at_50": 0.654628,
+            "Recall_at_50_CI": [
+              0.553516,
+              0.75324
+            ],
+            "MRR": 0.341998,
+            "MRR_CI": [
+              0.187235,
+              0.507516
+            ],
+            "refs_with_facts": 28,
+            "n_ref": 30,
+            "n_train": 100
+          },
+          "continuous": {
+            "kendall_tau": 0.010689079749010682,
+            "kendall_tau_std": 0.1018934995409356,
+            "spearman_rho": 0.013026425496235549,
+            "spearman_rho_std": 0.12417421438394236,
+            "ndcg_at_50": 0.28003917860202354,
+            "ndcg_at_50_std": 0.15711064050024076,
+            "n_evaluated_refs": 28
+          },
+          "runtime_sec": 2.58
+        }
+      }
+    },
+    "kNN": {
+      "standard": {
+        "toxicity": {
+          "rank_based": {
+            "AUPRC": 0.743144,
+            "CI_lower": 0.557574,
+            "CI_upper": 0.887985,
+            "n_unsafe": 20,
+            "n_train": 100
+          },
+          "score_stats": {
+            "mean": 0.3642662763595581,
+            "std": 0.28024759888648987,
+            "min": 0.0,
+            "max": 0.818468451499939
+          },
+          "continuous": {
+            "kendall_tau": 0.4526397455062995,
+            "kendall_p": 5.999759117081865e-08,
+            "spearman_rho": 0.5446107301656772,
+            "spearman_p": 4.701777657350445e-09,
+            "ndcg_at_50": 0.8832493781955167
+          },
+          "runtime_sec": 0.0
+        },
+        "counterfact": {
+          "rank_based": {
+            "Recall_at_50": 0.948718,
+            "Recall_at_50_CI": [
+              0.895823,
+              0.986673
+            ],
+            "MRR": 0.622963,
+            "MRR_CI": [
+              0.515306,
+              0.732472
+            ],
+            "refs_with_facts": 52,
+            "n_ref": 66,
+            "n_train": 100
+          },
+          "continuous": {
+            "kendall_tau": 0.16114951467259717,
+            "kendall_tau_std": 0.0684590390197607,
+            "spearman_rho": 0.18212147125330785,
+            "spearman_rho_std": 0.07736828083036444,
+            "ndcg_at_50": 0.6634073739650268,
+            "ndcg_at_50_std": 0.3188932235456998,
+            "n_evaluated_refs": 52
+          },
+          "runtime_sec": 0.0
+        },
+        "ftrace": {
+          "rank_based": {
+            "Recall_at_50": 0.660451,
+            "Recall_at_50_CI": [
+              0.573168,
+              0.753816
+            ],
+            "MRR": 0.403189,
+            "MRR_CI": [
+              0.245446,
+              0.573587
+            ],
+            "refs_with_facts": 28,
+            "n_ref": 30,
+            "n_train": 100
+          },
+          "continuous": {
+            "kendall_tau": 0.025108363948992882,
+            "kendall_tau_std": 0.11433135875085401,
+            "spearman_rho": 0.028375960004871692,
+            "spearman_rho_std": 0.12921041250666593,
+            "ndcg_at_50": 0.32932060833452065,
+            "ndcg_at_50_std": 0.2322325578979813,
+            "n_evaluated_refs": 28
+          },
+          "runtime_sec": 0.0
+        }
+      },
+      "contrastive": {
+        "toxicity": {
+          "rank_based": {
+            "AUPRC": 0.743144,
+            "CI_lower": 0.557574,
+            "CI_upper": 0.887985,
+            "n_unsafe": 20,
+            "n_train": 100
+          },
+          "score_stats": {
+            "mean": -2.086162531611535e-08,
+            "std": 0.2802475690841675,
+            "min": -0.3642663061618805,
+            "max": 0.4542021155357361
+          },
+          "continuous": {
+            "kendall_tau": 0.4526397455062995,
+            "kendall_p": 5.999759117081865e-08,
+            "spearman_rho": 0.5446107301656772,
+            "spearman_p": 4.701777657350445e-09,
+            "ndcg_at_50": 0.8832493781955167
+          },
+          "runtime_sec": 0.0
+        },
+        "counterfact": {
+          "rank_based": {
+            "Recall_at_50": 0.948718,
+            "Recall_at_50_CI": [
+              0.895823,
+              0.986673
+            ],
+            "MRR": 0.622963,
+            "MRR_CI": [
+              0.515306,
+              0.732472
+            ],
+            "refs_with_facts": 52,
+            "n_ref": 66,
+            "n_train": 100
+          },
+          "continuous": {
+            "kendall_tau": 0.16114951467259717,
+            "kendall_tau_std": 0.0684590390197607,
+            "spearman_rho": 0.18212147125330785,
+            "spearman_rho_std": 0.07736828083036444,
+            "ndcg_at_50": 0.6634073739650268,
+            "ndcg_at_50_std": 0.3188932235456998,
+            "n_evaluated_refs": 52
+          },
+          "runtime_sec": 0.0
+        },
+        "ftrace": {
+          "rank_based": {
+            "Recall_at_50": 0.660451,
+            "Recall_at_50_CI": [
+              0.573168,
+              0.753816
+            ],
+            "MRR": 0.403189,
+            "MRR_CI": [
+              0.245446,
+              0.573587
+            ],
+            "refs_with_facts": 28,
+            "n_ref": 30,
+            "n_train": 100
+          },
+          "continuous": {
+            "kendall_tau": 0.025108363948992882,
+            "kendall_tau_std": 0.11433135875085401,
+            "spearman_rho": 0.028375960004871692,
+            "spearman_rho_std": 0.12921041250666593,
+            "ndcg_at_50": 0.32932060833452065,
+            "ndcg_at_50_std": 0.2322325578979813,
+            "n_evaluated_refs": 28
+          },
+          "runtime_sec": 0.0
+        }
+      }
+    },
+    "BM25": {
+      "standard": {
+        "toxicity": {
+          "rank_based": {
+            "AUPRC": 0.509496,
+            "CI_lower": 0.287687,
+            "CI_upper": 0.726326,
+            "n_unsafe": 20,
+            "n_train": 100
+          },
+          "score_stats": {
+            "mean": 136.5953369140625,
+            "std": 25.599027633666992,
+            "min": 59.24163818359375,
+            "max": 196.31903076171875
+          },
+          "continuous": {
+            "kendall_tau": 0.3084303696611164,
+            "kendall_p": 0.00018409546908047214,
+            "spearman_rho": 0.3758738194032822,
+            "spearman_p": 0.00011630037297146767,
+            "ndcg_at_50": 0.7328348138849664
+          },
+          "runtime_sec": 0.06
+        },
+        "counterfact": {
+          "rank_based": {
+            "Recall_at_50": 1.0,
+            "Recall_at_50_CI": [
+              1.0,
+              1.0
+            ],
+            "MRR": 0.742216,
+            "MRR_CI": [
+              0.649379,
+              0.829301
+            ],
+            "refs_with_facts": 52,
+            "n_ref": 66,
+            "n_train": 100
+          },
+          "continuous": {
+            "kendall_tau": 0.256025028411806,
+            "kendall_tau_std": 0.11638579889379215,
+            "spearman_rho": 0.2756873216198854,
+            "spearman_rho_std": 0.11326661674890771,
+            "ndcg_at_50": 0.8150039949468947,
+            "ndcg_at_50_std": 0.21874945854137962,
+            "n_evaluated_refs": 52
+          },
+          "runtime_sec": 0.01
+        },
+        "ftrace": {
+          "rank_based": {
+            "Recall_at_50": 0.660864,
+            "Recall_at_50_CI": [
+              0.555127,
+              0.757929
+            ],
+            "MRR": 0.588606,
+            "MRR_CI": [
+              0.436257,
+              0.741884
+            ],
+            "refs_with_facts": 28,
+            "n_ref": 30,
+            "n_train": 100
+          },
+          "continuous": {
+            "kendall_tau": 0.0874998629210982,
+            "kendall_tau_std": 0.11506089195602036,
+            "spearman_rho": 0.10659135406938271,
+            "spearman_rho_std": 0.14017223752570135,
+            "ndcg_at_50": 0.4825983568403836,
+            "ndcg_at_50_std": 0.3016859500387026,
+            "n_evaluated_refs": 28
+          },
+          "runtime_sec": 0.01
+        }
+      },
+      "contrastive": {
+        "toxicity": {
+          "rank_based": {
+            "AUPRC": 0.509496,
+            "CI_lower": 0.287687,
+            "CI_upper": 0.726326,
+            "n_unsafe": 20,
+            "n_train": 100
+          },
+          "score_stats": {
+            "mean": 3.776550329348538e-06,
+            "std": 25.599027633666992,
+            "min": -77.35369873046875,
+            "max": 59.72367477416992
+          },
+          "continuous": {
+            "kendall_tau": 0.3084303696611164,
+            "kendall_p": 0.00018409546908047214,
+            "spearman_rho": 0.3758738194032822,
+            "spearman_p": 0.00011630037297146767,
+            "ndcg_at_50": 0.7328348138849664
+          },
+          "runtime_sec": 0.06
+        },
+        "counterfact": {
+          "rank_based": {
+            "Recall_at_50": 1.0,
+            "Recall_at_50_CI": [
+              1.0,
+              1.0
+            ],
+            "MRR": 0.742216,
+            "MRR_CI": [
+              0.649379,
+              0.829301
+            ],
+            "refs_with_facts": 52,
+            "n_ref": 66,
+            "n_train": 100
+          },
+          "continuous": {
+            "kendall_tau": 0.256025028411806,
+            "kendall_tau_std": 0.11638579889379215,
+            "spearman_rho": 0.2756873216198854,
+            "spearman_rho_std": 0.11326661674890771,
+            "ndcg_at_50": 0.8150039949468947,
+            "ndcg_at_50_std": 0.21874945854137962,
+            "n_evaluated_refs": 52
+          },
+          "runtime_sec": 0.01
+        },
+        "ftrace": {
+          "rank_based": {
+            "Recall_at_50": 0.660864,
+            "Recall_at_50_CI": [
+              0.555127,
+              0.757929
+            ],
+            "MRR": 0.588606,
+            "MRR_CI": [
+              0.436257,
+              0.741884
+            ],
+            "refs_with_facts": 28,
+            "n_ref": 30,
+            "n_train": 100
+          },
+          "continuous": {
+            "kendall_tau": 0.0874998629210982,
+            "kendall_tau_std": 0.11506089195602036,
+            "spearman_rho": 0.10659135406938271,
+            "spearman_rho_std": 0.14017223752570135,
+            "ndcg_at_50": 0.4825983568403836,
+            "ndcg_at_50_std": 0.3016859500387026,
+            "n_evaluated_refs": 28
+          },
+          "runtime_sec": 0.01
+        }
+      }
+    }
+  },
+  "contrastive_gains": {
+    "RepSim": {
+      "toxicity": {
+        "kendall_tau_gain": 0.0,
+        "spearman_rho_gain": 0.0,
+        "primary_metric_gain_pp": 0.0,
+        "std_tau": 0.464778,
+        "con_tau": 0.464778,
+        "std_rho": 0.566409,
+        "con_rho": 0.566409,
+        "std_primary": 0.809212,
+        "con_primary": 0.809212
+      },
+      "counterfact": {
+        "kendall_tau_gain": 0.0,
+        "spearman_rho_gain": 0.0,
+        "primary_metric_gain_pp": 0.0,
+        "std_tau": 0.143253,
+        "con_tau": 0.143253,
+        "std_rho": 0.174578,
+        "con_rho": 0.174578,
+        "std_primary": 0.948718,
+        "con_primary": 0.948718
+      },
+      "ftrace": {
+        "kendall_tau_gain": 0.0,
+        "spearman_rho_gain": 0.0,
+        "primary_metric_gain_pp": 0.0,
+        "std_tau": 0.030242,
+        "con_tau": 0.030242,
+        "std_rho": 0.036855,
+        "con_rho": 0.036855,
+        "std_primary": 0.660451,
+        "con_primary": 0.660451
+      }
+    },
+    "TRAK": {
+      "toxicity": {
+        "kendall_tau_gain": 0.0,
+        "spearman_rho_gain": 0.0,
+        "primary_metric_gain_pp": 0.0,
+        "std_tau": 0.528027,
+        "con_tau": 0.528027,
+        "std_rho": 0.643489,
+        "con_rho": 0.643489,
+        "std_primary": 0.925612,
+        "con_primary": 0.925612
+      },
+      "counterfact": {
+        "kendall_tau_gain": 0.0,
+        "spearman_rho_gain": 0.0,
+        "primary_metric_gain_pp": 0.0,
+        "std_tau": 0.055592,
+        "con_tau": 0.055592,
+        "std_rho": 0.067749,
+        "con_rho": 0.067749,
+        "std_primary": 0.669872,
+        "con_primary": 0.669872
+      },
+      "ftrace": {
+        "kendall_tau_gain": 0.0,
+        "spearman_rho_gain": 0.0,
+        "primary_metric_gain_pp": 0.0,
+        "std_tau": 0.011379,
+        "con_tau": 0.011379,
+        "std_rho": 0.013867,
+        "con_rho": 0.013867,
+        "std_primary": 0.590167,
+        "con_primary": 0.590167
+      }
+    },
+    "LoGra": {
+      "toxicity": {
+        "kendall_tau_gain": 0.0,
+        "spearman_rho_gain": 0.0,
+        "primary_metric_gain_pp": 0.0,
+        "std_tau": 0.534423,
+        "con_tau": 0.534423,
+        "std_rho": 0.651284,
+        "con_rho": 0.651284,
+        "std_primary": 0.922158,
+        "con_primary": 0.922158
+      },
+      "counterfact": {
+        "kendall_tau_gain": 0.0,
+        "spearman_rho_gain": 0.0,
+        "primary_metric_gain_pp": 0.0,
+        "std_tau": 0.07643,
+        "con_tau": 0.07643,
+        "std_rho": 0.093143,
+        "con_rho": 0.093143,
+        "std_primary": 0.798077,
+        "con_primary": 0.798077
+      },
+      "ftrace": {
+        "kendall_tau_gain": 0.0,
+        "spearman_rho_gain": 0.0,
+        "primary_metric_gain_pp": 0.0,
+        "std_tau": 0.013852,
+        "con_tau": 0.013852,
+        "std_rho": 0.016881,
+        "con_rho": 0.016881,
+        "std_primary": 0.582862,
+        "con_primary": 0.582862
+      }
+    },
+    "DDA": {
+      "toxicity": {
+        "kendall_tau_gain": 0.0,
+        "spearman_rho_gain": 0.0,
+        "primary_metric_gain_pp": 0.0,
+        "std_tau": 0.504575,
+        "con_tau": 0.504575,
+        "std_rho": 0.614909,
+        "con_rho": 0.614909,
+        "std_primary": 0.876384,
+        "con_primary": 0.876384
+      },
+      "counterfact": {
+        "kendall_tau_gain": 0.0,
+        "spearman_rho_gain": 0.0,
+        "primary_metric_gain_pp": 0.0,
+        "std_tau": 0.051894,
+        "con_tau": 0.051894,
+        "std_rho": 0.063242,
+        "con_rho": 0.063242,
+        "std_primary": 0.692308,
+        "con_primary": 0.692308
+      },
+      "ftrace": {
+        "kendall_tau_gain": 0.0,
+        "spearman_rho_gain": 0.0,
+        "primary_metric_gain_pp": 0.0,
+        "std_tau": 0.008526,
+        "con_tau": 0.008526,
+        "std_rho": 0.010391,
+        "con_rho": 0.010391,
+        "std_primary": 0.651381,
+        "con_primary": 0.651381
+      }
+    },
+    "RawDotIF": {
+      "toxicity": {
+        "kendall_tau_gain": 0.0,
+        "spearman_rho_gain": 0.0,
+        "primary_metric_gain_pp": 0.0,
+        "std_tau": 0.555033,
+        "con_tau": 0.555033,
+        "std_rho": 0.6764,
+        "con_rho": 0.6764,
+        "std_primary": 0.954206,
+        "con_primary": 0.954206
+      },
+      "counterfact": {
+        "kendall_tau_gain": 0.0,
+        "spearman_rho_gain": 0.0,
+        "primary_metric_gain_pp": 0.0,
+        "std_tau": 0.074209,
+        "con_tau": 0.074209,
+        "std_rho": 0.090436,
+        "con_rho": 0.090436,
+        "std_primary": 0.753205,
+        "con_primary": 0.753205
+      },
+      "ftrace": {
+        "kendall_tau_gain": 0.0,
+        "spearman_rho_gain": 0.0,
+        "primary_metric_gain_pp": 0.0,
+        "std_tau": 0.004417,
+        "con_tau": 0.004417,
+        "std_rho": 0.005383,
+        "con_rho": 0.005383,
+        "std_primary": 0.643465,
+        "con_primary": 0.643465
+      }
+    },
+    "DiagIF": {
+      "toxicity": {
+        "kendall_tau_gain": 0.0,
+        "spearman_rho_gain": 0.0,
+        "primary_metric_gain_pp": 0.0,
+        "std_tau": 0.563561,
+        "con_tau": 0.563561,
+        "std_rho": 0.686792,
+        "con_rho": 0.686792,
+        "std_primary": 0.981868,
+        "con_primary": 0.981868
+      },
+      "counterfact": {
+        "kendall_tau_gain": 0.0,
+        "spearman_rho_gain": 0.0,
+        "primary_metric_gain_pp": 0.0,
+        "std_tau": 0.146877,
+        "con_tau": 0.146877,
+        "std_rho": 0.178994,
+        "con_rho": 0.178994,
+        "std_primary": 0.964744,
+        "con_primary": 0.964744
+      },
+      "ftrace": {
+        "kendall_tau_gain": 0.0,
+        "spearman_rho_gain": 0.0,
+        "primary_metric_gain_pp": 0.0,
+        "std_tau": 0.010689,
+        "con_tau": 0.010689,
+        "std_rho": 0.013026,
+        "con_rho": 0.013026,
+        "std_primary": 0.654628,
+        "con_primary": 0.654628
+      }
+    },
+    "kNN": {
+      "toxicity": {
+        "kendall_tau_gain": 0.0,
+        "spearman_rho_gain": 0.0,
+        "primary_metric_gain_pp": 0.0,
+        "std_tau": 0.45264,
+        "con_tau": 0.45264,
+        "std_rho": 0.544611,
+        "con_rho": 0.544611,
+        "std_primary": 0.743144,
+        "con_primary": 0.743144
+      },
+      "counterfact": {
+        "kendall_tau_gain": 0.0,
+        "spearman_rho_gain": 0.0,
+        "primary_metric_gain_pp": 0.0,
+        "std_tau": 0.16115,
+        "con_tau": 0.16115,
+        "std_rho": 0.182121,
+        "con_rho": 0.182121,
+        "std_primary": 0.948718,
+        "con_primary": 0.948718
+      },
+      "ftrace": {
+        "kendall_tau_gain": 0.0,
+        "spearman_rho_gain": 0.0,
+        "primary_metric_gain_pp": 0.0,
+        "std_tau": 0.025108,
+        "con_tau": 0.025108,
+        "std_rho": 0.028376,
+        "con_rho": 0.028376,
+        "std_primary": 0.660451,
+        "con_primary": 0.660451
+      }
+    },
+    "BM25": {
+      "toxicity": {
+        "kendall_tau_gain": 0.0,
+        "spearman_rho_gain": 0.0,
+        "primary_metric_gain_pp": 0.0,
+        "std_tau": 0.30843,
+        "con_tau": 0.30843,
+        "std_rho": 0.375874,
+        "con_rho": 0.375874,
+        "std_primary": 0.509496,
+        "con_primary": 0.509496
+      },
+      "counterfact": {
+        "kendall_tau_gain": 0.0,
+        "spearman_rho_gain": 0.0,
+        "primary_metric_gain_pp": 0.0,
+        "std_tau": 0.256025,
+        "con_tau": 0.256025,
+        "std_rho": 0.275687,
+        "con_rho": 0.275687,
+        "std_primary": 1.0,
+        "con_primary": 1.0
+      },
+      "ftrace": {
+        "kendall_tau_gain": 0.0,
+        "spearman_rho_gain": 0.0,
+        "primary_metric_gain_pp": 0.0,
+        "std_tau": 0.0875,
+        "con_tau": 0.0875,
+        "std_rho": 0.106591,
+        "con_rho": 0.106591,
+        "std_primary": 0.660864,
+        "con_primary": 0.660864
+      }
+    }
+  },
+  "factorial_2x2": {
+    "TRAK": {
+      "standard": {
+        "toxicity": {
+          "rank_based": {
+            "AUPRC": 0.925612,
+            "CI_lower": 0.806091,
+            "CI_upper": 0.997001,
+            "n_unsafe": 20,
+            "n_train": 100
+          },
+          "continuous": {
+            "kendall_tau": 0.5280271075073952,
+            "kendall_p": 1.5271777873358312e-10,
+            "spearman_rho": 0.6434890502687527,
+            "spearman_p": 5.18652787474386e-13,
+            "ndcg_at_50": 0.9583988007414836
+          }
+        },
+        "counterfact": {
+          "rank_based": {
+            "Recall_at_50": 0.669872,
+            "Recall_at_50_CI": [
+              0.542384,
+              0.77783
+            ],
+            "MRR": 0.239908,
+            "MRR_CI": [
+              0.141839,
+              0.337716
+            ],
+            "refs_with_facts": 52,
+            "n_ref": 66,
+            "n_train": 100
+          },
+          "continuous": {
+            "kendall_tau": 0.05559235033708847,
+            "kendall_tau_std": 0.08822797704597242,
+            "spearman_rho": 0.06774854588335663,
+            "spearman_rho_std": 0.10752049724199242,
+            "ndcg_at_50": 0.3157564141354377,
+            "ndcg_at_50_std": 0.32634503484374716,
+            "n_evaluated_refs": 52
+          }
+        },
+        "ftrace": {
+          "rank_based": {
+            "Recall_at_50": 0.590167,
+            "Recall_at_50_CI": [
+              0.494256,
+              0.678111
+            ],
+            "MRR": 0.364972,
+            "MRR_CI": [
+              0.213334,
+              0.523583
+            ],
+            "refs_with_facts": 28,
+            "n_ref": 30,
+            "n_train": 100
+          },
+          "continuous": {
+            "kendall_tau": 0.011378525289065062,
+            "kendall_tau_std": 0.0959484127630932,
+            "spearman_rho": 0.013866629814297772,
+            "spearman_rho_std": 0.11692913512560982,
+            "ndcg_at_50": 0.2890132540952367,
+            "ndcg_at_50_std": 0.16417451598202534,
+            "n_evaluated_refs": 28
+          }
+        }
+      },
+      "contrastive": {
+        "toxicity": {
+          "rank_based": {
+            "AUPRC": 0.925612,
+            "CI_lower": 0.806091,
+            "CI_upper": 0.997001,
+            "n_unsafe": 20,
+            "n_train": 100
+          },
+          "continuous": {
+            "kendall_tau": 0.5280271075073952,
+            "kendall_p": 1.5271777873358312e-10,
+            "spearman_rho": 0.6434890502687527,
+            "spearman_p": 5.18652787474386e-13,
+            "ndcg_at_50": 0.9583988007414836
+          }
+        },
+        "counterfact": {
+          "rank_based": {
+            "Recall_at_50": 0.669872,
+            "Recall_at_50_CI": [
+              0.542384,
+              0.77783
+            ],
+            "MRR": 0.239908,
+            "MRR_CI": [
+              0.141839,
+              0.337716
+            ],
+            "refs_with_facts": 52,
+            "n_ref": 66,
+            "n_train": 100
+          },
+          "continuous": {
+            "kendall_tau": 0.05559235033708847,
+            "kendall_tau_std": 0.08822797704597242,
+            "spearman_rho": 0.06774854588335663,
+            "spearman_rho_std": 0.10752049724199242,
+            "ndcg_at_50": 0.3157564141354377,
+            "ndcg_at_50_std": 0.32634503484374716,
+            "n_evaluated_refs": 52
+          }
+        },
+        "ftrace": {
+          "rank_based": {
+            "Recall_at_50": 0.590167,
+            "Recall_at_50_CI": [
+              0.494256,
+              0.678111
+            ],
+            "MRR": 0.364972,
+            "MRR_CI": [
+              0.213334,
+              0.523583
+            ],
+            "refs_with_facts": 28,
+            "n_ref": 30,
+            "n_train": 100
+          },
+          "continuous": {
+            "kendall_tau": 0.011378525289065062,
+            "kendall_tau_std": 0.0959484127630932,
+            "spearman_rho": 0.013866629814297772,
+            "spearman_rho_std": 0.11692913512560982,
+            "ndcg_at_50": 0.2890132540952367,
+            "ndcg_at_50_std": 0.16417451598202534,
+            "n_evaluated_refs": 28
+          }
+        }
+      }
+    },
+    "RepSim": {
+      "standard": {
+        "toxicity": {
+          "rank_based": {
+            "AUPRC": 0.809212,
+            "CI_lower": 0.652062,
+            "CI_upper": 0.937057,
+            "n_unsafe": 20,
+            "n_train": 100
+          },
+          "continuous": {
+            "kendall_tau": 0.4647775616552308,
+            "kendall_p": 1.743509453359617e-08,
+            "spearman_rho": 0.5664089352298308,
+            "spearman_p": 8.139854570676756e-10,
+            "ndcg_at_50": 0.9041513829638967
+          }
+        },
+        "counterfact": {
+          "rank_based": {
+            "Recall_at_50": 0.948718,
+            "Recall_at_50_CI": [
+              0.895823,
+              0.986673
+            ],
+            "MRR": 0.623001,
+            "MRR_CI": [
+              0.515343,
+              0.732473
+            ],
+            "refs_with_facts": 52,
+            "n_ref": 66,
+            "n_train": 100
+          },
+          "continuous": {
+            "kendall_tau": 0.14325314626905133,
+            "kendall_tau_std": 0.05385853061439713,
+            "spearman_rho": 0.1745778383913586,
+            "spearman_rho_std": 0.06563559753121874,
+            "ndcg_at_50": 0.6634073739650268,
+            "ndcg_at_50_std": 0.3188932235456998,
+            "n_evaluated_refs": 52
+          }
+        },
+        "ftrace": {
+          "rank_based": {
+            "Recall_at_50": 0.660451,
+            "Recall_at_50_CI": [
+              0.573168,
+              0.753816
+            ],
+            "MRR": 0.403189,
+            "MRR_CI": [
+              0.245446,
+              0.573587
+            ],
+            "refs_with_facts": 28,
+            "n_ref": 30,
+            "n_train": 100
+          },
+          "continuous": {
+            "kendall_tau": 0.030242116705813508,
+            "kendall_tau_std": 0.11078082750485649,
+            "spearman_rho": 0.0368550604324195,
+            "spearman_rho_std": 0.13500490498603473,
+            "ndcg_at_50": 0.32932060833452065,
+            "ndcg_at_50_std": 0.2322325578979813,
+            "n_evaluated_refs": 28
+          }
+        }
+      },
+      "contrastive": {
+        "toxicity": {
+          "rank_based": {
+            "AUPRC": 0.809212,
+            "CI_lower": 0.652062,
+            "CI_upper": 0.937057,
+            "n_unsafe": 20,
+            "n_train": 100
+          },
+          "continuous": {
+            "kendall_tau": 0.4647775616552308,
+            "kendall_p": 1.743509453359617e-08,
+            "spearman_rho": 0.5664089352298308,
+            "spearman_p": 8.139854570676756e-10,
+            "ndcg_at_50": 0.9041513829638967
+          }
+        },
+        "counterfact": {
+          "rank_based": {
+            "Recall_at_50": 0.948718,
+            "Recall_at_50_CI": [
+              0.895823,
+              0.986673
+            ],
+            "MRR": 0.623001,
+            "MRR_CI": [
+              0.515343,
+              0.732473
+            ],
+            "refs_with_facts": 52,
+            "n_ref": 66,
+            "n_train": 100
+          },
+          "continuous": {
+            "kendall_tau": 0.14325314626905133,
+            "kendall_tau_std": 0.05385853061439713,
+            "spearman_rho": 0.1745778383913586,
+            "spearman_rho_std": 0.06563559753121874,
+            "ndcg_at_50": 0.6634073739650268,
+            "ndcg_at_50_std": 0.3188932235456998,
+            "n_evaluated_refs": 52
+          }
+        },
+        "ftrace": {
+          "rank_based": {
+            "Recall_at_50": 0.660451,
+            "Recall_at_50_CI": [
+              0.573168,
+              0.753816
+            ],
+            "MRR": 0.403189,
+            "MRR_CI": [
+              0.245446,
+              0.573587
+            ],
+            "refs_with_facts": 28,
+            "n_ref": 30,
+            "n_train": 100
+          },
+          "continuous": {
+            "kendall_tau": 0.030242116705813508,
+            "kendall_tau_std": 0.11078082750485649,
+            "spearman_rho": 0.0368550604324195,
+            "spearman_rho_std": 0.13500490498603473,
+            "ndcg_at_50": 0.32932060833452065,
+            "ndcg_at_50_std": 0.2322325578979813,
+            "n_evaluated_refs": 28
+          }
+        }
+      }
+    }
+  },
+  "pass_criteria": {
+    "all_tau_computable": true,
+    "max_tau_diff": 0.0,
+    "max_tau_diff_method": "",
+    "max_tau_diff_task": "",
+    "threshold": 0.01,
+    "passed": false
+  },
+  "method_timings": {
+    "RepSim": {
+      "toxicity": 0.0006334781646728516,
+      "counterfact": 0.0005118846893310547,
+      "ftrace": 0.0005280971527099609
+    },
+    "kNN": {
+      "toxicity": 0.0004379749298095703,
+      "counterfact": 0.0007252693176269531,
+      "ftrace": 0.0005657672882080078
+    },
+    "TRAK": {
+      "toxicity": 4.890808582305908,
+      "counterfact": 7.12744402885437,
+      "ftrace": 5.509004354476929
+    },
+    "LoGra": {
+      "toxicity": 18.67376136779785,
+      "counterfact": 21.948574781417847,
+      "ftrace": 18.786699056625366
+    },
+    "DDA": {
+      "toxicity": 12.261706113815308,
+      "counterfact": 10.483699083328247,
+      "ftrace": 11.836015939712524
+    },
+    "RawDotIF": {
+      "toxicity": 1.5141711235046387,
+      "counterfact": 1.4064600467681885,
+      "ftrace": 1.1205461025238037
+    },
+    "DiagIF": {
+      "toxicity": 3.3654425144195557,
+      "counterfact": 2.9162333011627197,
+      "ftrace": 2.584336757659912
+    },
+    "BM25": {
+      "toxicity": 0.05783796310424805,
+      "counterfact": 0.008350610733032227,
+      "ftrace": 0.010863780975341797
+    }
+  },
+  "total_runtime_sec": 202.81,
+  "gpu": "NVIDIA GeForce RTX 4090",
+  "timestamp": "2026-03-17T15:21:05.312367"
+}

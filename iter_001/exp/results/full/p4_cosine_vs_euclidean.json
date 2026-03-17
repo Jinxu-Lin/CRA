@@ -1,0 +1,385 @@
+{
+  "task_id": "p4_cosine_vs_euclidean",
+  "candidate_id": "cand_a",
+  "mode": "pilot",
+  "model": "EleutherAI/pythia-1b",
+  "hidden_dim": 2048,
+  "pilot_n_train": 100,
+  "bootstrap_B": 1000,
+  "seed": 42,
+  "similarity_functions": [
+    "cosine",
+    "euclidean",
+    "dot_product"
+  ],
+  "note": "v2: uses RAW (unnormalized) last-token representations. v1 incorrectly used pre-normalized cache, making all metrics identical.",
+  "results_by_similarity": {
+    "cosine": {
+      "toxicity": {
+        "AUPRC": 0.640655,
+        "AUPRC_CI": [
+          0.418894,
+          0.811499
+        ],
+        "n_unsafe": 20,
+        "n_train": 100,
+        "kendall_tau": 0.209647,
+        "kendall_tau_CI": [
+          0.006127,
+          0.396289
+        ],
+        "spearman_rho": 0.25549
+      },
+      "counterfact": {
+        "Recall@50": 0.932692,
+        "Recall@50_CI": [
+          0.863924,
+          0.984855
+        ],
+        "MRR": 0.5041,
+        "MRR_CI": [
+          0.385233,
+          0.621756
+        ],
+        "kendall_tau": 0.127,
+        "kendall_tau_CI": [
+          0.110402,
+          0.141212
+        ],
+        "spearman_rho": 0.154771,
+        "refs_with_facts": 52,
+        "n_ref": 66,
+        "n_train": 100
+      },
+      "ftrace": {
+        "Recall@50": 0.733874,
+        "Recall@50_CI": [
+          0.64712,
+          0.832226
+        ],
+        "MRR": 0.408332,
+        "MRR_CI": [
+          0.250855,
+          0.564527
+        ],
+        "kendall_tau": 0.049762,
+        "kendall_tau_CI": [
+          0.016863,
+          0.080936
+        ],
+        "spearman_rho": 0.060643,
+        "refs_with_facts": 28,
+        "n_ref": 30,
+        "n_train": 100
+      }
+    },
+    "euclidean": {
+      "toxicity": {
+        "AUPRC": 0.628026,
+        "AUPRC_CI": [
+          0.407707,
+          0.802223
+        ],
+        "n_unsafe": 20,
+        "n_train": 100,
+        "kendall_tau": 0.205383,
+        "kendall_tau_CI": [
+          0.002445,
+          0.392465
+        ],
+        "spearman_rho": 0.250294
+      },
+      "counterfact": {
+        "Recall@50": 0.926282,
+        "Recall@50_CI": [
+          0.856198,
+          0.979602
+        ],
+        "MRR": 0.509285,
+        "MRR_CI": [
+          0.390661,
+          0.626213
+        ],
+        "kendall_tau": 0.126632,
+        "kendall_tau_CI": [
+          0.109887,
+          0.140983
+        ],
+        "spearman_rho": 0.154322,
+        "refs_with_facts": 52,
+        "n_ref": 66,
+        "n_train": 100
+      },
+      "ftrace": {
+        "Recall@50": 0.725222,
+        "Recall@50_CI": [
+          0.629409,
+          0.825575
+        ],
+        "MRR": 0.40983,
+        "MRR_CI": [
+          0.247537,
+          0.568685
+        ],
+        "kendall_tau": 0.050127,
+        "kendall_tau_CI": [
+          0.018438,
+          0.081019
+        ],
+        "spearman_rho": 0.061089,
+        "refs_with_facts": 28,
+        "n_ref": 30,
+        "n_train": 100
+      }
+    },
+    "dot_product": {
+      "toxicity": {
+        "AUPRC": 0.64992,
+        "AUPRC_CI": [
+          0.425832,
+          0.823833
+        ],
+        "n_unsafe": 20,
+        "n_train": 100,
+        "kendall_tau": 0.220307,
+        "kendall_tau_CI": [
+          0.015653,
+          0.405185
+        ],
+        "spearman_rho": 0.268481
+      },
+      "counterfact": {
+        "Recall@50": 0.910256,
+        "Recall@50_CI": [
+          0.842702,
+          0.972727
+        ],
+        "MRR": 0.478113,
+        "MRR_CI": [
+          0.359061,
+          0.600542
+        ],
+        "kendall_tau": 0.123275,
+        "kendall_tau_CI": [
+          0.106584,
+          0.138596
+        ],
+        "spearman_rho": 0.150231,
+        "refs_with_facts": 52,
+        "n_ref": 66,
+        "n_train": 100
+      },
+      "ftrace": {
+        "Recall@50": 0.617496,
+        "Recall@50_CI": [
+          0.501769,
+          0.731777
+        ],
+        "MRR": 0.35225,
+        "MRR_CI": [
+          0.219183,
+          0.492469
+        ],
+        "kendall_tau": 0.032086,
+        "kendall_tau_CI": [
+          -0.007056,
+          0.070027
+        ],
+        "spearman_rho": 0.039102,
+        "refs_with_facts": 28,
+        "n_ref": 30,
+        "n_train": 100
+      }
+    }
+  },
+  "comparison": {
+    "toxicity": {
+      "metric": "AUPRC",
+      "cosine": 0.640655,
+      "euclidean": 0.628026,
+      "dot_product": 0.64992,
+      "cosine_minus_euclidean_pp": 1.26,
+      "cosine_minus_dot_pp": -0.93,
+      "euclidean_minus_dot_pp": -2.19,
+      "cosine_tau": 0.209647,
+      "euclidean_tau": 0.205383,
+      "dot_tau": 0.220307,
+      "cosine_minus_euclidean_tau": 0.004264,
+      "cosine_minus_dot_tau": -0.01066
+    },
+    "counterfact": {
+      "metric": "Recall@50",
+      "cosine": 0.932692,
+      "euclidean": 0.926282,
+      "dot_product": 0.910256,
+      "cosine_minus_euclidean_pp": 0.64,
+      "cosine_minus_dot_pp": 2.24,
+      "euclidean_minus_dot_pp": 1.6,
+      "cosine_tau": 0.127,
+      "euclidean_tau": 0.126632,
+      "dot_tau": 0.123275,
+      "cosine_minus_euclidean_tau": 0.000368,
+      "cosine_minus_dot_tau": 0.003725
+    },
+    "ftrace": {
+      "metric": "Recall@50",
+      "cosine": 0.733874,
+      "euclidean": 0.725222,
+      "dot_product": 0.617496,
+      "cosine_minus_euclidean_pp": 0.87,
+      "cosine_minus_dot_pp": 11.64,
+      "euclidean_minus_dot_pp": 10.77,
+      "cosine_tau": 0.049762,
+      "euclidean_tau": 0.050127,
+      "dot_tau": 0.032086,
+      "cosine_minus_euclidean_tau": -0.000365,
+      "cosine_minus_dot_tau": 0.017676
+    }
+  },
+  "norm_analysis": {
+    "toxicity": {
+      "train_norm_mean": 107.0965,
+      "train_norm_std": 4.7418,
+      "train_norm_cv": 0.0443,
+      "train_norm_min": 90.667,
+      "train_norm_max": 116.3558,
+      "train_norm_p10": 100.7812,
+      "train_norm_p90": 112.2171,
+      "ref_norm_mean": 107.2327,
+      "ref_norm_std": 2.8387,
+      "ref_norm_cv": 0.0265
+    },
+    "counterfact": {
+      "train_norm_mean": 101.5188,
+      "train_norm_std": 4.6574,
+      "train_norm_cv": 0.0459,
+      "train_norm_min": 84.997,
+      "train_norm_max": 110.4377,
+      "train_norm_p10": 95.4524,
+      "train_norm_p90": 107.083,
+      "ref_norm_mean": 102.6162,
+      "ref_norm_std": 3.798,
+      "ref_norm_cv": 0.037
+    },
+    "ftrace": {
+      "train_norm_mean": 106.1375,
+      "train_norm_std": 1.9211,
+      "train_norm_cv": 0.0181,
+      "train_norm_min": 100.7258,
+      "train_norm_max": 109.6065,
+      "train_norm_p10": 103.3047,
+      "train_norm_p90": 108.3533,
+      "ref_norm_mean": 105.6578,
+      "ref_norm_std": 0.9993,
+      "ref_norm_cv": 0.0095
+    }
+  },
+  "score_distributions": {
+    "toxicity": {
+      "cosine": {
+        "mean": 0.529739,
+        "std": 0.295801,
+        "min": -0.301679,
+        "max": 0.946028,
+        "median": 0.679257
+      },
+      "euclidean": {
+        "mean": -98.978111,
+        "std": 31.605793,
+        "min": -167.26532,
+        "max": -35.39727,
+        "median": -86.629921
+      },
+      "dot_product": {
+        "mean": 6101.725098,
+        "std": 3462.840332,
+        "min": -3239.659668,
+        "max": 11266.387695,
+        "median": 7751.457031
+      }
+    },
+    "counterfact": {
+      "cosine": {
+        "mean": 0.59653,
+        "std": 0.108635,
+        "min": 0.274355,
+        "max": 0.983815,
+        "median": 0.589991
+      },
+      "euclidean": {
+        "mean": -90.910339,
+        "std": 13.667598,
+        "min": -127.411667,
+        "max": -17.157019,
+        "median": -92.378059
+      },
+      "dot_product": {
+        "mean": 6210.386719,
+        "std": 1165.505493,
+        "min": 2795.41333,
+        "max": 11001.810547,
+        "median": 6158.192383
+      }
+    },
+    "ftrace": {
+      "cosine": {
+        "mean": 0.886713,
+        "std": 0.032399,
+        "min": 0.721631,
+        "max": 0.971271,
+        "median": 0.891606
+      },
+      "euclidean": {
+        "mean": -49.943062,
+        "std": 6.92972,
+        "min": -78.381195,
+        "max": -25.612917,
+        "median": -49.383255
+      },
+      "dot_product": {
+        "mean": 9945.549805,
+        "std": 453.945557,
+        "min": 7948.889648,
+        "max": 11089.222656,
+        "median": 10002.954102
+      }
+    }
+  },
+  "rank_correlations": {
+    "toxicity": {
+      "cosine_vs_euclidean_tau": 0.9462,
+      "cosine_vs_dot_tau": 0.9104,
+      "euclidean_vs_dot_tau": 0.8572,
+      "cosine_vs_euclidean_rho": 0.9958,
+      "cosine_vs_dot_rho": 0.9846,
+      "euclidean_vs_dot_rho": 0.9685
+    },
+    "counterfact": {
+      "cosine_vs_euclidean_tau": 0.8647,
+      "cosine_vs_dot_tau": 0.799,
+      "euclidean_vs_dot_tau": 0.664,
+      "cosine_vs_euclidean_rho": 0.9735,
+      "cosine_vs_dot_rho": 0.9438,
+      "euclidean_vs_dot_rho": 0.8494
+    },
+    "ftrace": {
+      "cosine_vs_euclidean_tau": 0.9542,
+      "cosine_vs_dot_tau": 0.7016,
+      "euclidean_vs_dot_tau": 0.6559,
+      "cosine_vs_euclidean_rho": 0.9972,
+      "cosine_vs_dot_rho": 0.8843,
+      "euclidean_vs_dot_rho": 0.8486
+    }
+  },
+  "pass_criteria": {
+    "all_valid_scores": true,
+    "cosine_vs_euclidean_gap_gt_3pp": false,
+    "cosine_vs_dot_gap_gt_3pp": true,
+    "max_cosine_euclidean_gap_pp": 1.26,
+    "max_gap_task": "toxicity",
+    "overall_pass": true
+  },
+  "implication_for_gap": "Euclidean is robust (matches cosine within 3pp) but dot product diverges (>3pp gap). This means direction is what matters, not scale. Euclidean distance is approximately equivalent to cosine at fixed norm, so the normalization effect is subtle. Dot product's vulnerability to norm variation confirms that TRAK's unnormalized gradient inner products lose signal to norm noise.",
+  "runtime_sec": 176.99,
+  "timestamp": "2026-03-17T18:53:38.738228"
+}

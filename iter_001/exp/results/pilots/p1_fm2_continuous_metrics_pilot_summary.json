@@ -1,0 +1,26 @@
+{
+  "overall_recommendation": "REFINE",
+  "selected_candidate_id": "cand_a",
+  "candidates": [
+    {
+      "candidate_id": "cand_a",
+      "go_no_go": "GO",
+      "confidence": 0.55,
+      "supported_hypotheses": ["H1_task_type_boundary"],
+      "failed_assumptions": ["H2_contrastive_detectable_via_kendall_tau"],
+      "key_metrics": {
+        "max_kendall_tau_diff": 0.0,
+        "all_tau_computable": true,
+        "pass_criteria_met": false,
+        "best_tox_tau": 0.5636,
+        "best_cf_tau": 0.256,
+        "best_ft_tau": 0.0875,
+        "diag_if_tox_auprc": 0.9819,
+        "diag_if_cf_r50": 0.9647,
+        "repsim_cf_r50": 0.9487,
+        "trak_tox_auprc": 0.9256
+      },
+      "notes": "CRITICAL FINDING: Kendall tau is also invariant to mean subtraction (contrastive scoring), just like rank-based metrics. Mean subtraction shifts all scores for a given ref column by the same constant, preserving ranks. Kendall tau measures rank concordance, so it is equally invariant. FM2 detection via contrastive scoring requires a metric that is sensitive to score magnitudes, not just ranks. The contamination injection experiment (p1_fm2_contamination_injection) with non-uniform contamination is the key test. NEW FINDINGS: (1) DiagIF achieves 0.9819 AUPRC on toxicity (best) and 0.9647 R@50 on counterfact (matching RepSim), suggesting diagonal Fisher inverse is highly effective. (2) BM25 achieves perfect R@50=1.0 on counterfact at pilot scale. (3) RawDotIF achieves 0.9542 AUPRC on toxicity, confirming gradient norm as primary toxicity signal."
+    }
+  ]
+}

@@ -1,0 +1,333 @@
+{
+  "completed": [
+    "p1_fm2_continuous_metrics",
+    "p1_fm2_contamination_injection",
+    "p1_fm2_interaction_analysis",
+    "p2_eigenspectrum_fullscale",
+    "p2_trak_dim_sweep_fullscale",
+    "p2_repsim_dim_sweep_fullscale",
+    "p3_retrieval_baselines",
+    "p4_gap_decomposition",
+    "p4_layer_sweep",
+    "p4_cosine_vs_euclidean",
+    "p5_pca_whitened_attribution",
+    "final_analysis"
+  ],
+  "failed": [],
+  "running": {},
+  "timings": {
+    "p1_fm2_continuous_metrics": {
+      "planned_min": 60,
+      "actual_min": 4,
+      "start_time": "2026-03-17T15:10:50",
+      "end_time": "2026-03-17T15:14:53",
+      "config_snapshot": {
+        "model": "EleutherAI/pythia-1b",
+        "batch_size": 4,
+        "seq_len": 512,
+        "dataset_size": 100,
+        "gpu_model": "RTX 4090",
+        "gpu_count": 1,
+        "mode": "pilot",
+        "methods": 8,
+        "scorings": 2
+      }
+    },
+    "p1_fm2_contamination_injection": {
+      "planned_min": 30,
+      "actual_min": 2,
+      "start_time": "2026-03-17T15:23:27",
+      "end_time": "2026-03-17T15:25:27",
+      "config_snapshot": {
+        "model": "EleutherAI/pythia-1b",
+        "batch_size": 4,
+        "seq_len": 512,
+        "dataset_size": 100,
+        "gpu_model": "RTX 4090",
+        "gpu_count": 1,
+        "mode": "pilot",
+        "methods": 2,
+        "contamination_modes": 3,
+        "alphas": 6
+      }
+    },
+    "p1_fm2_interaction_analysis": {
+      "planned_min": 10,
+      "actual_min": 1,
+      "start_time": "2026-03-17T15:32:32",
+      "end_time": "2026-03-17T15:35:43",
+      "config_snapshot": {
+        "type": "analysis",
+        "gpu_count": 0,
+        "mode": "pilot",
+        "dataset_size": 100,
+        "depends_on": [
+          "p1_fm2_continuous_metrics",
+          "p1_fm2_contamination_injection"
+        ]
+      }
+    },
+    "p2_eigenspectrum_fullscale": {
+      "planned_min": 60,
+      "actual_min": 27,
+      "start_time": "2026-03-17T16:00:10",
+      "end_time": "2026-03-17T16:27:51",
+      "config_snapshot": {
+        "model": "EleutherAI/pythia-70m",
+        "batch_size": 16,
+        "seq_len": 256,
+        "dataset_size": 5000,
+        "gpu_model": "RTX 4090",
+        "gpu_count": 1,
+        "mode": "pilot",
+        "n_values": [
+          500,
+          1000,
+          2000,
+          5000
+        ],
+        "method": "countsketch_svd",
+        "top_k_eigenvalues": 500
+      }
+    },
+    "p2_trak_dim_sweep_fullscale": {
+      "planned_min": 60,
+      "actual_min": 10,
+      "start_time": "2026-03-17T16:58:37",
+      "end_time": "2026-03-17T17:08:50",
+      "config_snapshot": {
+        "model": "EleutherAI/pythia-1b",
+        "batch_size": 1,
+        "seq_len": 512,
+        "dataset_size": 100,
+        "gpu_model": "RTX 4090",
+        "gpu_count": 1,
+        "mode": "pilot",
+        "random_dims": [
+          32,
+          64,
+          128,
+          256,
+          512,
+          1024,
+          2048,
+          4096
+        ],
+        "pca_dims": [
+          32,
+          64,
+          128,
+          256,
+          512,
+          1024,
+          2048
+        ],
+        "target_layers": "layers.15 (attention.dense + mlp.dense_4h_to_h)",
+        "grad_dim_D": 20971520
+      }
+    },
+    "p2_repsim_dim_sweep_fullscale": {
+      "planned_min": 30,
+      "actual_min": 7,
+      "start_time": "2026-03-17T17:12:26",
+      "end_time": "2026-03-17T17:19:16",
+      "config_snapshot": {
+        "model": "EleutherAI/pythia-1b",
+        "dataset_size": 100,
+        "gpu_model": "RTX 4090",
+        "gpu_count": 1,
+        "mode": "pilot",
+        "pca_dims": [
+          16,
+          32,
+          64,
+          128,
+          256,
+          512,
+          1024,
+          2048
+        ],
+        "tasks": [
+          "toxicity",
+          "counterfact",
+          "ftrace"
+        ],
+        "hidden_dim": 2048,
+        "used_cached_reps": true
+      }
+    },
+    "p3_retrieval_baselines": {
+      "planned_min": 45,
+      "actual_min": 1,
+      "start_time": "2026-03-17T19:30:00",
+      "end_time": "2026-03-17T19:30:56",
+      "config_snapshot": {
+        "methods": [
+          "Contriever",
+          "GTR-T5",
+          "BM25"
+        ],
+        "dataset_size": 100,
+        "gpu_model": "RTX 4090",
+        "gpu_count": 1,
+        "mode": "pilot",
+        "tasks": [
+          "toxicity",
+          "counterfact",
+          "ftrace"
+        ],
+        "contriever_dim": 768,
+        "gtr_t5_dim": 768,
+        "batch_size": 32
+      }
+    },
+    "p4_gap_decomposition": {
+      "planned_min": 45,
+      "actual_min": 5,
+      "start_time": "2026-03-17T18:17:24",
+      "end_time": "2026-03-17T18:22:18",
+      "config_snapshot": {
+        "model": "EleutherAI/pythia-1b",
+        "batch_size": 1,
+        "seq_len": 512,
+        "dataset_size": 100,
+        "gpu_model": "RTX 4090",
+        "gpu_count": 1,
+        "mode": "pilot",
+        "configs": [
+          "standard_trak_pca",
+          "lastlayer_trak_pca",
+          "cosine_trak_pca",
+          "combined_trak_pca",
+          "repsim",
+          "raw_dot_trak"
+        ],
+        "D_standard": 20971520,
+        "D_lastlayer": 50358272,
+        "method": "gram_matrix_pca"
+      }
+    },
+    "p4_layer_sweep": {
+      "planned_min": 45,
+      "actual_min": 7,
+      "start_time": "2026-03-17T18:25:18",
+      "end_time": "2026-03-17T18:31:49",
+      "config_snapshot": {
+        "model": "EleutherAI/pythia-1b",
+        "batch_size": 1,
+        "seq_len": 512,
+        "dataset_size": 100,
+        "gpu_model": "RTX 4090",
+        "gpu_count": 1,
+        "mode": "pilot",
+        "sweep_layers": [
+          "embed",
+          "layer_2",
+          "layer_4",
+          "layer_7",
+          "layer_10",
+          "layer_12",
+          "layer_15"
+        ],
+        "sweep_hs_indices": [
+          0,
+          3,
+          5,
+          8,
+          11,
+          13,
+          16
+        ],
+        "tasks": [
+          "toxicity",
+          "counterfact",
+          "ftrace"
+        ],
+        "hidden_dim": 2048,
+        "num_model_layers": 16
+      }
+    },
+    "p4_cosine_vs_euclidean": {
+      "planned_min": 20,
+      "actual_min": 3,
+      "start_time": "2026-03-17T18:38:52",
+      "end_time": "2026-03-17T18:41:49",
+      "config_snapshot": {
+        "model": "EleutherAI/pythia-1b",
+        "batch_size": 4,
+        "seq_len": 512,
+        "dataset_size": 100,
+        "gpu_model": "RTX 4090",
+        "gpu_count": 1,
+        "mode": "pilot",
+        "similarity_functions": [
+          "cosine",
+          "euclidean",
+          "dot_product"
+        ],
+        "tasks": [
+          "toxicity",
+          "counterfact",
+          "ftrace"
+        ],
+        "hidden_dim": 2048,
+        "extraction": "last_token_raw_unnormalized"
+      }
+    },
+    "p5_pca_whitened_attribution": {
+      "planned_min": 45,
+      "actual_min": 1,
+      "start_time": "2026-03-17T19:35:00",
+      "end_time": "2026-03-17T19:35:32",
+      "config_snapshot": {
+        "model": "EleutherAI/pythia-1b",
+        "dataset_size": 100,
+        "gpu_model": "RTX 4090",
+        "gpu_count": 1,
+        "mode": "pilot",
+        "pca_dims": [
+          16,
+          32,
+          64,
+          128,
+          256,
+          512
+        ],
+        "methods": [
+          "standard_repsim",
+          "pca_whitened_lw",
+          "ridge_cv_whitened"
+        ],
+        "tasks": [
+          "toxicity",
+          "counterfact",
+          "ftrace"
+        ],
+        "hidden_dim": 2048,
+        "used_cached_reps": true,
+        "ridge_cv_folds": 5
+      }
+    },
+    "final_analysis": {
+      "planned_min": 15,
+      "actual_min": 2,
+      "start_time": "2026-03-17T19:13:00",
+      "end_time": "2026-03-17T19:15:00",
+      "config_snapshot": {
+        "type": "analysis",
+        "gpu_count": 0,
+        "mode": "pilot",
+        "aggregates_from": [
+          "p1_fm2_interaction_analysis",
+          "p2_trak_dim_sweep_fullscale",
+          "p2_repsim_dim_sweep_fullscale",
+          "p3_retrieval_baselines",
+          "p4_gap_decomposition",
+          "p4_layer_sweep",
+          "p4_cosine_vs_euclidean",
+          "p5_pca_whitened_attribution"
+        ]
+      }
+    }
+  }
+}

@@ -1,0 +1,39 @@
+{
+  "overall_recommendation": "GO",
+  "selected_candidate_id": "cand_a",
+  "candidates": [
+    {
+      "candidate_id": "cand_a",
+      "go_no_go": "GO",
+      "confidence": 0.45,
+      "supported_hypotheses": [],
+      "failed_assumptions": ["H8_retrieval_gap"],
+      "key_metrics": {
+        "contriever_tox_auprc": 0.968,
+        "contriever_cf_r50": 1.0,
+        "contriever_ft_r50": 0.682,
+        "contriever_tox_tau": 0.555,
+        "contriever_cf_tau": 0.172,
+        "contriever_ft_tau": 0.102,
+        "gtr_tox_auprc": 0.842,
+        "gtr_cf_r50": 1.0,
+        "gtr_ft_r50": 0.832,
+        "gtr_tox_tau": 0.465,
+        "gtr_cf_tau": 0.173,
+        "gtr_ft_tau": 0.141,
+        "bm25_tox_auprc": 0.509,
+        "bm25_cf_r50": 1.0,
+        "bm25_ft_r50": 0.661,
+        "repsim_tox_auprc": 0.809,
+        "repsim_cf_r50": 0.949,
+        "repsim_ft_r50": 0.660,
+        "repsim_tox_tau": 0.465,
+        "repsim_cf_tau": 0.143,
+        "repsim_ft_tau": 0.030,
+        "critical_concern_retrieval_matches_repsim": true,
+        "pass_criteria_met": false
+      },
+      "notes": "CRITICAL FINDING: Contriever MATCHES or EXCEEDS RepSim on ALL 3 tasks at pilot scale. Contriever toxicity AUPRC=0.968 vs RepSim=0.809 (+15.9pp); Contriever counterfact R@50=1.0 vs RepSim=0.949 (+5.1pp); Contriever ftrace R@50=0.682 vs RepSim=0.660 (+2.2pp). GTR-T5 also matches/exceeds: toxicity AUPRC=0.842 (+3.3pp), counterfact R@50=1.0 (+5.1pp), ftrace R@50=0.832 (+17.2pp). Pass criteria (>5pp gap BELOW RepSim) is NOT MET because retrieval models are ABOVE RepSim, not below. Decision gate TRIGGERED: retrieval matches RepSim on >=2 tasks. This means at pilot scale, generic dense retrieval (Contriever, GTR-T5) performs AT LEAST as well as model-internal RepSim, calling into question whether RepSim captures genuine 'attribution' beyond semantic retrieval. CAVEAT: Pilot scale (N=100) may inflate retrieval performance due to high counterfact saturation; full-scale (N=5473) is critical. BM25 also R@50=1.0 on counterfact (pilot saturation artifact). Kendall tau shows Contriever > RepSim on all tasks. Experiment is GO for full scale to confirm whether this pattern holds."
+    }
+  ]
+}

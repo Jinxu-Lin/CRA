@@ -1,0 +1,24 @@
+{
+  "overall_recommendation": "REFINE",
+  "selected_candidate_id": "cand_a",
+  "candidates": [
+    {
+      "candidate_id": "cand_a",
+      "go_no_go": "CONDITIONAL_GO",
+      "confidence": 0.55,
+      "supported_hypotheses": ["H11_contamination_degrades_performance"],
+      "failed_assumptions": ["H11_contrastive_recovery"],
+      "key_metrics": {
+        "repsim_counterfact_structured_alpha1_degradation_pp": 35.26,
+        "repsim_toxicity_structured_alpha1_degradation_pp": 55.98,
+        "trak_counterfact_magnitude_alpha1_degradation_pp": 8.97,
+        "trak_toxicity_structured_alpha1_degradation_pp": 5.81,
+        "uniform_contamination_effect": "zero (rank-invariant, as expected)",
+        "contrastive_correction_recovery": "negligible (corrected == contaminated for structured/magnitude modes)",
+        "tau_monotonic_degradation_all_structured": true,
+        "uniform_is_rank_invariant": true
+      },
+      "notes": "CRITICAL FINDINGS: (1) Uniform contamination (s + alpha*mu_j) has ZERO effect on all metrics including Kendall tau -- confirmed rank-invariant as expected. (2) Structured contamination (s + alpha*|mu_j|*noise_i) and magnitude-proportional contamination (s + alpha*scale*noise_ij) both degrade performance monotonically with alpha. RepSim degrades faster than TRAK (35pp vs 9pp at alpha=1.0 on counterfact). (3) CRITICAL NEGATIVE: Contrastive correction (mean subtraction) does NOT recover performance from structured contamination. Corrected scores are identical to contaminated scores because noise_i is per-sample and mean subtraction only removes column-constant shifts. (4) This REFRAMES FM2: the original H11 hypothesis assumed contrastive correction could fix common influence contamination. But if contamination is sample-specific (non-uniform), mean subtraction is powerless. FM2 as formulated in the proposal (mean-subtraction as remedy) is fundamentally limited to uniform contamination patterns, which are already rank-invariant and thus undetectable. (5) Implication: FM2 is a THEORETICAL concept without practical measurement consequences -- uniform contamination doesn't affect any metric, and non-uniform contamination can't be fixed by mean subtraction."
+    }
+  ]
+}

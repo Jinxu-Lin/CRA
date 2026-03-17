@@ -23,3 +23,16 @@
 {"ts": 1773674421.801356, "event": "stage_start", "stage": "idea_debate", "iteration": 0, "action_type": "team", "description": "Agent Team: 6人辩论生成研究提案（恢复：已完成 0/6） + Codex 独立审查"}
 {"ts": 1773719774.659775, "event": "stage_end", "stage": "idea_debate", "iteration": 0, "duration_sec": 45359.323759794235, "score": null, "next_stage": "planning"}
 {"ts": 1773719779.488496, "event": "stage_start", "stage": "planning", "iteration": 0, "action_type": "skill", "description": "Design experiment plan with pilot/full configs"}
+{"ts": 1773720232.525315, "event": "stage_end", "stage": "planning", "iteration": 0, "duration_sec": 457.9289982318878, "score": null, "next_stage": "pilot_experiments"}
+{"ts": 1773720650.6547232, "event": "stage_start", "stage": "pilot_experiments", "iteration": 0, "action_type": "skill", "description": "[0/12] 并行 1 任务 (PILOT), 预计 60min: p1_fm2_continuous_metrics→GPU[2]"}
+{"ts": 1773721407.451555, "event": "task_dispatch", "task_ids": ["p1_fm2_contamination_injection"], "gpu_ids": [2], "iteration": 0}
+{"ts": 1773721952.758967, "event": "task_dispatch", "task_ids": ["p1_fm2_interaction_analysis"], "gpu_ids": [2], "iteration": 0}
+{"ts": 1773722217.351988, "event": "task_dispatch", "task_ids": ["p2_eigenspectrum_fullscale"], "gpu_ids": [2], "iteration": 0}
+{"ts": 1773725930.530541, "event": "task_dispatch", "task_ids": ["p2_trak_dim_sweep_fullscale"], "gpu_ids": [2], "iteration": 0}
+{"ts": 1773727946.1830919, "event": "task_dispatch", "task_ids": ["p2_repsim_dim_sweep_fullscale"], "gpu_ids": [2], "iteration": 0}
+{"ts": 1773728703.935437, "event": "task_dispatch", "task_ids": ["p3_retrieval_baselines"], "gpu_ids": [2], "iteration": 0}
+{"ts": 1773729423.2632818, "event": "task_dispatch", "task_ids": ["p4_gap_decomposition"], "gpu_ids": [2], "iteration": 0}
+{"ts": 1773732318.154538, "event": "task_dispatch", "task_ids": ["p4_layer_sweep"], "gpu_ids": [2], "iteration": 0}
+{"ts": 1773733131.968363, "event": "task_dispatch", "task_ids": ["p4_cosine_vs_euclidean"], "gpu_ids": [2], "iteration": 0}
+{"ts": 1773734110.443769, "event": "task_dispatch", "task_ids": ["p5_pca_whitened_attribution"], "gpu_ids": [2], "iteration": 0}
+{"ts": 1773734595.8047512, "event": "task_dispatch", "task_ids": ["final_analysis"], "gpu_ids": [2], "iteration": 0}

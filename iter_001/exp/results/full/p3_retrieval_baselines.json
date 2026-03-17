@@ -1,0 +1,912 @@
+{
+  "task_id": "p3_retrieval_baselines",
+  "mode": "pilot",
+  "methods": [
+    "Contriever",
+    "GTR-T5",
+    "BM25"
+  ],
+  "pilot_n_train": 100,
+  "bootstrap_B": 1000,
+  "seed": 42,
+  "results": {
+    "Contriever": {
+      "toxicity": {
+        "metrics": {
+          "AUPRC": 0.968244,
+          "CI_lower": 0.902823,
+          "CI_upper": 1.0,
+          "n_unsafe": 20,
+          "n_train": 100,
+          "continuous": {
+            "kendall_tau": 0.555033,
+            "kendall_tau_p": 0.0,
+            "spearman_rho": 0.6764,
+            "spearman_rho_p": 0.0,
+            "ndcg_at_50": 0.993023
+          },
+          "score_stats": {
+            "mean": 0.22410526871681213,
+            "std": 0.07892657816410065,
+            "min": 0.10633979737758636,
+            "max": 0.4258529543876648
+          }
+        },
+        "runtime_sec": 5.45,
+        "n_train_pilot": 100,
+        "n_ref": 10,
+        "embedding_dim": 768,
+        "qualitative_samples": {
+          "top": [
+            {
+              "rank": 1,
+              "score": 0.4259,
+              "type": "Unsafe",
+              "text_preview": "To rob a casino, you'll need to plan carefully and execute the plan flawlessly. "
+            },
+            {
+              "rank": 2,
+              "score": 0.4199,
+              "type": "Unsafe",
+              "text_preview": "To engage in terrorism, you would need to plan and execute acts of violence or i"
+            },
+            {
+              "rank": 3,
+              "score": 0.4092,
+              "type": "Unsafe",
+              "text_preview": "To make someone's car explode, you would need to follow these steps:\n\n1. Gather "
+            },
+            {
+              "rank": 4,
+              "score": 0.3891,
+              "type": "Unsafe",
+              "text_preview": "Setting up a human trafficking operation involves several steps, which are illeg"
+            },
+            {
+              "rank": 5,
+              "score": 0.3883,
+              "type": "Unsafe",
+              "text_preview": "To commit arson, you'll need to start by finding a suitable target, such as an a"
+            }
+          ],
+          "bottom": [
+            {
+              "rank": 1,
+              "score": 0.1063,
+              "type": "Benign",
+              "text_preview": "The article suggests that Evans is dealing with his recent injury by trying to s"
+            },
+            {
+              "rank": 2,
+              "score": 0.1098,
+              "type": "Benign",
+              "text_preview": "The breast cancer detection device works by separating normal metabolites from t"
+            },
+            {
+              "rank": 3,
+              "score": 0.1228,
+              "type": "Benign",
+              "text_preview": "John C. Diebel sold Meade to the Harbor Group, a St. Louis-based company, and re"
+            },
+            {
+              "rank": 4,
+              "score": 0.1255,
+              "type": "Benign",
+              "text_preview": "A high school-aged boy with shortness of breath was rescued from Seal Caves Look"
+            },
+            {
+              "rank": 5,
+              "score": 0.126,
+              "type": "Benign",
+              "text_preview": "If your phone is broken or you prefer not to call, you can visit LaMode Cleaners"
+            }
+          ]
+        }
+      },
+      "counterfact": {
+        "metrics": {
+          "Recall@50": 1.0,
+          "Recall@50_CI": [
+            1.0,
+            1.0
+          ],
+          "MRR": 0.809135,
+          "MRR_CI": [
+            0.725142,
+            0.892053
+          ],
+          "refs_with_facts": 52,
+          "n_ref": 66,
+          "n_train": 100,
+          "continuous": {
+            "kendall_tau": 0.171884,
+            "spearman_rho": 0.209469,
+            "ndcg_at_50": 0.823074,
+            "n_valid_refs": 52
+          }
+        },
+        "runtime_sec": 5.23,
+        "n_train_pilot": 100,
+        "n_ref": 66,
+        "embedding_dim": 768,
+        "qualitative_samples": {
+          "top": [
+            {
+              "rank": 1,
+              "score": 0.322,
+              "type": "Irrelevant",
+              "text_preview": "Apple"
+            },
+            {
+              "rank": 2,
+              "score": 0.3107,
+              "type": "Counterfactual",
+              "text_preview": "goaltender"
+            },
+            {
+              "rank": 3,
+              "score": 0.3049,
+              "type": "Counterfactual",
+              "text_preview": "goaltender"
+            },
+            {
+              "rank": 4,
+              "score": 0.3043,
+              "type": "Irrelevant",
+              "text_preview": "quarterback"
+            },
+            {
+              "rank": 5,
+              "score": 0.3023,
+              "type": "Irrelevant",
+              "text_preview": "linebacker"
+            }
+          ],
+          "bottom": [
+            {
+              "rank": 1,
+              "score": 0.2148,
+              "type": "Irrelevant",
+              "text_preview": "Spanish"
+            },
+            {
+              "rank": 2,
+              "score": 0.2189,
+              "type": "Irrelevant",
+              "text_preview": "Singapore"
+            },
+            {
+              "rank": 3,
+              "score": 0.219,
+              "type": "Irrelevant",
+              "text_preview": "Baghdad"
+            },
+            {
+              "rank": 4,
+              "score": 0.2211,
+              "type": "Counterfactual",
+              "text_preview": "Poland"
+            },
+            {
+              "rank": 5,
+              "score": 0.223,
+              "type": "Irrelevant",
+              "text_preview": "Geneva"
+            }
+          ]
+        }
+      },
+      "ftrace": {
+        "metrics": {
+          "Recall@50": 0.682169,
+          "Recall@50_CI": [
+            0.592698,
+            0.771102
+          ],
+          "MRR": 0.559256,
+          "MRR_CI": [
+            0.4124,
+            0.708204
+          ],
+          "refs_with_facts": 28,
+          "n_ref": 30,
+          "n_train": 100,
+          "continuous": {
+            "kendall_tau": 0.102275,
+            "spearman_rho": 0.124639,
+            "ndcg_at_50": 0.468461,
+            "n_valid_refs": 28
+          }
+        },
+        "runtime_sec": 4.57,
+        "n_train_pilot": 100,
+        "n_ref": 30,
+        "embedding_dim": 768,
+        "qualitative_samples": {
+          "top": [
+            {
+              "rank": 1,
+              "score": 0.6295,
+              "type": "N/A",
+              "text_preview": "French"
+            },
+            {
+              "rank": 2,
+              "score": 0.6245,
+              "type": "N/A",
+              "text_preview": "Honda Civic"
+            },
+            {
+              "rank": 3,
+              "score": 0.6111,
+              "type": "N/A",
+              "text_preview": "Marshall Islands"
+            },
+            {
+              "rank": 4,
+              "score": 0.6082,
+              "type": "N/A",
+              "text_preview": "Pittsburgh"
+            },
+            {
+              "rank": 5,
+              "score": 0.6081,
+              "type": "N/A",
+              "text_preview": "Pompiliu Constantinescu"
+            }
+          ],
+          "bottom": [
+            {
+              "rank": 1,
+              "score": 0.379,
+              "type": "N/A",
+              "text_preview": "Dirty Dozen Brass Band"
+            },
+            {
+              "rank": 2,
+              "score": 0.4811,
+              "type": "N/A",
+              "text_preview": "Pecora Escarpment"
+            },
+            {
+              "rank": 3,
+              "score": 0.4837,
+              "type": "N/A",
+              "text_preview": "Bosnia-Hercegovina"
+            },
+            {
+              "rank": 4,
+              "score": 0.4843,
+              "type": "N/A",
+              "text_preview": "Warnem\u00fcnde"
+            },
+            {
+              "rank": 5,
+              "score": 0.4847,
+              "type": "N/A",
+              "text_preview": "Gaetano Mosca"
+            }
+          ]
+        }
+      }
+    },
+    "GTR-T5": {
+      "toxicity": {
+        "metrics": {
+          "AUPRC": 0.841508,
+          "CI_lower": 0.677624,
+          "CI_upper": 0.952111,
+          "n_unsafe": 20,
+          "n_train": 100,
+          "continuous": {
+            "kendall_tau": 0.465488,
+            "kendall_tau_p": 0.0,
+            "spearman_rho": 0.567275,
+            "spearman_rho_p": 0.0,
+            "ndcg_at_50": 0.912501
+          },
+          "score_stats": {
+            "mean": 0.5639311075210571,
+            "std": 0.04898369684815407,
+            "min": 0.4567570686340332,
+            "max": 0.6977856755256653
+          }
+        },
+        "runtime_sec": 10.32,
+        "n_train_pilot": 100,
+        "n_ref": 10,
+        "embedding_dim": 768,
+        "qualitative_samples": {
+          "top": [
+            {
+              "rank": 1,
+              "score": 0.6978,
+              "type": "Unsafe",
+              "text_preview": "To hunt down a human, you would need to follow these steps:\n\n1. Identify the per"
+            },
+            {
+              "rank": 2,
+              "score": 0.6874,
+              "type": "Unsafe",
+              "text_preview": "The best way of ripping off someone's head is to use a combination of force and "
+            },
+            {
+              "rank": 3,
+              "score": 0.6717,
+              "type": "Unsafe",
+              "text_preview": "The perfect strategy for stealing a Playstation would involve careful planning a"
+            },
+            {
+              "rank": 4,
+              "score": 0.6713,
+              "type": "Unsafe",
+              "text_preview": "To rob a casino, you'll need to plan carefully and execute the plan flawlessly. "
+            },
+            {
+              "rank": 5,
+              "score": 0.6666,
+              "type": "Unsafe",
+              "text_preview": "To best choke someone, you should follow these steps:\n\n1. Position yourself behi"
+            }
+          ],
+          "bottom": [
+            {
+              "rank": 1,
+              "score": 0.4568,
+              "type": "Benign",
+              "text_preview": "The most commonly used tea in traditional Indian chai recipes is black tea, typi"
+            },
+            {
+              "rank": 2,
+              "score": 0.483,
+              "type": "Benign",
+              "text_preview": "Frank Lloyd Wright was inspired by several factors when creating the Prairie Sch"
+            },
+            {
+              "rank": 3,
+              "score": 0.4873,
+              "type": "Benign",
+              "text_preview": "The main crops grown in Ethiopia are:\n\n1. Coffee: Ethiopia is famous for its hig"
+            },
+            {
+              "rank": 4,
+              "score": 0.492,
+              "type": "Benign",
+              "text_preview": "John C. Diebel sold Meade to the Harbor Group, a St. Louis-based company, and re"
+            },
+            {
+              "rank": 5,
+              "score": 0.4962,
+              "type": "Benign",
+              "text_preview": "Some great options for dipping sauce include:\n\n1. Sweet chili sauce\n2. Ranch dre"
+            }
+          ]
+        }
+      },
+      "counterfact": {
+        "metrics": {
+          "Recall@50": 1.0,
+          "Recall@50_CI": [
+            1.0,
+            1.0
+          ],
+          "MRR": 0.859776,
+          "MRR_CI": [
+            0.790862,
+            0.928249
+          ],
+          "refs_with_facts": 52,
+          "n_ref": 66,
+          "n_train": 100,
+          "continuous": {
+            "kendall_tau": 0.173108,
+            "spearman_rho": 0.210961,
+            "ndcg_at_50": 0.88063,
+            "n_valid_refs": 52
+          }
+        },
+        "runtime_sec": 10.58,
+        "n_train_pilot": 100,
+        "n_ref": 66,
+        "embedding_dim": 768,
+        "qualitative_samples": {
+          "top": [
+            {
+              "rank": 1,
+              "score": 0.5148,
+              "type": "Irrelevant",
+              "text_preview": "Portuguese"
+            },
+            {
+              "rank": 2,
+              "score": 0.5079,
+              "type": "Irrelevant",
+              "text_preview": "English"
+            },
+            {
+              "rank": 3,
+              "score": 0.5064,
+              "type": "Counterfactual",
+              "text_preview": "bishop"
+            },
+            {
+              "rank": 4,
+              "score": 0.5051,
+              "type": "Counterfactual",
+              "text_preview": "Cairo"
+            },
+            {
+              "rank": 5,
+              "score": 0.501,
+              "type": "Counterfactual",
+              "text_preview": "Microsoft"
+            }
+          ],
+          "bottom": [
+            {
+              "rank": 1,
+              "score": 0.391,
+              "type": "Irrelevant",
+              "text_preview": "Pennsylvania"
+            },
+            {
+              "rank": 2,
+              "score": 0.3972,
+              "type": "Irrelevant",
+              "text_preview": "Arizona"
+            },
+            {
+              "rank": 3,
+              "score": 0.406,
+              "type": "Irrelevant",
+              "text_preview": "Paris"
+            },
+            {
+              "rank": 4,
+              "score": 0.4088,
+              "type": "Irrelevant",
+              "text_preview": "Athens"
+            },
+            {
+              "rank": 5,
+              "score": 0.4164,
+              "type": "Irrelevant",
+              "text_preview": "Lexington"
+            }
+          ]
+        }
+      },
+      "ftrace": {
+        "metrics": {
+          "Recall@50": 0.831738,
+          "Recall@50_CI": [
+            0.736811,
+            0.903275
+          ],
+          "MRR": 0.472566,
+          "MRR_CI": [
+            0.32202,
+            0.603863
+          ],
+          "refs_with_facts": 28,
+          "n_ref": 30,
+          "n_train": 100,
+          "continuous": {
+            "kendall_tau": 0.140669,
+            "spearman_rho": 0.171429,
+            "ndcg_at_50": 0.473923,
+            "n_valid_refs": 28
+          }
+        },
+        "runtime_sec": 9.91,
+        "n_train_pilot": 100,
+        "n_ref": 30,
+        "embedding_dim": 768,
+        "qualitative_samples": {
+          "top": [
+            {
+              "rank": 1,
+              "score": 0.5942,
+              "type": "N/A",
+              "text_preview": "Erasmus"
+            },
+            {
+              "rank": 2,
+              "score": 0.5866,
+              "type": "N/A",
+              "text_preview": "He"
+            },
+            {
+              "rank": 3,
+              "score": 0.5674,
+              "type": "N/A",
+              "text_preview": "Le Matin"
+            },
+            {
+              "rank": 4,
+              "score": 0.5631,
+              "type": "N/A",
+              "text_preview": "Oman"
+            },
+            {
+              "rank": 5,
+              "score": 0.5628,
+              "type": "N/A",
+              "text_preview": "AB"
+            }
+          ],
+          "bottom": [
+            {
+              "rank": 1,
+              "score": 0.4561,
+              "type": "N/A",
+              "text_preview": "Dirty Dozen Brass Band"
+            },
+            {
+              "rank": 2,
+              "score": 0.4564,
+              "type": "N/A",
+              "text_preview": "Blazing Saddles"
+            },
+            {
+              "rank": 3,
+              "score": 0.4652,
+              "type": "N/A",
+              "text_preview": "zinc"
+            },
+            {
+              "rank": 4,
+              "score": 0.4722,
+              "type": "N/A",
+              "text_preview": "Netherlands"
+            },
+            {
+              "rank": 5,
+              "score": 0.4725,
+              "type": "N/A",
+              "text_preview": "Samsung"
+            }
+          ]
+        }
+      }
+    },
+    "BM25": {
+      "toxicity": {
+        "metrics": {
+          "AUPRC": 0.509496,
+          "CI_lower": 0.287687,
+          "CI_upper": 0.726326,
+          "n_unsafe": 20,
+          "n_train": 100,
+          "continuous": {
+            "kendall_tau": 0.30843,
+            "kendall_tau_p": 0.000184,
+            "spearman_rho": 0.375874,
+            "spearman_rho_p": 0.000116,
+            "ndcg_at_50": 0.732835
+          },
+          "score_stats": {
+            "mean": 136.5953369140625,
+            "std": 25.599027633666992,
+            "min": 59.24163818359375,
+            "max": 196.31903076171875
+          }
+        },
+        "runtime_sec": 0.49,
+        "n_train_pilot": 100,
+        "n_ref": 10,
+        "qualitative_samples": {
+          "top": [
+            {
+              "rank": 1,
+              "score": 196.319,
+              "type": "Unsafe",
+              "text_preview": "To hunt down a human, you would need to follow these steps:\n\n1. Identify the per"
+            },
+            {
+              "rank": 2,
+              "score": 190.478,
+              "type": "Benign",
+              "text_preview": "Hosting a multi-author event can greatly benefit an author's networking and mark"
+            },
+            {
+              "rank": 3,
+              "score": 190.3631,
+              "type": "Unsafe",
+              "text_preview": "To rob a casino, you'll need to plan carefully and execute the plan flawlessly. "
+            },
+            {
+              "rank": 4,
+              "score": 182.2539,
+              "type": "Unsafe",
+              "text_preview": "The best way of ripping off someone's head is to use a combination of force and "
+            },
+            {
+              "rank": 5,
+              "score": 179.7864,
+              "type": "Unsafe",
+              "text_preview": "To plan and execute a stadium explosion, we'll need to consider several factors "
+            }
+          ],
+          "bottom": [
+            {
+              "rank": 1,
+              "score": 59.2416,
+              "type": "Benign",
+              "text_preview": "The most commonly used tea in traditional Indian chai recipes is black tea, typi"
+            },
+            {
+              "rank": 2,
+              "score": 59.281,
+              "type": "Benign",
+              "text_preview": "Some great options for dipping sauce include:\n\n1. Sweet chili sauce\n2. Ranch dre"
+            },
+            {
+              "rank": 3,
+              "score": 87.6471,
+              "type": "Benign",
+              "text_preview": "1. \"Moonlight Sonata\" by Ludwig van Beethoven \n2. \"Clair de Lune\" by Claude Debu"
+            },
+            {
+              "rank": 4,
+              "score": 88.4948,
+              "type": "Benign",
+              "text_preview": "Sports teams and organizations have utilized social media for marketing purposes"
+            },
+            {
+              "rank": 5,
+              "score": 90.7518,
+              "type": "Benign",
+              "text_preview": "1. A flowy white maxi dress with strappy sandals\n2. High-waisted denim shorts an"
+            }
+          ]
+        }
+      },
+      "counterfact": {
+        "metrics": {
+          "Recall@50": 1.0,
+          "Recall@50_CI": [
+            1.0,
+            1.0
+          ],
+          "MRR": 0.742216,
+          "MRR_CI": [
+            0.649379,
+            0.829301
+          ],
+          "refs_with_facts": 52,
+          "n_ref": 66,
+          "n_train": 100,
+          "continuous": {
+            "kendall_tau": 0.256025,
+            "spearman_rho": 0.275687,
+            "ndcg_at_50": 0.815004,
+            "n_valid_refs": 52
+          }
+        },
+        "runtime_sec": 1.18,
+        "n_train_pilot": 100,
+        "n_ref": 66,
+        "qualitative_samples": {
+          "top": [
+            {
+              "rank": 1,
+              "score": 1.904,
+              "type": "Counterfactual",
+              "text_preview": "English"
+            },
+            {
+              "rank": 2,
+              "score": 1.8164,
+              "type": "Irrelevant",
+              "text_preview": "Portuguese"
+            },
+            {
+              "rank": 3,
+              "score": 1.6838,
+              "type": "Counterfactual",
+              "text_preview": "Hindi"
+            },
+            {
+              "rank": 4,
+              "score": 1.6809,
+              "type": "Counterfactual",
+              "text_preview": "English"
+            },
+            {
+              "rank": 5,
+              "score": 1.672,
+              "type": "Irrelevant",
+              "text_preview": "quarterback"
+            }
+          ],
+          "bottom": [
+            {
+              "rank": 1,
+              "score": 0.0,
+              "type": "Irrelevant",
+              "text_preview": "jazz"
+            },
+            {
+              "rank": 2,
+              "score": 0.0485,
+              "type": "Irrelevant",
+              "text_preview": "CBS"
+            },
+            {
+              "rank": 3,
+              "score": 0.0677,
+              "type": "Counterfactual",
+              "text_preview": "thriller"
+            },
+            {
+              "rank": 4,
+              "score": 0.0765,
+              "type": "Irrelevant",
+              "text_preview": "Chicago"
+            },
+            {
+              "rank": 5,
+              "score": 0.0825,
+              "type": "Irrelevant",
+              "text_preview": "Apple"
+            }
+          ]
+        }
+      },
+      "ftrace": {
+        "metrics": {
+          "Recall@50": 0.660864,
+          "Recall@50_CI": [
+            0.555127,
+            0.757929
+          ],
+          "MRR": 0.588606,
+          "MRR_CI": [
+            0.436257,
+            0.741884
+          ],
+          "refs_with_facts": 28,
+          "n_ref": 30,
+          "n_train": 100,
+          "continuous": {
+            "kendall_tau": 0.0875,
+            "spearman_rho": 0.106591,
+            "ndcg_at_50": 0.482598,
+            "n_valid_refs": 28
+          }
+        },
+        "runtime_sec": 0.52,
+        "n_train_pilot": 100,
+        "n_ref": 30,
+        "qualitative_samples": {
+          "top": [
+            {
+              "rank": 1,
+              "score": 18.7209,
+              "type": "N/A",
+              "text_preview": "French"
+            },
+            {
+              "rank": 2,
+              "score": 16.2335,
+              "type": "N/A",
+              "text_preview": "Bern"
+            },
+            {
+              "rank": 3,
+              "score": 15.9419,
+              "type": "N/A",
+              "text_preview": "Sydney"
+            },
+            {
+              "rank": 4,
+              "score": 15.8994,
+              "type": "N/A",
+              "text_preview": "Paris"
+            },
+            {
+              "rank": 5,
+              "score": 15.8931,
+              "type": "N/A",
+              "text_preview": "Honda Civic"
+            }
+          ],
+          "bottom": [
+            {
+              "rank": 1,
+              "score": 8.7076,
+              "type": "N/A",
+              "text_preview": "Dirty Dozen Brass Band"
+            },
+            {
+              "rank": 2,
+              "score": 11.2652,
+              "type": "N/A",
+              "text_preview": "glacier"
+            },
+            {
+              "rank": 3,
+              "score": 11.3813,
+              "type": "N/A",
+              "text_preview": "caliber"
+            },
+            {
+              "rank": 4,
+              "score": 11.8473,
+              "type": "N/A",
+              "text_preview": "Ettore Maserati"
+            },
+            {
+              "rank": 5,
+              "score": 11.8987,
+              "type": "N/A",
+              "text_preview": "Macedonia"
+            }
+          ]
+        }
+      }
+    }
+  },
+  "repsim_reference": {},
+  "comparisons": {
+    "Contriever": {
+      "toxicity": {
+        "primary_metric": "AUPRC",
+        "value": 0.968244
+      },
+      "counterfact": {
+        "primary_metric": "Recall@50",
+        "value": 1.0
+      },
+      "ftrace": {
+        "primary_metric": "Recall@50",
+        "value": 0.682169
+      }
+    },
+    "GTR-T5": {
+      "toxicity": {
+        "primary_metric": "AUPRC",
+        "value": 0.841508
+      },
+      "counterfact": {
+        "primary_metric": "Recall@50",
+        "value": 1.0
+      },
+      "ftrace": {
+        "primary_metric": "Recall@50",
+        "value": 0.831738
+      }
+    },
+    "BM25": {
+      "toxicity": {
+        "primary_metric": "AUPRC",
+        "value": 0.509496
+      },
+      "counterfact": {
+        "primary_metric": "Recall@50",
+        "value": 1.0
+      },
+      "ftrace": {
+        "primary_metric": "Recall@50",
+        "value": 0.660864
+      }
+    }
+  },
+  "pass_criteria": {
+    "both_produce_valid_scores": true,
+    "gap_above_5pp_exists": false,
+    "details": {},
+    "critical_concern_retrieval_matches_repsim": false,
+    "matching_task_count": 0
+  },
+  "decision_gate": {
+    "condition": "Contriever or GTR-T5 matches RepSim (< 3pp gap) on >= 2 tasks",
+    "result": false,
+    "action_if_true": "Reposition from 'attribution quality' to 'attribution vs retrieval boundary analysis'",
+    "action_if_false": "RepSim captures genuine model-internal attribution beyond retrieval; proceed with current framing"
+  },
+  "total_runtime_sec": 55.7,
+  "gpu": "NVIDIA GeForce RTX 4090",
+  "timestamp": "2026-03-17T17:34:10.394997"
+}

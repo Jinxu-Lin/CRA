@@ -1,0 +1,1012 @@
+{
+  "task_id": "p2_repsim_dim_sweep_fullscale",
+  "model": "EleutherAI/pythia-1b",
+  "hidden_dim": 2048,
+  "pca_dims": [
+    16,
+    32,
+    64,
+    128,
+    256,
+    512,
+    1024,
+    2048
+  ],
+  "pilot_n_train": 100,
+  "bootstrap_B": 1000,
+  "seed": 42,
+  "mode": "pilot",
+  "sweep_results": {
+    "16": {
+      "metrics": {
+        "toxicity": {
+          "AUPRC": 0.723347,
+          "AUPRC_CI": [
+            0.533764,
+            0.87315
+          ],
+          "n_unsafe": 20,
+          "n_train": 100,
+          "kendall_tau": 0.365995,
+          "spearman_rho": 0.446025
+        },
+        "counterfact": {
+          "Recall@50": 1.0,
+          "Recall@50_CI": [
+            1.0,
+            1.0
+          ],
+          "MRR": 0.82323,
+          "MRR_CI": [
+            0.727858,
+            0.910884
+          ],
+          "kendall_tau": 0.171375,
+          "kendall_tau_CI": [
+            0.161163,
+            0.181182
+          ],
+          "spearman_rho": 0.208849,
+          "refs_with_facts": 52,
+          "n_ref": 66,
+          "n_train": 100
+        },
+        "ftrace": {
+          "Recall@50": 0.768076,
+          "Recall@50_CI": [
+            0.679437,
+            0.852287
+          ],
+          "MRR": 0.594035,
+          "MRR_CI": [
+            0.448083,
+            0.732863
+          ],
+          "kendall_tau": 0.13397,
+          "kendall_tau_CI": [
+            0.102015,
+            0.165174
+          ],
+          "spearman_rho": 0.163264,
+          "refs_with_facts": 28,
+          "n_ref": 30,
+          "n_train": 100
+        }
+      },
+      "runtime_sec": 49.37
+    },
+    "32": {
+      "metrics": {
+        "toxicity": {
+          "AUPRC": 0.72424,
+          "AUPRC_CI": [
+            0.535797,
+            0.873196
+          ],
+          "n_unsafe": 20,
+          "n_train": 100,
+          "kendall_tau": 0.368127,
+          "spearman_rho": 0.448624
+        },
+        "counterfact": {
+          "Recall@50": 1.0,
+          "Recall@50_CI": [
+            1.0,
+            1.0
+          ],
+          "MRR": 0.83592,
+          "MRR_CI": [
+            0.745079,
+            0.916471
+          ],
+          "kendall_tau": 0.173797,
+          "kendall_tau_CI": [
+            0.163702,
+            0.183832
+          ],
+          "spearman_rho": 0.2118,
+          "refs_with_facts": 52,
+          "n_ref": 66,
+          "n_train": 100
+        },
+        "ftrace": {
+          "Recall@50": 0.774461,
+          "Recall@50_CI": [
+            0.68444,
+            0.852743
+          ],
+          "MRR": 0.632189,
+          "MRR_CI": [
+            0.469772,
+            0.774181
+          ],
+          "kendall_tau": 0.134147,
+          "kendall_tau_CI": [
+            0.102532,
+            0.164068
+          ],
+          "spearman_rho": 0.16348,
+          "refs_with_facts": 28,
+          "n_ref": 30,
+          "n_train": 100
+        }
+      },
+      "runtime_sec": 49.92
+    },
+    "64": {
+      "metrics": {
+        "toxicity": {
+          "AUPRC": 0.727657,
+          "AUPRC_CI": [
+            0.538838,
+            0.875321
+          ],
+          "n_unsafe": 20,
+          "n_train": 100,
+          "kendall_tau": 0.375944,
+          "spearman_rho": 0.45815
+        },
+        "counterfact": {
+          "Recall@50": 1.0,
+          "Recall@50_CI": [
+            1.0,
+            1.0
+          ],
+          "MRR": 0.855952,
+          "MRR_CI": [
+            0.773926,
+            0.92922
+          ],
+          "kendall_tau": 0.174922,
+          "kendall_tau_CI": [
+            0.164676,
+            0.185006
+          ],
+          "spearman_rho": 0.213171,
+          "refs_with_facts": 52,
+          "n_ref": 66,
+          "n_train": 100
+        },
+        "ftrace": {
+          "Recall@50": 0.803126,
+          "Recall@50_CI": [
+            0.717492,
+            0.877759
+          ],
+          "MRR": 0.652753,
+          "MRR_CI": [
+            0.505307,
+            0.798711
+          ],
+          "kendall_tau": 0.136266,
+          "kendall_tau_CI": [
+            0.105183,
+            0.165935
+          ],
+          "spearman_rho": 0.166063,
+          "refs_with_facts": 28,
+          "n_ref": 30,
+          "n_train": 100
+        }
+      },
+      "runtime_sec": 51.56
+    },
+    "128": {
+      "metrics": {
+        "toxicity": {
+          "AUPRC": 0.685158,
+          "AUPRC_CI": [
+            0.471979,
+            0.844056
+          ],
+          "n_unsafe": 20,
+          "n_train": 100,
+          "kendall_tau": 0.346096,
+          "spearman_rho": 0.421775
+        },
+        "counterfact": {
+          "Recall@50": 1.0,
+          "Recall@50_CI": [
+            1.0,
+            1.0
+          ],
+          "MRR": 0.876145,
+          "MRR_CI": [
+            0.79675,
+            0.945479
+          ],
+          "kendall_tau": 0.17496,
+          "kendall_tau_CI": [
+            0.164708,
+            0.184953
+          ],
+          "spearman_rho": 0.213219,
+          "refs_with_facts": 52,
+          "n_ref": 66,
+          "n_train": 100
+        },
+        "ftrace": {
+          "Recall@50": 0.79095,
+          "Recall@50_CI": [
+            0.70667,
+            0.864263
+          ],
+          "MRR": 0.624128,
+          "MRR_CI": [
+            0.470192,
+            0.763928
+          ],
+          "kendall_tau": 0.138235,
+          "kendall_tau_CI": [
+            0.107592,
+            0.1689
+          ],
+          "spearman_rho": 0.168463,
+          "refs_with_facts": 28,
+          "n_ref": 30,
+          "n_train": 100
+        }
+      },
+      "runtime_sec": 55.63
+    },
+    "256": {
+      "metrics": {
+        "toxicity": {
+          "AUPRC": 0.685158,
+          "AUPRC_CI": [
+            0.471979,
+            0.844056
+          ],
+          "n_unsafe": 20,
+          "n_train": 100,
+          "kendall_tau": 0.346096,
+          "spearman_rho": 0.421775
+        },
+        "counterfact": {
+          "Recall@50": 0.99359,
+          "Recall@50_CI": [
+            0.979167,
+            1.0
+          ],
+          "MRR": 0.875801,
+          "MRR_CI": [
+            0.797745,
+            0.945513
+          ],
+          "kendall_tau": 0.170393,
+          "kendall_tau_CI": [
+            0.160508,
+            0.179838
+          ],
+          "spearman_rho": 0.207653,
+          "refs_with_facts": 52,
+          "n_ref": 66,
+          "n_train": 100
+        },
+        "ftrace": {
+          "Recall@50": 0.756321,
+          "Recall@50_CI": [
+            0.661071,
+            0.841806
+          ],
+          "MRR": 0.617514,
+          "MRR_CI": [
+            0.465883,
+            0.769108
+          ],
+          "kendall_tau": 0.117385,
+          "kendall_tau_CI": [
+            0.072151,
+            0.160203
+          ],
+          "spearman_rho": 0.143054,
+          "refs_with_facts": 28,
+          "n_ref": 30,
+          "n_train": 100
+        }
+      },
+      "runtime_sec": 48.93
+    },
+    "512": {
+      "metrics": {
+        "toxicity": {
+          "AUPRC": 0.685158,
+          "AUPRC_CI": [
+            0.471979,
+            0.844056
+          ],
+          "n_unsafe": 20,
+          "n_train": 100,
+          "kendall_tau": 0.346096,
+          "spearman_rho": 0.421775
+        },
+        "counterfact": {
+          "Recall@50": 0.99359,
+          "Recall@50_CI": [
+            0.979167,
+            1.0
+          ],
+          "MRR": 0.875801,
+          "MRR_CI": [
+            0.797745,
+            0.945513
+          ],
+          "kendall_tau": 0.170393,
+          "kendall_tau_CI": [
+            0.160508,
+            0.179838
+          ],
+          "spearman_rho": 0.207653,
+          "refs_with_facts": 52,
+          "n_ref": 66,
+          "n_train": 100
+        },
+        "ftrace": {
+          "Recall@50": 0.756321,
+          "Recall@50_CI": [
+            0.661071,
+            0.841806
+          ],
+          "MRR": 0.617514,
+          "MRR_CI": [
+            0.465883,
+            0.769108
+          ],
+          "kendall_tau": 0.117385,
+          "kendall_tau_CI": [
+            0.072151,
+            0.160203
+          ],
+          "spearman_rho": 0.143054,
+          "refs_with_facts": 28,
+          "n_ref": 30,
+          "n_train": 100
+        }
+      },
+      "runtime_sec": 48.95
+    },
+    "1024": {
+      "metrics": {
+        "toxicity": {
+          "AUPRC": 0.685158,
+          "AUPRC_CI": [
+            0.471979,
+            0.844056
+          ],
+          "n_unsafe": 20,
+          "n_train": 100,
+          "kendall_tau": 0.346096,
+          "spearman_rho": 0.421775
+        },
+        "counterfact": {
+          "Recall@50": 0.99359,
+          "Recall@50_CI": [
+            0.979167,
+            1.0
+          ],
+          "MRR": 0.875801,
+          "MRR_CI": [
+            0.797745,
+            0.945513
+          ],
+          "kendall_tau": 0.170393,
+          "kendall_tau_CI": [
+            0.160508,
+            0.179838
+          ],
+          "spearman_rho": 0.207653,
+          "refs_with_facts": 52,
+          "n_ref": 66,
+          "n_train": 100
+        },
+        "ftrace": {
+          "Recall@50": 0.756321,
+          "Recall@50_CI": [
+            0.661071,
+            0.841806
+          ],
+          "MRR": 0.617514,
+          "MRR_CI": [
+            0.465883,
+            0.769108
+          ],
+          "kendall_tau": 0.117385,
+          "kendall_tau_CI": [
+            0.072151,
+            0.160203
+          ],
+          "spearman_rho": 0.143054,
+          "refs_with_facts": 28,
+          "n_ref": 30,
+          "n_train": 100
+        }
+      },
+      "runtime_sec": 48.87
+    },
+    "2048": {
+      "metrics": {
+        "toxicity": {
+          "AUPRC": 0.685158,
+          "AUPRC_CI": [
+            0.471979,
+            0.844056
+          ],
+          "n_unsafe": 20,
+          "n_train": 100,
+          "kendall_tau": 0.346096,
+          "spearman_rho": 0.421775
+        },
+        "counterfact": {
+          "Recall@50": 0.99359,
+          "Recall@50_CI": [
+            0.979167,
+            1.0
+          ],
+          "MRR": 0.875801,
+          "MRR_CI": [
+            0.797745,
+            0.945513
+          ],
+          "kendall_tau": 0.170393,
+          "kendall_tau_CI": [
+            0.160508,
+            0.179838
+          ],
+          "spearman_rho": 0.207653,
+          "refs_with_facts": 52,
+          "n_ref": 66,
+          "n_train": 100
+        },
+        "ftrace": {
+          "Recall@50": 0.756321,
+          "Recall@50_CI": [
+            0.661071,
+            0.841806
+          ],
+          "MRR": 0.617514,
+          "MRR_CI": [
+            0.465883,
+            0.769108
+          ],
+          "kendall_tau": 0.117385,
+          "kendall_tau_CI": [
+            0.072151,
+            0.160203
+          ],
+          "spearman_rho": 0.143054,
+          "refs_with_facts": 28,
+          "n_ref": 30,
+          "n_train": 100
+        }
+      },
+      "runtime_sec": 48.67
+    }
+  },
+  "pca_info": {
+    "16": {
+      "toxicity": {
+        "effective_k": 16,
+        "explained_variance_ratio": 0.666698,
+        "top_eigenvalues": [
+          0.170839,
+          0.105132,
+          0.026374,
+          0.020137,
+          0.01751,
+          0.014563,
+          0.01388,
+          0.01201,
+          0.010952,
+          0.010447
+        ],
+        "n_fit_samples": 110
+      },
+      "counterfact": {
+        "effective_k": 16,
+        "explained_variance_ratio": 0.638878,
+        "top_eigenvalues": [
+          0.064386,
+          0.047038,
+          0.044247,
+          0.023095,
+          0.022691,
+          0.020207,
+          0.015532,
+          0.01483,
+          0.012435,
+          0.012154
+        ],
+        "n_fit_samples": 166
+      },
+      "ftrace": {
+        "effective_k": 16,
+        "explained_variance_ratio": 0.521524,
+        "top_eigenvalues": [
+          0.050336,
+          0.033851,
+          0.027179,
+          0.022163,
+          0.018479,
+          0.017002,
+          0.014079,
+          0.013405,
+          0.011095,
+          0.010748
+        ],
+        "n_fit_samples": 130
+      }
+    },
+    "32": {
+      "toxicity": {
+        "effective_k": 32,
+        "explained_variance_ratio": 0.799136,
+        "top_eigenvalues": [
+          0.170838,
+          0.105132,
+          0.026374,
+          0.020137,
+          0.01751,
+          0.014563,
+          0.013881,
+          0.012015,
+          0.010956,
+          0.010451
+        ],
+        "n_fit_samples": 110
+      },
+      "counterfact": {
+        "effective_k": 32,
+        "explained_variance_ratio": 0.776159,
+        "top_eigenvalues": [
+          0.064386,
+          0.047038,
+          0.044247,
+          0.023095,
+          0.022691,
+          0.020207,
+          0.015532,
+          0.01483,
+          0.012435,
+          0.012154
+        ],
+        "n_fit_samples": 166
+      },
+      "ftrace": {
+        "effective_k": 32,
+        "explained_variance_ratio": 0.67616,
+        "top_eigenvalues": [
+          0.050336,
+          0.033851,
+          0.027179,
+          0.022163,
+          0.018479,
+          0.017002,
+          0.01408,
+          0.013407,
+          0.011097,
+          0.010751
+        ],
+        "n_fit_samples": 130
+      }
+    },
+    "64": {
+      "toxicity": {
+        "effective_k": 64,
+        "explained_variance_ratio": 0.940005,
+        "top_eigenvalues": [
+          0.170838,
+          0.105132,
+          0.026374,
+          0.020137,
+          0.01751,
+          0.014563,
+          0.013881,
+          0.012015,
+          0.010956,
+          0.010451
+        ],
+        "n_fit_samples": 110
+      },
+      "counterfact": {
+        "effective_k": 64,
+        "explained_variance_ratio": 0.90323,
+        "top_eigenvalues": [
+          0.064386,
+          0.047038,
+          0.044247,
+          0.023095,
+          0.022691,
+          0.020207,
+          0.015532,
+          0.01483,
+          0.012435,
+          0.012154
+        ],
+        "n_fit_samples": 166
+      },
+      "ftrace": {
+        "effective_k": 64,
+        "explained_variance_ratio": 0.853655,
+        "top_eigenvalues": [
+          0.050336,
+          0.033851,
+          0.027179,
+          0.022163,
+          0.018479,
+          0.017002,
+          0.01408,
+          0.013407,
+          0.011097,
+          0.010751
+        ],
+        "n_fit_samples": 130
+      }
+    },
+    "128": {
+      "toxicity": {
+        "note": "k=128 >= max_components=109; using full representations",
+        "effective_k": 2048,
+        "explained_variance_ratio": 1.0
+      },
+      "counterfact": {
+        "effective_k": 128,
+        "explained_variance_ratio": 0.987577,
+        "top_eigenvalues": [
+          0.064386,
+          0.047038,
+          0.044247,
+          0.023095,
+          0.022691,
+          0.020207,
+          0.015532,
+          0.01483,
+          0.012435,
+          0.012154
+        ],
+        "n_fit_samples": 166
+      },
+      "ftrace": {
+        "effective_k": 128,
+        "explained_variance_ratio": 0.999545,
+        "top_eigenvalues": [
+          0.050336,
+          0.033851,
+          0.027179,
+          0.022163,
+          0.018479,
+          0.017002,
+          0.01408,
+          0.013407,
+          0.011097,
+          0.010751
+        ],
+        "n_fit_samples": 130
+      }
+    },
+    "256": {
+      "toxicity": {
+        "note": "k=256 >= max_components=109; using full representations",
+        "effective_k": 2048,
+        "explained_variance_ratio": 1.0
+      },
+      "counterfact": {
+        "note": "k=256 >= max_components=165; using full representations",
+        "effective_k": 2048,
+        "explained_variance_ratio": 1.0
+      },
+      "ftrace": {
+        "note": "k=256 >= max_components=129; using full representations",
+        "effective_k": 2048,
+        "explained_variance_ratio": 1.0
+      }
+    },
+    "512": {
+      "toxicity": {
+        "note": "k=512 >= max_components=109; using full representations",
+        "effective_k": 2048,
+        "explained_variance_ratio": 1.0
+      },
+      "counterfact": {
+        "note": "k=512 >= max_components=165; using full representations",
+        "effective_k": 2048,
+        "explained_variance_ratio": 1.0
+      },
+      "ftrace": {
+        "note": "k=512 >= max_components=129; using full representations",
+        "effective_k": 2048,
+        "explained_variance_ratio": 1.0
+      }
+    },
+    "1024": {
+      "toxicity": {
+        "note": "k=1024 >= max_components=109; using full representations",
+        "effective_k": 2048,
+        "explained_variance_ratio": 1.0
+      },
+      "counterfact": {
+        "note": "k=1024 >= max_components=165; using full representations",
+        "effective_k": 2048,
+        "explained_variance_ratio": 1.0
+      },
+      "ftrace": {
+        "note": "k=1024 >= max_components=129; using full representations",
+        "effective_k": 2048,
+        "explained_variance_ratio": 1.0
+      }
+    },
+    "2048": {
+      "toxicity": {
+        "note": "k=2048 >= max_components=109; using full representations",
+        "effective_k": 2048,
+        "explained_variance_ratio": 1.0
+      },
+      "counterfact": {
+        "note": "k=2048 >= max_components=165; using full representations",
+        "effective_k": 2048,
+        "explained_variance_ratio": 1.0
+      },
+      "ftrace": {
+        "note": "k=2048 >= max_components=129; using full representations",
+        "effective_k": 2048,
+        "explained_variance_ratio": 1.0
+      }
+    }
+  },
+  "degradation_analysis": {
+    "toxicity": {
+      "metric": "AUPRC",
+      "full_dim_value": 0.685158,
+      "full_dim_tau": 0.346096,
+      "curve": [
+        {
+          "pca_dim": 16,
+          "value": 0.723347,
+          "drop_pp": -3.82,
+          "retention_pct": 105.57,
+          "kendall_tau": 0.365995,
+          "tau_drop": -0.019899
+        },
+        {
+          "pca_dim": 32,
+          "value": 0.72424,
+          "drop_pp": -3.91,
+          "retention_pct": 105.7,
+          "kendall_tau": 0.368127,
+          "tau_drop": -0.022031
+        },
+        {
+          "pca_dim": 64,
+          "value": 0.727657,
+          "drop_pp": -4.25,
+          "retention_pct": 106.2,
+          "kendall_tau": 0.375944,
+          "tau_drop": -0.029848
+        },
+        {
+          "pca_dim": 128,
+          "value": 0.685158,
+          "drop_pp": 0.0,
+          "retention_pct": 100.0,
+          "kendall_tau": 0.346096,
+          "tau_drop": 0.0
+        },
+        {
+          "pca_dim": 256,
+          "value": 0.685158,
+          "drop_pp": 0.0,
+          "retention_pct": 100.0,
+          "kendall_tau": 0.346096,
+          "tau_drop": 0.0
+        },
+        {
+          "pca_dim": 512,
+          "value": 0.685158,
+          "drop_pp": 0.0,
+          "retention_pct": 100.0,
+          "kendall_tau": 0.346096,
+          "tau_drop": 0.0
+        },
+        {
+          "pca_dim": 1024,
+          "value": 0.685158,
+          "drop_pp": 0.0,
+          "retention_pct": 100.0,
+          "kendall_tau": 0.346096,
+          "tau_drop": 0.0
+        },
+        {
+          "pca_dim": 2048,
+          "value": 0.685158,
+          "drop_pp": 0.0,
+          "retention_pct": 100.0,
+          "kendall_tau": 0.346096,
+          "tau_drop": 0.0
+        }
+      ]
+    },
+    "counterfact": {
+      "metric": "Recall@50",
+      "full_dim_value": 0.99359,
+      "full_dim_tau": 0.170393,
+      "curve": [
+        {
+          "pca_dim": 16,
+          "value": 1.0,
+          "drop_pp": -0.64,
+          "retention_pct": 100.65,
+          "kendall_tau": 0.171375,
+          "tau_drop": -0.000982
+        },
+        {
+          "pca_dim": 32,
+          "value": 1.0,
+          "drop_pp": -0.64,
+          "retention_pct": 100.65,
+          "kendall_tau": 0.173797,
+          "tau_drop": -0.003404
+        },
+        {
+          "pca_dim": 64,
+          "value": 1.0,
+          "drop_pp": -0.64,
+          "retention_pct": 100.65,
+          "kendall_tau": 0.174922,
+          "tau_drop": -0.004529
+        },
+        {
+          "pca_dim": 128,
+          "value": 1.0,
+          "drop_pp": -0.64,
+          "retention_pct": 100.65,
+          "kendall_tau": 0.17496,
+          "tau_drop": -0.004567
+        },
+        {
+          "pca_dim": 256,
+          "value": 0.99359,
+          "drop_pp": 0.0,
+          "retention_pct": 100.0,
+          "kendall_tau": 0.170393,
+          "tau_drop": 0.0
+        },
+        {
+          "pca_dim": 512,
+          "value": 0.99359,
+          "drop_pp": 0.0,
+          "retention_pct": 100.0,
+          "kendall_tau": 0.170393,
+          "tau_drop": 0.0
+        },
+        {
+          "pca_dim": 1024,
+          "value": 0.99359,
+          "drop_pp": 0.0,
+          "retention_pct": 100.0,
+          "kendall_tau": 0.170393,
+          "tau_drop": 0.0
+        },
+        {
+          "pca_dim": 2048,
+          "value": 0.99359,
+          "drop_pp": 0.0,
+          "retention_pct": 100.0,
+          "kendall_tau": 0.170393,
+          "tau_drop": 0.0
+        }
+      ]
+    },
+    "ftrace": {
+      "metric": "Recall@50",
+      "full_dim_value": 0.756321,
+      "full_dim_tau": 0.117385,
+      "curve": [
+        {
+          "pca_dim": 16,
+          "value": 0.768076,
+          "drop_pp": -1.18,
+          "retention_pct": 101.55,
+          "kendall_tau": 0.13397,
+          "tau_drop": -0.016585
+        },
+        {
+          "pca_dim": 32,
+          "value": 0.774461,
+          "drop_pp": -1.81,
+          "retention_pct": 102.4,
+          "kendall_tau": 0.134147,
+          "tau_drop": -0.016762
+        },
+        {
+          "pca_dim": 64,
+          "value": 0.803126,
+          "drop_pp": -4.68,
+          "retention_pct": 106.19,
+          "kendall_tau": 0.136266,
+          "tau_drop": -0.018881
+        },
+        {
+          "pca_dim": 128,
+          "value": 0.79095,
+          "drop_pp": -3.46,
+          "retention_pct": 104.58,
+          "kendall_tau": 0.138235,
+          "tau_drop": -0.02085
+        },
+        {
+          "pca_dim": 256,
+          "value": 0.756321,
+          "drop_pp": 0.0,
+          "retention_pct": 100.0,
+          "kendall_tau": 0.117385,
+          "tau_drop": 0.0
+        },
+        {
+          "pca_dim": 512,
+          "value": 0.756321,
+          "drop_pp": 0.0,
+          "retention_pct": 100.0,
+          "kendall_tau": 0.117385,
+          "tau_drop": 0.0
+        },
+        {
+          "pca_dim": 1024,
+          "value": 0.756321,
+          "drop_pp": 0.0,
+          "retention_pct": 100.0,
+          "kendall_tau": 0.117385,
+          "tau_drop": 0.0
+        },
+        {
+          "pca_dim": 2048,
+          "value": 0.756321,
+          "drop_pp": 0.0,
+          "retention_pct": 100.0,
+          "kendall_tau": 0.117385,
+          "tau_drop": 0.0
+        }
+      ]
+    }
+  },
+  "knee_points": {
+    "toxicity": 16,
+    "counterfact": 16,
+    "ftrace": 16
+  },
+  "min_k_within_3pp": {
+    "toxicity": 128,
+    "counterfact": 16,
+    "ftrace": 16
+  },
+  "h4_cross_validation": {
+    "toxicity": {
+      "knee_k": 16,
+      "knee_ratio": 0.008,
+      "in_expected_range": false,
+      "note": "knee at k=16 = 0.008*d"
+    },
+    "counterfact": {
+      "knee_k": 16,
+      "knee_ratio": 0.008,
+      "in_expected_range": false,
+      "note": "knee at k=16 = 0.008*d"
+    },
+    "ftrace": {
+      "knee_k": 16,
+      "knee_ratio": 0.008,
+      "in_expected_range": false,
+      "note": "knee at k=16 = 0.008*d"
+    }
+  },
+  "pass_criteria": {
+    "full_dim_matches_within_1pp": true,
+    "graceful_degradation": true,
+    "knee_in_expected_range": false
+  },
+  "pilot_limitations": [
+    "N=100 caps PCA max_components to ~129 (varies by task pool size); k>max_components falls back to full d=2048",
+    "At pilot scale saturation may appear earlier (fewer samples = lower effective rank)",
+    "Bootstrap CIs may be wide with small ref sets"
+  ],
+  "total_runtime_sec": 409.31,
+  "timestamp": "2026-03-17T17:23:51.854335"
+}

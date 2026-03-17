@@ -1,0 +1,42 @@
+{
+  "overall_recommendation": "GO",
+  "selected_candidate_id": "cand_a",
+  "candidates": [
+    {
+      "candidate_id": "cand_a",
+      "go_no_go": "GO",
+      "confidence": 0.75,
+      "supported_hypotheses": [
+        "H_layer_variation",
+        "H_last_layer_semantic"
+      ],
+      "failed_assumptions": [],
+      "key_metrics": {
+        "toxicity": {
+          "best_layer": "layer_15",
+          "best_value": 0.685158,
+          "range_pp": 16.33,
+          "depth_correlation": 0.3929
+        },
+        "counterfact": {
+          "best_layer": "embed",
+          "best_value": 1.0,
+          "range_pp": 0.64,
+          "depth_correlation": -0.6124
+        },
+        "ftrace": {
+          "best_layer": "layer_15",
+          "best_value": 0.747392,
+          "range_pp": 39.02,
+          "depth_correlation": 0.8571
+        }
+      },
+      "notes": "Layer sweep pilot (N=100). Ranges (pp): toxicity=16.3, counterfact=0.6, ftrace=39.0. Last-layer best on semantic: counterfact=no, ftrace=yes. Depth correlation: toxicity=0.393, counterfact=-0.612, ftrace=0.857."
+    }
+  ],
+  "pilot_limitations": [
+    "N=100 pilot scale; full-scale may shift optimal layers",
+    "Pythia-1B has 16 layers; sweep covers 7 points",
+    "Bootstrap CIs may be wide with small ref sets"
+  ]
+}

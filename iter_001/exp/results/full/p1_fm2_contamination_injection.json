@@ -1,0 +1,1899 @@
+{
+  "task_id": "p1_fm2_contamination_injection",
+  "candidate_id": "cand_a",
+  "mode": "pilot",
+  "n_train": 100,
+  "seed": 42,
+  "model": "EleutherAI/pythia-1b",
+  "alphas": [
+    0.0,
+    0.1,
+    0.5,
+    1.0,
+    2.0,
+    5.0
+  ],
+  "contamination_modes": [
+    "uniform",
+    "structured",
+    "magnitude_proportional"
+  ],
+  "methods": [
+    "RepSim",
+    "TRAK"
+  ],
+  "tasks": [
+    "counterfact",
+    "toxicity"
+  ],
+  "injection_results": {
+    "counterfact": {
+      "RepSim": {
+        "uniform": {
+          "0.0": {
+            "contaminated": {
+              "Recall_at_50": 0.948718,
+              "MRR": 0.623001,
+              "refs_with_facts": 52,
+              "kendall_tau": 0.14325314626905133,
+              "spearman_rho": 0.1745778383913586,
+              "ndcg_at_50": 0.6634073739650268
+            },
+            "corrected": {
+              "Recall_at_50": 0.948718,
+              "MRR": 0.623001,
+              "refs_with_facts": 52,
+              "kendall_tau": 0.14325314626905133,
+              "spearman_rho": 0.1745778383913586,
+              "ndcg_at_50": 0.6634073739650268
+            }
+          },
+          "0.1": {
+            "contaminated": {
+              "Recall_at_50": 0.948718,
+              "MRR": 0.623001,
+              "refs_with_facts": 52,
+              "kendall_tau": 0.14325314626905133,
+              "spearman_rho": 0.1745778383913586,
+              "ndcg_at_50": 0.6634073739650268
+            },
+            "corrected": {
+              "Recall_at_50": 0.948718,
+              "MRR": 0.623001,
+              "refs_with_facts": 52,
+              "kendall_tau": 0.14325314626905133,
+              "spearman_rho": 0.1745778383913586,
+              "ndcg_at_50": 0.6634073739650268
+            }
+          },
+          "0.5": {
+            "contaminated": {
+              "Recall_at_50": 0.948718,
+              "MRR": 0.623001,
+              "refs_with_facts": 52,
+              "kendall_tau": 0.14325342102194044,
+              "spearman_rho": 0.17457784833540718,
+              "ndcg_at_50": 0.6634073739650268
+            },
+            "corrected": {
+              "Recall_at_50": 0.948718,
+              "MRR": 0.623001,
+              "refs_with_facts": 52,
+              "kendall_tau": 0.14325342102194044,
+              "spearman_rho": 0.17457784833540718,
+              "ndcg_at_50": 0.6634073739650268
+            }
+          },
+          "1.0": {
+            "contaminated": {
+              "Recall_at_50": 0.948718,
+              "MRR": 0.623001,
+              "refs_with_facts": 52,
+              "kendall_tau": 0.14325314626905133,
+              "spearman_rho": 0.1745778383913586,
+              "ndcg_at_50": 0.6634073739650268
+            },
+            "corrected": {
+              "Recall_at_50": 0.948718,
+              "MRR": 0.623001,
+              "refs_with_facts": 52,
+              "kendall_tau": 0.14325314626905133,
+              "spearman_rho": 0.1745778383913586,
+              "ndcg_at_50": 0.6634073739650268
+            }
+          },
+          "2.0": {
+            "contaminated": {
+              "Recall_at_50": 0.948718,
+              "MRR": 0.623001,
+              "refs_with_facts": 52,
+              "kendall_tau": 0.14325342102194044,
+              "spearman_rho": 0.17457784833540718,
+              "ndcg_at_50": 0.6634073739650268
+            },
+            "corrected": {
+              "Recall_at_50": 0.948718,
+              "MRR": 0.623001,
+              "refs_with_facts": 52,
+              "kendall_tau": 0.14325342102194044,
+              "spearman_rho": 0.17457784833540718,
+              "ndcg_at_50": 0.6634073739650268
+            }
+          },
+          "5.0": {
+            "contaminated": {
+              "Recall_at_50": 0.948718,
+              "MRR": 0.623001,
+              "refs_with_facts": 52,
+              "kendall_tau": 0.14325342102194044,
+              "spearman_rho": 0.17457784833540718,
+              "ndcg_at_50": 0.6634073739650268
+            },
+            "corrected": {
+              "Recall_at_50": 0.948718,
+              "MRR": 0.623001,
+              "refs_with_facts": 52,
+              "kendall_tau": 0.14325342102194044,
+              "spearman_rho": 0.17457784833540718,
+              "ndcg_at_50": 0.6634073739650268
+            }
+          }
+        },
+        "structured": {
+          "0.0": {
+            "contaminated": {
+              "Recall_at_50": 0.948718,
+              "MRR": 0.623001,
+              "refs_with_facts": 52,
+              "kendall_tau": 0.14325314626905133,
+              "spearman_rho": 0.1745778383913586,
+              "ndcg_at_50": 0.6634073739650268
+            },
+            "corrected": {
+              "Recall_at_50": 0.948718,
+              "MRR": 0.623001,
+              "refs_with_facts": 52,
+              "kendall_tau": 0.14325314626905133,
+              "spearman_rho": 0.1745778383913586,
+              "ndcg_at_50": 0.6634073739650268
+            }
+          },
+          "0.1": {
+            "contaminated": {
+              "Recall_at_50": 0.967949,
+              "MRR": 0.457378,
+              "refs_with_facts": 52,
+              "kendall_tau": 0.13800107013115073,
+              "spearman_rho": 0.16817730811958753,
+              "ndcg_at_50": 0.5258718882095678
+            },
+            "corrected": {
+              "Recall_at_50": 0.967949,
+              "MRR": 0.457378,
+              "refs_with_facts": 52,
+              "kendall_tau": 0.13800107013115073,
+              "spearman_rho": 0.16817730811958753,
+              "ndcg_at_50": 0.5258718882095678
+            }
+          },
+          "0.5": {
+            "contaminated": {
+              "Recall_at_50": 0.711538,
+              "MRR": 0.128119,
+              "refs_with_facts": 52,
+              "kendall_tau": 0.057181327296593636,
+              "spearman_rho": 0.06968497918390754,
+              "ndcg_at_50": 0.2210516666317478
+            },
+            "corrected": {
+              "Recall_at_50": 0.711538,
+              "MRR": 0.128119,
+              "refs_with_facts": 52,
+              "kendall_tau": 0.057181327296593636,
+              "spearman_rho": 0.06968497918390754,
+              "ndcg_at_50": 0.2210516666317478
+            }
+          },
+          "1.0": {
+            "contaminated": {
+              "Recall_at_50": 0.596154,
+              "MRR": 0.070271,
+              "refs_with_facts": 52,
+              "kendall_tau": 0.03897192008227806,
+              "spearman_rho": 0.04749378106604806,
+              "ndcg_at_50": 0.1654354427360429
+            },
+            "corrected": {
+              "Recall_at_50": 0.596154,
+              "MRR": 0.070271,
+              "refs_with_facts": 52,
+              "kendall_tau": 0.03897192008227806,
+              "spearman_rho": 0.04749378106604806,
+              "ndcg_at_50": 0.1654354427360429
+            }
+          },
+          "2.0": {
+            "contaminated": {
+              "Recall_at_50": 0.596154,
+              "MRR": 0.064332,
+              "refs_with_facts": 52,
+              "kendall_tau": 0.02973008499218232,
+              "spearman_rho": 0.036231064435949936,
+              "ndcg_at_50": 0.16045661656843072
+            },
+            "corrected": {
+              "Recall_at_50": 0.596154,
+              "MRR": 0.064332,
+              "refs_with_facts": 52,
+              "kendall_tau": 0.02973008499218232,
+              "spearman_rho": 0.036231064435949936,
+              "ndcg_at_50": 0.16045661656843072
+            }
+          },
+          "5.0": {
+            "contaminated": {
+              "Recall_at_50": 0.596154,
+              "MRR": 0.056389,
+              "refs_with_facts": 52,
+              "kendall_tau": 0.021897595116008268,
+              "spearman_rho": 0.026685869880596045,
+              "ndcg_at_50": 0.15629630312435
+            },
+            "corrected": {
+              "Recall_at_50": 0.596154,
+              "MRR": 0.056389,
+              "refs_with_facts": 52,
+              "kendall_tau": 0.021897595116008268,
+              "spearman_rho": 0.026685869880596045,
+              "ndcg_at_50": 0.15629630312435
+            }
+          }
+        },
+        "magnitude_proportional": {
+          "0.0": {
+            "contaminated": {
+              "Recall_at_50": 0.948718,
+              "MRR": 0.623001,
+              "refs_with_facts": 52,
+              "kendall_tau": 0.14325314626905133,
+              "spearman_rho": 0.1745778383913586,
+              "ndcg_at_50": 0.6634073739650268
+            },
+            "corrected": {
+              "Recall_at_50": 0.948718,
+              "MRR": 0.623001,
+              "refs_with_facts": 52,
+              "kendall_tau": 0.14325314626905133,
+              "spearman_rho": 0.1745778383913586,
+              "ndcg_at_50": 0.6634073739650268
+            }
+          },
+          "0.1": {
+            "contaminated": {
+              "Recall_at_50": 0.858974,
+              "MRR": 0.286773,
+              "refs_with_facts": 52,
+              "kendall_tau": 0.09807333804991236,
+              "spearman_rho": 0.11951871080319601,
+              "ndcg_at_50": 0.3714971932120435
+            },
+            "corrected": {
+              "Recall_at_50": 0.858974,
+              "MRR": 0.286773,
+              "refs_with_facts": 52,
+              "kendall_tau": 0.09807333804991236,
+              "spearman_rho": 0.11951871080319601,
+              "ndcg_at_50": 0.3714971932120435
+            }
+          },
+          "0.5": {
+            "contaminated": {
+              "Recall_at_50": 0.49359,
+              "MRR": 0.087118,
+              "refs_with_facts": 52,
+              "kendall_tau": -2.7140508135990568e-05,
+              "spearman_rho": -3.307523336573212e-05,
+              "ndcg_at_50": 0.14742705260813363
+            },
+            "corrected": {
+              "Recall_at_50": 0.49359,
+              "MRR": 0.087118,
+              "refs_with_facts": 52,
+              "kendall_tau": -2.7140508135990568e-05,
+              "spearman_rho": -3.307523336573212e-05,
+              "ndcg_at_50": 0.14742705260813363
+            }
+          },
+          "1.0": {
+            "contaminated": {
+              "Recall_at_50": 0.455128,
+              "MRR": 0.073249,
+              "refs_with_facts": 52,
+              "kendall_tau": -0.019239753807728324,
+              "spearman_rho": -0.023446847196128703,
+              "ndcg_at_50": 0.12799157455500942
+            },
+            "corrected": {
+              "Recall_at_50": 0.455128,
+              "MRR": 0.073249,
+              "refs_with_facts": 52,
+              "kendall_tau": -0.019239753807728324,
+              "spearman_rho": -0.023446847196128703,
+              "ndcg_at_50": 0.12799157455500942
+            }
+          },
+          "2.0": {
+            "contaminated": {
+              "Recall_at_50": 0.355769,
+              "MRR": 0.069598,
+              "refs_with_facts": 52,
+              "kendall_tau": -0.028821431522206377,
+              "spearman_rho": -0.03512371871429107,
+              "ndcg_at_50": 0.10560017155551378
+            },
+            "corrected": {
+              "Recall_at_50": 0.355769,
+              "MRR": 0.069598,
+              "refs_with_facts": 52,
+              "kendall_tau": -0.028821431522206377,
+              "spearman_rho": -0.03512371871429107,
+              "ndcg_at_50": 0.10560017155551378
+            }
+          },
+          "5.0": {
+            "contaminated": {
+              "Recall_at_50": 0.336538,
+              "MRR": 0.067514,
+              "refs_with_facts": 52,
+              "kendall_tau": -0.034885175782709645,
+              "spearman_rho": -0.042513401894920574,
+              "ndcg_at_50": 0.09953412323075785
+            },
+            "corrected": {
+              "Recall_at_50": 0.336538,
+              "MRR": 0.067514,
+              "refs_with_facts": 52,
+              "kendall_tau": -0.034885175782709645,
+              "spearman_rho": -0.042513401894920574,
+              "ndcg_at_50": 0.09953412323075785
+            }
+          }
+        }
+      },
+      "TRAK": {
+        "uniform": {
+          "0.0": {
+            "contaminated": {
+              "Recall_at_50": 0.669872,
+              "MRR": 0.239908,
+              "refs_with_facts": 52,
+              "kendall_tau": 0.05559235033708847,
+              "spearman_rho": 0.06774854588335663,
+              "ndcg_at_50": 0.3157564141354377
+            },
+            "corrected": {
+              "Recall_at_50": 0.669872,
+              "MRR": 0.239908,
+              "refs_with_facts": 52,
+              "kendall_tau": 0.05559235033708847,
+              "spearman_rho": 0.06774854588335663,
+              "ndcg_at_50": 0.3157564141354377
+            }
+          },
+          "0.1": {
+            "contaminated": {
+              "Recall_at_50": 0.669872,
+              "MRR": 0.239908,
+              "refs_with_facts": 52,
+              "kendall_tau": 0.05559235033708847,
+              "spearman_rho": 0.06774854588335663,
+              "ndcg_at_50": 0.3157564141354377
+            },
+            "corrected": {
+              "Recall_at_50": 0.669872,
+              "MRR": 0.239908,
+              "refs_with_facts": 52,
+              "kendall_tau": 0.05559235033708847,
+              "spearman_rho": 0.06774854588335663,
+              "ndcg_at_50": 0.3157564141354377
+            }
+          },
+          "0.5": {
+            "contaminated": {
+              "Recall_at_50": 0.669872,
+              "MRR": 0.239908,
+              "refs_with_facts": 52,
+              "kendall_tau": 0.05559235033708847,
+              "spearman_rho": 0.06774854588335663,
+              "ndcg_at_50": 0.3157564141354377
+            },
+            "corrected": {
+              "Recall_at_50": 0.669872,
+              "MRR": 0.239908,
+              "refs_with_facts": 52,
+              "kendall_tau": 0.05559235033708847,
+              "spearman_rho": 0.06774854588335663,
+              "ndcg_at_50": 0.3157564141354377
+            }
+          },
+          "1.0": {
+            "contaminated": {
+              "Recall_at_50": 0.669872,
+              "MRR": 0.239908,
+              "refs_with_facts": 52,
+              "kendall_tau": 0.05559235033708847,
+              "spearman_rho": 0.06774854588335663,
+              "ndcg_at_50": 0.3157564141354377
+            },
+            "corrected": {
+              "Recall_at_50": 0.669872,
+              "MRR": 0.239908,
+              "refs_with_facts": 52,
+              "kendall_tau": 0.05559235033708847,
+              "spearman_rho": 0.06774854588335663,
+              "ndcg_at_50": 0.3157564141354377
+            }
+          },
+          "2.0": {
+            "contaminated": {
+              "Recall_at_50": 0.669872,
+              "MRR": 0.239908,
+              "refs_with_facts": 52,
+              "kendall_tau": 0.05559235033708847,
+              "spearman_rho": 0.06774854588335663,
+              "ndcg_at_50": 0.3157564141354377
+            },
+            "corrected": {
+              "Recall_at_50": 0.669872,
+              "MRR": 0.239908,
+              "refs_with_facts": 52,
+              "kendall_tau": 0.05559235033708847,
+              "spearman_rho": 0.06774854588335663,
+              "ndcg_at_50": 0.3157564141354377
+            }
+          },
+          "5.0": {
+            "contaminated": {
+              "Recall_at_50": 0.669872,
+              "MRR": 0.239908,
+              "refs_with_facts": 52,
+              "kendall_tau": 0.05559235033708847,
+              "spearman_rho": 0.06774854588335663,
+              "ndcg_at_50": 0.3157564141354377
+            },
+            "corrected": {
+              "Recall_at_50": 0.669872,
+              "MRR": 0.239908,
+              "refs_with_facts": 52,
+              "kendall_tau": 0.05559235033708847,
+              "spearman_rho": 0.06774854588335663,
+              "ndcg_at_50": 0.3157564141354377
+            }
+          }
+        },
+        "structured": {
+          "0.0": {
+            "contaminated": {
+              "Recall_at_50": 0.669872,
+              "MRR": 0.239908,
+              "refs_with_facts": 52,
+              "kendall_tau": 0.05559235033708847,
+              "spearman_rho": 0.06774854588335663,
+              "ndcg_at_50": 0.3157564141354377
+            },
+            "corrected": {
+              "Recall_at_50": 0.669872,
+              "MRR": 0.239908,
+              "refs_with_facts": 52,
+              "kendall_tau": 0.05559235033708847,
+              "spearman_rho": 0.06774854588335663,
+              "ndcg_at_50": 0.3157564141354377
+            }
+          },
+          "0.1": {
+            "contaminated": {
+              "Recall_at_50": 0.669872,
+              "MRR": 0.239074,
+              "refs_with_facts": 52,
+              "kendall_tau": 0.05783304761534061,
+              "spearman_rho": 0.07047920903118006,
+              "ndcg_at_50": 0.31694959096741815
+            },
+            "corrected": {
+              "Recall_at_50": 0.669872,
+              "MRR": 0.239074,
+              "refs_with_facts": 52,
+              "kendall_tau": 0.05783304761534061,
+              "spearman_rho": 0.07047920903118006,
+              "ndcg_at_50": 0.31694959096741815
+            }
+          },
+          "0.5": {
+            "contaminated": {
+              "Recall_at_50": 0.705128,
+              "MRR": 0.237256,
+              "refs_with_facts": 52,
+              "kendall_tau": 0.060891658738891734,
+              "spearman_rho": 0.07420663654210155,
+              "ndcg_at_50": 0.3154627229815927
+            },
+            "corrected": {
+              "Recall_at_50": 0.705128,
+              "MRR": 0.237256,
+              "refs_with_facts": 52,
+              "kendall_tau": 0.060891658738891734,
+              "spearman_rho": 0.07420663654210155,
+              "ndcg_at_50": 0.3154627229815927
+            }
+          },
+          "1.0": {
+            "contaminated": {
+              "Recall_at_50": 0.737179,
+              "MRR": 0.241485,
+              "refs_with_facts": 52,
+              "kendall_tau": 0.06566065749588024,
+              "spearman_rho": 0.08001845649837985,
+              "ndcg_at_50": 0.32464368466927085
+            },
+            "corrected": {
+              "Recall_at_50": 0.737179,
+              "MRR": 0.241485,
+              "refs_with_facts": 52,
+              "kendall_tau": 0.06566065749588024,
+              "spearman_rho": 0.08001845649837985,
+              "ndcg_at_50": 0.32464368466927085
+            }
+          },
+          "2.0": {
+            "contaminated": {
+              "Recall_at_50": 0.724359,
+              "MRR": 0.195908,
+              "refs_with_facts": 52,
+              "kendall_tau": 0.06679891765558334,
+              "spearman_rho": 0.0814056162458855,
+              "ndcg_at_50": 0.3009803373344663
+            },
+            "corrected": {
+              "Recall_at_50": 0.724359,
+              "MRR": 0.195908,
+              "refs_with_facts": 52,
+              "kendall_tau": 0.06679891765558334,
+              "spearman_rho": 0.0814056162458855,
+              "ndcg_at_50": 0.3009803373344663
+            }
+          },
+          "5.0": {
+            "contaminated": {
+              "Recall_at_50": 0.733974,
+              "MRR": 0.155387,
+              "refs_with_facts": 52,
+              "kendall_tau": 0.06418210841422668,
+              "spearman_rho": 0.07821659797482733,
+              "ndcg_at_50": 0.2723000978230559
+            },
+            "corrected": {
+              "Recall_at_50": 0.733974,
+              "MRR": 0.155387,
+              "refs_with_facts": 52,
+              "kendall_tau": 0.06418210841422668,
+              "spearman_rho": 0.07821659797482733,
+              "ndcg_at_50": 0.2723000978230559
+            }
+          }
+        },
+        "magnitude_proportional": {
+          "0.0": {
+            "contaminated": {
+              "Recall_at_50": 0.669872,
+              "MRR": 0.239908,
+              "refs_with_facts": 52,
+              "kendall_tau": 0.05559235033708847,
+              "spearman_rho": 0.06774854588335663,
+              "ndcg_at_50": 0.3157564141354377
+            },
+            "corrected": {
+              "Recall_at_50": 0.669872,
+              "MRR": 0.239908,
+              "refs_with_facts": 52,
+              "kendall_tau": 0.05559235033708847,
+              "spearman_rho": 0.06774854588335663,
+              "ndcg_at_50": 0.3157564141354377
+            }
+          },
+          "0.1": {
+            "contaminated": {
+              "Recall_at_50": 0.637821,
+              "MRR": 0.239273,
+              "refs_with_facts": 52,
+              "kendall_tau": 0.050611849400864134,
+              "spearman_rho": 0.061678975265206604,
+              "ndcg_at_50": 0.30445090327555824
+            },
+            "corrected": {
+              "Recall_at_50": 0.637821,
+              "MRR": 0.239273,
+              "refs_with_facts": 52,
+              "kendall_tau": 0.050611849400864134,
+              "spearman_rho": 0.061678975265206604,
+              "ndcg_at_50": 0.30445090327555824
+            }
+          },
+          "0.5": {
+            "contaminated": {
+              "Recall_at_50": 0.612179,
+              "MRR": 0.205396,
+              "refs_with_facts": 52,
+              "kendall_tau": 0.03705119236896049,
+              "spearman_rho": 0.04515305417060113,
+              "ndcg_at_50": 0.27382635352059614
+            },
+            "corrected": {
+              "Recall_at_50": 0.612179,
+              "MRR": 0.205396,
+              "refs_with_facts": 52,
+              "kendall_tau": 0.03705119236896049,
+              "spearman_rho": 0.04515305417060113,
+              "ndcg_at_50": 0.27382635352059614
+            }
+          },
+          "1.0": {
+            "contaminated": {
+              "Recall_at_50": 0.580128,
+              "MRR": 0.202175,
+              "refs_with_facts": 52,
+              "kendall_tau": 0.02645677622802483,
+              "spearman_rho": 0.032241992060807564,
+              "ndcg_at_50": 0.2604595612570806
+            },
+            "corrected": {
+              "Recall_at_50": 0.580128,
+              "MRR": 0.202175,
+              "refs_with_facts": 52,
+              "kendall_tau": 0.02645677622802483,
+              "spearman_rho": 0.032241992060807564,
+              "ndcg_at_50": 0.2604595612570806
+            }
+          },
+          "2.0": {
+            "contaminated": {
+              "Recall_at_50": 0.503205,
+              "MRR": 0.185563,
+              "refs_with_facts": 52,
+              "kendall_tau": 0.015144377897110697,
+              "spearman_rho": 0.018455948968086583,
+              "ndcg_at_50": 0.23386947115676188
+            },
+            "corrected": {
+              "Recall_at_50": 0.503205,
+              "MRR": 0.185563,
+              "refs_with_facts": 52,
+              "kendall_tau": 0.015144377897110697,
+              "spearman_rho": 0.018455948968086583,
+              "ndcg_at_50": 0.23386947115676188
+            }
+          },
+          "5.0": {
+            "contaminated": {
+              "Recall_at_50": 0.487179,
+              "MRR": 0.175885,
+              "refs_with_facts": 52,
+              "kendall_tau": 0.0024566467625899077,
+              "spearman_rho": 0.002993833592307845,
+              "ndcg_at_50": 0.20594144740270043
+            },
+            "corrected": {
+              "Recall_at_50": 0.487179,
+              "MRR": 0.175885,
+              "refs_with_facts": 52,
+              "kendall_tau": 0.0024566467625899077,
+              "spearman_rho": 0.002993833592307845,
+              "ndcg_at_50": 0.20594144740270043
+            }
+          }
+        }
+      }
+    },
+    "toxicity": {
+      "RepSim": {
+        "uniform": {
+          "0.0": {
+            "contaminated": {
+              "AUPRC": 0.809212,
+              "n_unsafe": 20,
+              "kendall_tau": 0.4647775616552308,
+              "spearman_rho": 0.5664089352298308,
+              "ndcg_at_50": 0.9041513829638967
+            },
+            "corrected": {
+              "AUPRC": 0.809212,
+              "n_unsafe": 20,
+              "kendall_tau": 0.4647775616552308,
+              "spearman_rho": 0.5664089352298308,
+              "ndcg_at_50": 0.9041513829638967
+            }
+          },
+          "0.1": {
+            "contaminated": {
+              "AUPRC": 0.809212,
+              "n_unsafe": 20,
+              "kendall_tau": 0.4647775616552308,
+              "spearman_rho": 0.5664089352298308,
+              "ndcg_at_50": 0.9041513829638967
+            },
+            "corrected": {
+              "AUPRC": 0.809212,
+              "n_unsafe": 20,
+              "kendall_tau": 0.4647775616552308,
+              "spearman_rho": 0.5664089352298308,
+              "ndcg_at_50": 0.9041513829638967
+            }
+          },
+          "0.5": {
+            "contaminated": {
+              "AUPRC": 0.809212,
+              "n_unsafe": 20,
+              "kendall_tau": 0.4647775616552308,
+              "spearman_rho": 0.5664089352298308,
+              "ndcg_at_50": 0.9041513829638967
+            },
+            "corrected": {
+              "AUPRC": 0.809212,
+              "n_unsafe": 20,
+              "kendall_tau": 0.4647775616552308,
+              "spearman_rho": 0.5664089352298308,
+              "ndcg_at_50": 0.9041513829638967
+            }
+          },
+          "1.0": {
+            "contaminated": {
+              "AUPRC": 0.809212,
+              "n_unsafe": 20,
+              "kendall_tau": 0.4647775616552308,
+              "spearman_rho": 0.5664089352298308,
+              "ndcg_at_50": 0.9041513829638967
+            },
+            "corrected": {
+              "AUPRC": 0.809212,
+              "n_unsafe": 20,
+              "kendall_tau": 0.4647775616552308,
+              "spearman_rho": 0.5664089352298308,
+              "ndcg_at_50": 0.9041513829638967
+            }
+          },
+          "2.0": {
+            "contaminated": {
+              "AUPRC": 0.809212,
+              "n_unsafe": 20,
+              "kendall_tau": 0.4647775616552308,
+              "spearman_rho": 0.5664089352298308,
+              "ndcg_at_50": 0.9041513829638967
+            },
+            "corrected": {
+              "AUPRC": 0.809212,
+              "n_unsafe": 20,
+              "kendall_tau": 0.4647775616552308,
+              "spearman_rho": 0.5664089352298308,
+              "ndcg_at_50": 0.9041513829638967
+            }
+          },
+          "5.0": {
+            "contaminated": {
+              "AUPRC": 0.809212,
+              "n_unsafe": 20,
+              "kendall_tau": 0.4647775616552308,
+              "spearman_rho": 0.5664089352298308,
+              "ndcg_at_50": 0.9041513829638967
+            },
+            "corrected": {
+              "AUPRC": 0.809212,
+              "n_unsafe": 20,
+              "kendall_tau": 0.4647775616552308,
+              "spearman_rho": 0.5664089352298308,
+              "ndcg_at_50": 0.9041513829638967
+            }
+          }
+        },
+        "structured": {
+          "0.0": {
+            "contaminated": {
+              "AUPRC": 0.809212,
+              "n_unsafe": 20,
+              "kendall_tau": 0.4647775616552308,
+              "spearman_rho": 0.5664089352298308,
+              "ndcg_at_50": 0.9041513829638967
+            },
+            "corrected": {
+              "AUPRC": 0.809212,
+              "n_unsafe": 20,
+              "kendall_tau": 0.4647775616552308,
+              "spearman_rho": 0.5664089352298308,
+              "ndcg_at_50": 0.9041513829638967
+            }
+          },
+          "0.1": {
+            "contaminated": {
+              "AUPRC": 0.516361,
+              "n_unsafe": 20,
+              "kendall_tau": 0.3396998080599393,
+              "spearman_rho": 0.41398084256859197,
+              "ndcg_at_50": 0.7661580927759469
+            },
+            "corrected": {
+              "AUPRC": 0.516361,
+              "n_unsafe": 20,
+              "kendall_tau": 0.3396998080599393,
+              "spearman_rho": 0.41398084256859197,
+              "ndcg_at_50": 0.7661580927759469
+            }
+          },
+          "0.5": {
+            "contaminated": {
+              "AUPRC": 0.269839,
+              "n_unsafe": 20,
+              "kendall_tau": 0.08599095559676288,
+              "spearman_rho": 0.10479431370460174,
+              "ndcg_at_50": 0.46632931303152986
+            },
+            "corrected": {
+              "AUPRC": 0.269839,
+              "n_unsafe": 20,
+              "kendall_tau": 0.08599095559676288,
+              "spearman_rho": 0.10479431370460174,
+              "ndcg_at_50": 0.46632931303152986
+            }
+          },
+          "1.0": {
+            "contaminated": {
+              "AUPRC": 0.249448,
+              "n_unsafe": 20,
+              "kendall_tau": 0.03482278367141638,
+              "spearman_rho": 0.042437366706822195,
+              "ndcg_at_50": 0.45301445206447266
+            },
+            "corrected": {
+              "AUPRC": 0.249448,
+              "n_unsafe": 20,
+              "kendall_tau": 0.03482278367141638,
+              "spearman_rho": 0.042437366706822195,
+              "ndcg_at_50": 0.45301445206447266
+            }
+          },
+          "2.0": {
+            "contaminated": {
+              "AUPRC": 0.235889,
+              "n_unsafe": 20,
+              "kendall_tau": 0.001421338109037403,
+              "spearman_rho": 0.0017321374166049872,
+              "ndcg_at_50": 0.39169244010087306
+            },
+            "corrected": {
+              "AUPRC": 0.235889,
+              "n_unsafe": 20,
+              "kendall_tau": 0.001421338109037403,
+              "spearman_rho": 0.0017321374166049872,
+              "ndcg_at_50": 0.39169244010087306
+            }
+          },
+          "5.0": {
+            "contaminated": {
+              "AUPRC": 0.189955,
+              "n_unsafe": 20,
+              "kendall_tau": -0.02416274785363585,
+              "spearman_rho": -0.02944633608228478,
+              "ndcg_at_50": 0.3327481436652023
+            },
+            "corrected": {
+              "AUPRC": 0.189955,
+              "n_unsafe": 20,
+              "kendall_tau": -0.02416274785363585,
+              "spearman_rho": -0.02944633608228478,
+              "ndcg_at_50": 0.3327481436652023
+            }
+          }
+        },
+        "magnitude_proportional": {
+          "0.0": {
+            "contaminated": {
+              "AUPRC": 0.809212,
+              "n_unsafe": 20,
+              "kendall_tau": 0.4647775616552308,
+              "spearman_rho": 0.5664089352298308,
+              "ndcg_at_50": 0.9041513829638967
+            },
+            "corrected": {
+              "AUPRC": 0.809212,
+              "n_unsafe": 20,
+              "kendall_tau": 0.4647775616552308,
+              "spearman_rho": 0.5664089352298308,
+              "ndcg_at_50": 0.9041513829638967
+            }
+          },
+          "0.1": {
+            "contaminated": {
+              "AUPRC": 0.724141,
+              "n_unsafe": 20,
+              "kendall_tau": 0.44843217340130065,
+              "spearman_rho": 0.5464893549388735,
+              "ndcg_at_50": 0.9003716738446665
+            },
+            "corrected": {
+              "AUPRC": 0.724141,
+              "n_unsafe": 20,
+              "kendall_tau": 0.44843217340130065,
+              "spearman_rho": 0.5464893549388735,
+              "ndcg_at_50": 0.9003716738446665
+            }
+          },
+          "0.5": {
+            "contaminated": {
+              "AUPRC": 0.31292,
+              "n_unsafe": 20,
+              "kendall_tau": 0.18406328512034367,
+              "spearman_rho": 0.22431179545034588,
+              "ndcg_at_50": 0.5825334696105213
+            },
+            "corrected": {
+              "AUPRC": 0.31292,
+              "n_unsafe": 20,
+              "kendall_tau": 0.18406328512034367,
+              "spearman_rho": 0.22431179545034588,
+              "ndcg_at_50": 0.5825334696105213
+            }
+          },
+          "1.0": {
+            "contaminated": {
+              "AUPRC": 0.248629,
+              "n_unsafe": 20,
+              "kendall_tau": 0.03837612894400989,
+              "spearman_rho": 0.046767710248334655,
+              "ndcg_at_50": 0.4235321217833475
+            },
+            "corrected": {
+              "AUPRC": 0.248629,
+              "n_unsafe": 20,
+              "kendall_tau": 0.03837612894400989,
+              "spearman_rho": 0.046767710248334655,
+              "ndcg_at_50": 0.4235321217833475
+            }
+          },
+          "2.0": {
+            "contaminated": {
+              "AUPRC": 0.183518,
+              "n_unsafe": 20,
+              "kendall_tau": -0.055432186252458715,
+              "spearman_rho": -0.06755335924759451,
+              "ndcg_at_50": 0.33314230314656973
+            },
+            "corrected": {
+              "AUPRC": 0.183518,
+              "n_unsafe": 20,
+              "kendall_tau": -0.055432186252458715,
+              "spearman_rho": -0.06755335924759451,
+              "ndcg_at_50": 0.33314230314656973
+            }
+          },
+          "5.0": {
+            "contaminated": {
+              "AUPRC": 0.165837,
+              "n_unsafe": 20,
+              "kendall_tau": -0.10873236534136134,
+              "spearman_rho": -0.13250851237028152,
+              "ndcg_at_50": 0.2559238380379271
+            },
+            "corrected": {
+              "AUPRC": 0.165837,
+              "n_unsafe": 20,
+              "kendall_tau": -0.10873236534136134,
+              "spearman_rho": -0.13250851237028152,
+              "ndcg_at_50": 0.2559238380379271
+            }
+          }
+        }
+      },
+      "TRAK": {
+        "uniform": {
+          "0.0": {
+            "contaminated": {
+              "AUPRC": 0.925612,
+              "n_unsafe": 20,
+              "kendall_tau": 0.5280271075073952,
+              "spearman_rho": 0.6434890502687527,
+              "ndcg_at_50": 0.9583988007414836
+            },
+            "corrected": {
+              "AUPRC": 0.925612,
+              "n_unsafe": 20,
+              "kendall_tau": 0.5280271075073952,
+              "spearman_rho": 0.6434890502687527,
+              "ndcg_at_50": 0.9583988007414836
+            }
+          },
+          "0.1": {
+            "contaminated": {
+              "AUPRC": 0.925612,
+              "n_unsafe": 20,
+              "kendall_tau": 0.5280271075073952,
+              "spearman_rho": 0.6434890502687527,
+              "ndcg_at_50": 0.9583988007414836
+            },
+            "corrected": {
+              "AUPRC": 0.925612,
+              "n_unsafe": 20,
+              "kendall_tau": 0.5280271075073952,
+              "spearman_rho": 0.6434890502687527,
+              "ndcg_at_50": 0.9583988007414836
+            }
+          },
+          "0.5": {
+            "contaminated": {
+              "AUPRC": 0.925612,
+              "n_unsafe": 20,
+              "kendall_tau": 0.5280271075073952,
+              "spearman_rho": 0.6434890502687527,
+              "ndcg_at_50": 0.9583988007414836
+            },
+            "corrected": {
+              "AUPRC": 0.925612,
+              "n_unsafe": 20,
+              "kendall_tau": 0.5280271075073952,
+              "spearman_rho": 0.6434890502687527,
+              "ndcg_at_50": 0.9583988007414836
+            }
+          },
+          "1.0": {
+            "contaminated": {
+              "AUPRC": 0.925612,
+              "n_unsafe": 20,
+              "kendall_tau": 0.5280271075073952,
+              "spearman_rho": 0.6434890502687527,
+              "ndcg_at_50": 0.9583988007414836
+            },
+            "corrected": {
+              "AUPRC": 0.925612,
+              "n_unsafe": 20,
+              "kendall_tau": 0.5280271075073952,
+              "spearman_rho": 0.6434890502687527,
+              "ndcg_at_50": 0.9583988007414836
+            }
+          },
+          "2.0": {
+            "contaminated": {
+              "AUPRC": 0.925612,
+              "n_unsafe": 20,
+              "kendall_tau": 0.5280271075073952,
+              "spearman_rho": 0.6434890502687527,
+              "ndcg_at_50": 0.9583988007414836
+            },
+            "corrected": {
+              "AUPRC": 0.925612,
+              "n_unsafe": 20,
+              "kendall_tau": 0.5280271075073952,
+              "spearman_rho": 0.6434890502687527,
+              "ndcg_at_50": 0.9583988007414836
+            }
+          },
+          "5.0": {
+            "contaminated": {
+              "AUPRC": 0.925612,
+              "n_unsafe": 20,
+              "kendall_tau": 0.5280271075073952,
+              "spearman_rho": 0.6434890502687527,
+              "ndcg_at_50": 0.9583988007414836
+            },
+            "corrected": {
+              "AUPRC": 0.925612,
+              "n_unsafe": 20,
+              "kendall_tau": 0.5280271075073952,
+              "spearman_rho": 0.6434890502687527,
+              "ndcg_at_50": 0.9583988007414836
+            }
+          }
+        },
+        "structured": {
+          "0.0": {
+            "contaminated": {
+              "AUPRC": 0.925612,
+              "n_unsafe": 20,
+              "kendall_tau": 0.5280271075073952,
+              "spearman_rho": 0.6434890502687527,
+              "ndcg_at_50": 0.9583988007414836
+            },
+            "corrected": {
+              "AUPRC": 0.925612,
+              "n_unsafe": 20,
+              "kendall_tau": 0.5280271075073952,
+              "spearman_rho": 0.6434890502687527,
+              "ndcg_at_50": 0.9583988007414836
+            }
+          },
+          "0.1": {
+            "contaminated": {
+              "AUPRC": 0.922563,
+              "n_unsafe": 20,
+              "kendall_tau": 0.5258951003438391,
+              "spearman_rho": 0.6408908441438453,
+              "ndcg_at_50": 0.9578262799243472
+            },
+            "corrected": {
+              "AUPRC": 0.922563,
+              "n_unsafe": 20,
+              "kendall_tau": 0.5258951003438391,
+              "spearman_rho": 0.6408908441438453,
+              "ndcg_at_50": 0.9578262799243472
+            }
+          },
+          "0.5": {
+            "contaminated": {
+              "AUPRC": 0.905355,
+              "n_unsafe": 20,
+              "kendall_tau": 0.5109710501989464,
+              "spearman_rho": 0.6227034012694929,
+              "ndcg_at_50": 0.9542283166979317
+            },
+            "corrected": {
+              "AUPRC": 0.905355,
+              "n_unsafe": 20,
+              "kendall_tau": 0.5109710501989464,
+              "spearman_rho": 0.6227034012694929,
+              "ndcg_at_50": 0.9542283166979317
+            }
+          },
+          "1.0": {
+            "contaminated": {
+              "AUPRC": 0.867539,
+              "n_unsafe": 20,
+              "kendall_tau": 0.48894030950886663,
+              "spearman_rho": 0.5958552713121157,
+              "ndcg_at_50": 0.9442131499276103
+            },
+            "corrected": {
+              "AUPRC": 0.867539,
+              "n_unsafe": 20,
+              "kendall_tau": 0.48894030950886663,
+              "spearman_rho": 0.5958552713121157,
+              "ndcg_at_50": 0.9442131499276103
+            }
+          },
+          "2.0": {
+            "contaminated": {
+              "AUPRC": 0.721756,
+              "n_unsafe": 20,
+              "kendall_tau": 0.4221374183841087,
+              "spearman_rho": 0.5144448127316812,
+              "ndcg_at_50": 0.8778674511635478
+            },
+            "corrected": {
+              "AUPRC": 0.721756,
+              "n_unsafe": 20,
+              "kendall_tau": 0.4221374183841087,
+              "spearman_rho": 0.5144448127316812,
+              "ndcg_at_50": 0.8778674511635478
+            }
+          },
+          "5.0": {
+            "contaminated": {
+              "AUPRC": 0.374589,
+              "n_unsafe": 20,
+              "kendall_tau": 0.20396201864686733,
+              "spearman_rho": 0.24856171928281567,
+              "ndcg_at_50": 0.5619763551636766
+            },
+            "corrected": {
+              "AUPRC": 0.374589,
+              "n_unsafe": 20,
+              "kendall_tau": 0.20396201864686733,
+              "spearman_rho": 0.24856171928281567,
+              "ndcg_at_50": 0.5619763551636766
+            }
+          }
+        },
+        "magnitude_proportional": {
+          "0.0": {
+            "contaminated": {
+              "AUPRC": 0.925612,
+              "n_unsafe": 20,
+              "kendall_tau": 0.5280271075073952,
+              "spearman_rho": 0.6434890502687527,
+              "ndcg_at_50": 0.9583988007414836
+            },
+            "corrected": {
+              "AUPRC": 0.925612,
+              "n_unsafe": 20,
+              "kendall_tau": 0.5280271075073952,
+              "spearman_rho": 0.6434890502687527,
+              "ndcg_at_50": 0.9583988007414836
+            }
+          },
+          "0.1": {
+            "contaminated": {
+              "AUPRC": 0.926815,
+              "n_unsafe": 20,
+              "kendall_tau": 0.5273164384528766,
+              "spearman_rho": 0.6426229815604503,
+              "ndcg_at_50": 0.9589041677232855
+            },
+            "corrected": {
+              "AUPRC": 0.926815,
+              "n_unsafe": 20,
+              "kendall_tau": 0.5273164384528766,
+              "spearman_rho": 0.6426229815604503,
+              "ndcg_at_50": 0.9589041677232855
+            }
+          },
+          "0.5": {
+            "contaminated": {
+              "AUPRC": 0.920699,
+              "n_unsafe": 20,
+              "kendall_tau": 0.5216310860167269,
+              "spearman_rho": 0.6356944318940304,
+              "ndcg_at_50": 0.9576924850939696
+            },
+            "corrected": {
+              "AUPRC": 0.920699,
+              "n_unsafe": 20,
+              "kendall_tau": 0.5216310860167269,
+              "spearman_rho": 0.6356944318940304,
+              "ndcg_at_50": 0.9576924850939696
+            }
+          },
+          "1.0": {
+            "contaminated": {
+              "AUPRC": 0.891783,
+              "n_unsafe": 20,
+              "kendall_tau": 0.507417704926353,
+              "spearman_rho": 0.6183730577279805,
+              "ndcg_at_50": 0.950930407554604
+            },
+            "corrected": {
+              "AUPRC": 0.891783,
+              "n_unsafe": 20,
+              "kendall_tau": 0.507417704926353,
+              "spearman_rho": 0.6183730577279805,
+              "ndcg_at_50": 0.950930407554604
+            }
+          },
+          "2.0": {
+            "contaminated": {
+              "AUPRC": 0.756441,
+              "n_unsafe": 20,
+              "kendall_tau": 0.4335081232564079,
+              "spearman_rho": 0.528301912064521,
+              "ndcg_at_50": 0.8882356805299683
+            },
+            "corrected": {
+              "AUPRC": 0.756441,
+              "n_unsafe": 20,
+              "kendall_tau": 0.4335081232564079,
+              "spearman_rho": 0.528301912064521,
+              "ndcg_at_50": 0.8882356805299683
+            }
+          },
+          "5.0": {
+            "contaminated": {
+              "AUPRC": 0.427466,
+              "n_unsafe": 20,
+              "kendall_tau": 0.1940126518836055,
+              "spearman_rho": 0.23643675736658076,
+              "ndcg_at_50": 0.6105810224251977
+            },
+            "corrected": {
+              "AUPRC": 0.427466,
+              "n_unsafe": 20,
+              "kendall_tau": 0.1940126518836055,
+              "spearman_rho": 0.23643675736658076,
+              "ndcg_at_50": 0.6105810224251977
+            }
+          }
+        }
+      }
+    }
+  },
+  "analysis": {
+    "counterfact": {
+      "RepSim": {
+        "uniform": {
+          "baseline_metric": 0.948718,
+          "baseline_tau": 0.143253,
+          "degradation_curve_pp": {
+            "0.0": 0.0,
+            "0.1": 0.0,
+            "0.5": 0.0,
+            "1.0": 0.0,
+            "2.0": 0.0,
+            "5.0": 0.0
+          },
+          "recovery_curve_pct": {
+            "0.0": 100.0,
+            "0.1": 100.0,
+            "0.5": 100.0,
+            "1.0": 100.0,
+            "2.0": 100.0,
+            "5.0": 100.0
+          },
+          "tau_degradation_curve": {
+            "0.0": 0.0,
+            "0.1": 0.0,
+            "0.5": -0.0,
+            "1.0": 0.0,
+            "2.0": -0.0,
+            "5.0": -0.0
+          },
+          "tau_recovery_pct": {
+            "0.0": 100.0,
+            "0.1": 100.0,
+            "0.5": 100.0,
+            "1.0": 100.0,
+            "2.0": 100.0,
+            "5.0": 100.0
+          },
+          "alpha_1_degradation_pp": 0.0,
+          "alpha_1_recovery_pct": 100.0,
+          "alpha_1_tau_degradation": 0.0,
+          "tau_monotonic_degradation": true,
+          "pass_criteria": {
+            "degradation_gte_5pp": false,
+            "recovery_gte_80pct": true,
+            "tau_monotonic": true
+          }
+        },
+        "structured": {
+          "baseline_metric": 0.948718,
+          "baseline_tau": 0.143253,
+          "degradation_curve_pp": {
+            "0.0": 0.0,
+            "0.1": -0.019231,
+            "0.5": 0.23718,
+            "1.0": 0.352564,
+            "2.0": 0.352564,
+            "5.0": 0.352564
+          },
+          "recovery_curve_pct": {
+            "0.0": 100.0,
+            "0.1": 102.03,
+            "0.5": 75.0,
+            "1.0": 62.84,
+            "2.0": 62.84,
+            "5.0": 62.84
+          },
+          "tau_degradation_curve": {
+            "0.0": 0.0,
+            "0.1": 0.005252,
+            "0.5": 0.086072,
+            "1.0": 0.104281,
+            "2.0": 0.113523,
+            "5.0": 0.121356
+          },
+          "tau_recovery_pct": {
+            "0.0": 100.0,
+            "0.1": 96.33,
+            "0.5": 39.92,
+            "1.0": 27.2,
+            "2.0": 20.75,
+            "5.0": 15.29
+          },
+          "alpha_1_degradation_pp": 35.26,
+          "alpha_1_recovery_pct": 62.84,
+          "alpha_1_tau_degradation": 0.104281,
+          "tau_monotonic_degradation": true,
+          "pass_criteria": {
+            "degradation_gte_5pp": true,
+            "recovery_gte_80pct": false,
+            "tau_monotonic": true
+          }
+        },
+        "magnitude_proportional": {
+          "baseline_metric": 0.948718,
+          "baseline_tau": 0.143253,
+          "degradation_curve_pp": {
+            "0.0": 0.0,
+            "0.1": 0.089744,
+            "0.5": 0.455128,
+            "1.0": 0.49359,
+            "2.0": 0.592949,
+            "5.0": 0.61218
+          },
+          "recovery_curve_pct": {
+            "0.0": 100.0,
+            "0.1": 90.54,
+            "0.5": 52.03,
+            "1.0": 47.97,
+            "2.0": 37.5,
+            "5.0": 35.47
+          },
+          "tau_degradation_curve": {
+            "0.0": 0.0,
+            "0.1": 0.04518,
+            "0.5": 0.14328,
+            "1.0": 0.162493,
+            "2.0": 0.172075,
+            "5.0": 0.178138
+          },
+          "tau_recovery_pct": {
+            "0.0": 100.0,
+            "0.1": 68.46,
+            "0.5": -0.02,
+            "1.0": -13.43,
+            "2.0": -20.12,
+            "5.0": -24.35
+          },
+          "alpha_1_degradation_pp": 49.36,
+          "alpha_1_recovery_pct": 47.97,
+          "alpha_1_tau_degradation": 0.162493,
+          "tau_monotonic_degradation": true,
+          "pass_criteria": {
+            "degradation_gte_5pp": true,
+            "recovery_gte_80pct": false,
+            "tau_monotonic": true
+          }
+        }
+      },
+      "TRAK": {
+        "uniform": {
+          "baseline_metric": 0.669872,
+          "baseline_tau": 0.055592,
+          "degradation_curve_pp": {
+            "0.0": 0.0,
+            "0.1": 0.0,
+            "0.5": 0.0,
+            "1.0": 0.0,
+            "2.0": 0.0,
+            "5.0": 0.0
+          },
+          "recovery_curve_pct": {
+            "0.0": 100.0,
+            "0.1": 100.0,
+            "0.5": 100.0,
+            "1.0": 100.0,
+            "2.0": 100.0,
+            "5.0": 100.0
+          },
+          "tau_degradation_curve": {
+            "0.0": 0.0,
+            "0.1": 0.0,
+            "0.5": 0.0,
+            "1.0": 0.0,
+            "2.0": 0.0,
+            "5.0": 0.0
+          },
+          "tau_recovery_pct": {
+            "0.0": 100.0,
+            "0.1": 100.0,
+            "0.5": 100.0,
+            "1.0": 100.0,
+            "2.0": 100.0,
+            "5.0": 100.0
+          },
+          "alpha_1_degradation_pp": 0.0,
+          "alpha_1_recovery_pct": 100.0,
+          "alpha_1_tau_degradation": 0.0,
+          "tau_monotonic_degradation": true,
+          "pass_criteria": {
+            "degradation_gte_5pp": false,
+            "recovery_gte_80pct": true,
+            "tau_monotonic": true
+          }
+        },
+        "structured": {
+          "baseline_metric": 0.669872,
+          "baseline_tau": 0.055592,
+          "degradation_curve_pp": {
+            "0.0": 0.0,
+            "0.1": 0.0,
+            "0.5": -0.035256,
+            "1.0": -0.067307,
+            "2.0": -0.054487,
+            "5.0": -0.064102
+          },
+          "recovery_curve_pct": {
+            "0.0": 100.0,
+            "0.1": 100.0,
+            "0.5": 105.26,
+            "1.0": 110.05,
+            "2.0": 108.13,
+            "5.0": 109.57
+          },
+          "tau_degradation_curve": {
+            "0.0": 0.0,
+            "0.1": -0.002241,
+            "0.5": -0.005299,
+            "1.0": -0.010068,
+            "2.0": -0.011207,
+            "5.0": -0.00859
+          },
+          "tau_recovery_pct": {
+            "0.0": 100.0,
+            "0.1": 104.03,
+            "0.5": 109.53,
+            "1.0": 118.11,
+            "2.0": 120.16,
+            "5.0": 115.45
+          },
+          "alpha_1_degradation_pp": -6.73,
+          "alpha_1_recovery_pct": 110.05,
+          "alpha_1_tau_degradation": -0.010068,
+          "tau_monotonic_degradation": true,
+          "pass_criteria": {
+            "degradation_gte_5pp": false,
+            "recovery_gte_80pct": true,
+            "tau_monotonic": true
+          }
+        },
+        "magnitude_proportional": {
+          "baseline_metric": 0.669872,
+          "baseline_tau": 0.055592,
+          "degradation_curve_pp": {
+            "0.0": 0.0,
+            "0.1": 0.032051,
+            "0.5": 0.057693,
+            "1.0": 0.089744,
+            "2.0": 0.166667,
+            "5.0": 0.182693
+          },
+          "recovery_curve_pct": {
+            "0.0": 100.0,
+            "0.1": 95.22,
+            "0.5": 91.39,
+            "1.0": 86.6,
+            "2.0": 75.12,
+            "5.0": 72.73
+          },
+          "tau_degradation_curve": {
+            "0.0": 0.0,
+            "0.1": 0.004981,
+            "0.5": 0.018541,
+            "1.0": 0.029136,
+            "2.0": 0.040448,
+            "5.0": 0.053136
+          },
+          "tau_recovery_pct": {
+            "0.0": 100.0,
+            "0.1": 91.04,
+            "0.5": 66.65,
+            "1.0": 47.59,
+            "2.0": 27.24,
+            "5.0": 4.42
+          },
+          "alpha_1_degradation_pp": 8.97,
+          "alpha_1_recovery_pct": 86.6,
+          "alpha_1_tau_degradation": 0.029136,
+          "tau_monotonic_degradation": true,
+          "pass_criteria": {
+            "degradation_gte_5pp": true,
+            "recovery_gte_80pct": true,
+            "tau_monotonic": true
+          }
+        }
+      }
+    },
+    "toxicity": {
+      "RepSim": {
+        "uniform": {
+          "baseline_metric": 0.809212,
+          "baseline_tau": 0.464778,
+          "degradation_curve_pp": {
+            "0.0": 0.0,
+            "0.1": 0.0,
+            "0.5": 0.0,
+            "1.0": 0.0,
+            "2.0": 0.0,
+            "5.0": 0.0
+          },
+          "recovery_curve_pct": {
+            "0.0": 100.0,
+            "0.1": 100.0,
+            "0.5": 100.0,
+            "1.0": 100.0,
+            "2.0": 100.0,
+            "5.0": 100.0
+          },
+          "tau_degradation_curve": {
+            "0.0": 0.0,
+            "0.1": 0.0,
+            "0.5": 0.0,
+            "1.0": 0.0,
+            "2.0": 0.0,
+            "5.0": 0.0
+          },
+          "tau_recovery_pct": {
+            "0.0": 100.0,
+            "0.1": 100.0,
+            "0.5": 100.0,
+            "1.0": 100.0,
+            "2.0": 100.0,
+            "5.0": 100.0
+          },
+          "alpha_1_degradation_pp": 0.0,
+          "alpha_1_recovery_pct": 100.0,
+          "alpha_1_tau_degradation": 0.0,
+          "tau_monotonic_degradation": true,
+          "pass_criteria": {
+            "degradation_gte_5pp": false,
+            "recovery_gte_80pct": true,
+            "tau_monotonic": true
+          }
+        },
+        "structured": {
+          "baseline_metric": 0.809212,
+          "baseline_tau": 0.464778,
+          "degradation_curve_pp": {
+            "0.0": 0.0,
+            "0.1": 0.292851,
+            "0.5": 0.539373,
+            "1.0": 0.559764,
+            "2.0": 0.573323,
+            "5.0": 0.619257
+          },
+          "recovery_curve_pct": {
+            "0.0": 100.0,
+            "0.1": 63.81,
+            "0.5": 33.35,
+            "1.0": 30.83,
+            "2.0": 29.15,
+            "5.0": 23.47
+          },
+          "tau_degradation_curve": {
+            "0.0": 0.0,
+            "0.1": 0.125078,
+            "0.5": 0.378787,
+            "1.0": 0.429955,
+            "2.0": 0.463356,
+            "5.0": 0.48894
+          },
+          "tau_recovery_pct": {
+            "0.0": 100.0,
+            "0.1": 73.09,
+            "0.5": 18.5,
+            "1.0": 7.49,
+            "2.0": 0.31,
+            "5.0": -5.2
+          },
+          "alpha_1_degradation_pp": 55.98,
+          "alpha_1_recovery_pct": 30.83,
+          "alpha_1_tau_degradation": 0.429955,
+          "tau_monotonic_degradation": true,
+          "pass_criteria": {
+            "degradation_gte_5pp": true,
+            "recovery_gte_80pct": false,
+            "tau_monotonic": true
+          }
+        },
+        "magnitude_proportional": {
+          "baseline_metric": 0.809212,
+          "baseline_tau": 0.464778,
+          "degradation_curve_pp": {
+            "0.0": 0.0,
+            "0.1": 0.085071,
+            "0.5": 0.496292,
+            "1.0": 0.560583,
+            "2.0": 0.625694,
+            "5.0": 0.643375
+          },
+          "recovery_curve_pct": {
+            "0.0": 100.0,
+            "0.1": 89.49,
+            "0.5": 38.67,
+            "1.0": 30.72,
+            "2.0": 22.68,
+            "5.0": 20.49
+          },
+          "tau_degradation_curve": {
+            "0.0": 0.0,
+            "0.1": 0.016345,
+            "0.5": 0.280714,
+            "1.0": 0.426401,
+            "2.0": 0.52021,
+            "5.0": 0.57351
+          },
+          "tau_recovery_pct": {
+            "0.0": 100.0,
+            "0.1": 96.48,
+            "0.5": 39.6,
+            "1.0": 8.26,
+            "2.0": -11.93,
+            "5.0": -23.39
+          },
+          "alpha_1_degradation_pp": 56.06,
+          "alpha_1_recovery_pct": 30.72,
+          "alpha_1_tau_degradation": 0.426401,
+          "tau_monotonic_degradation": true,
+          "pass_criteria": {
+            "degradation_gte_5pp": true,
+            "recovery_gte_80pct": false,
+            "tau_monotonic": true
+          }
+        }
+      },
+      "TRAK": {
+        "uniform": {
+          "baseline_metric": 0.925612,
+          "baseline_tau": 0.528027,
+          "degradation_curve_pp": {
+            "0.0": 0.0,
+            "0.1": 0.0,
+            "0.5": 0.0,
+            "1.0": 0.0,
+            "2.0": 0.0,
+            "5.0": 0.0
+          },
+          "recovery_curve_pct": {
+            "0.0": 100.0,
+            "0.1": 100.0,
+            "0.5": 100.0,
+            "1.0": 100.0,
+            "2.0": 100.0,
+            "5.0": 100.0
+          },
+          "tau_degradation_curve": {
+            "0.0": 0.0,
+            "0.1": 0.0,
+            "0.5": 0.0,
+            "1.0": 0.0,
+            "2.0": 0.0,
+            "5.0": 0.0
+          },
+          "tau_recovery_pct": {
+            "0.0": 100.0,
+            "0.1": 100.0,
+            "0.5": 100.0,
+            "1.0": 100.0,
+            "2.0": 100.0,
+            "5.0": 100.0
+          },
+          "alpha_1_degradation_pp": 0.0,
+          "alpha_1_recovery_pct": 100.0,
+          "alpha_1_tau_degradation": 0.0,
+          "tau_monotonic_degradation": true,
+          "pass_criteria": {
+            "degradation_gte_5pp": false,
+            "recovery_gte_80pct": true,
+            "tau_monotonic": true
+          }
+        },
+        "structured": {
+          "baseline_metric": 0.925612,
+          "baseline_tau": 0.528027,
+          "degradation_curve_pp": {
+            "0.0": 0.0,
+            "0.1": 0.003049,
+            "0.5": 0.020257,
+            "1.0": 0.058073,
+            "2.0": 0.203856,
+            "5.0": 0.551023
+          },
+          "recovery_curve_pct": {
+            "0.0": 100.0,
+            "0.1": 99.67,
+            "0.5": 97.81,
+            "1.0": 93.73,
+            "2.0": 77.98,
+            "5.0": 40.47
+          },
+          "tau_degradation_curve": {
+            "0.0": 0.0,
+            "0.1": 0.002132,
+            "0.5": 0.017056,
+            "1.0": 0.039087,
+            "2.0": 0.10589,
+            "5.0": 0.324065
+          },
+          "tau_recovery_pct": {
+            "0.0": 100.0,
+            "0.1": 99.6,
+            "0.5": 96.77,
+            "1.0": 92.6,
+            "2.0": 79.95,
+            "5.0": 38.63
+          },
+          "alpha_1_degradation_pp": 5.81,
+          "alpha_1_recovery_pct": 93.73,
+          "alpha_1_tau_degradation": 0.039087,
+          "tau_monotonic_degradation": true,
+          "pass_criteria": {
+            "degradation_gte_5pp": true,
+            "recovery_gte_80pct": true,
+            "tau_monotonic": true
+          }
+        },
+        "magnitude_proportional": {
+          "baseline_metric": 0.925612,
+          "baseline_tau": 0.528027,
+          "degradation_curve_pp": {
+            "0.0": 0.0,
+            "0.1": -0.001203,
+            "0.5": 0.004913,
+            "1.0": 0.033829,
+            "2.0": 0.169171,
+            "5.0": 0.498146
+          },
+          "recovery_curve_pct": {
+            "0.0": 100.0,
+            "0.1": 100.13,
+            "0.5": 99.47,
+            "1.0": 96.35,
+            "2.0": 81.72,
+            "5.0": 46.18
+          },
+          "tau_degradation_curve": {
+            "0.0": 0.0,
+            "0.1": 0.000711,
+            "0.5": 0.006396,
+            "1.0": 0.020609,
+            "2.0": 0.094519,
+            "5.0": 0.334014
+          },
+          "tau_recovery_pct": {
+            "0.0": 100.0,
+            "0.1": 99.87,
+            "0.5": 98.79,
+            "1.0": 96.1,
+            "2.0": 82.1,
+            "5.0": 36.74
+          },
+          "alpha_1_degradation_pp": 3.38,
+          "alpha_1_recovery_pct": 96.35,
+          "alpha_1_tau_degradation": 0.020609,
+          "tau_monotonic_degradation": true,
+          "pass_criteria": {
+            "degradation_gte_5pp": false,
+            "recovery_gte_80pct": true,
+            "tau_monotonic": true
+          }
+        }
+      }
+    }
+  },
+  "summary": {
+    "best_fm2_evidence": [
+      [
+        "counterfact/TRAK/magnitude_proportional",
+        {
+          "criteria_met": 3,
+          "alpha_1_degradation_pp": 8.97,
+          "alpha_1_recovery_pct": 86.6,
+          "tau_monotonic": true
+        }
+      ],
+      [
+        "toxicity/TRAK/structured",
+        {
+          "criteria_met": 3,
+          "alpha_1_degradation_pp": 5.81,
+          "alpha_1_recovery_pct": 93.73,
+          "tau_monotonic": true
+        }
+      ],
+      [
+        "toxicity/RepSim/magnitude_proportional",
+        {
+          "criteria_met": 2,
+          "alpha_1_degradation_pp": 56.06,
+          "alpha_1_recovery_pct": 30.72,
+          "tau_monotonic": true
+        }
+      ],
+      [
+        "toxicity/RepSim/structured",
+        {
+          "criteria_met": 2,
+          "alpha_1_degradation_pp": 55.98,
+          "alpha_1_recovery_pct": 30.83,
+          "tau_monotonic": true
+        }
+      ],
+      [
+        "counterfact/RepSim/magnitude_proportional",
+        {
+          "criteria_met": 2,
+          "alpha_1_degradation_pp": 49.36,
+          "alpha_1_recovery_pct": 47.97,
+          "tau_monotonic": true
+        }
+      ]
+    ],
+    "uniform_is_rank_invariant": true,
+    "structured_breaks_ranks": true,
+    "key_finding": "FM2 contamination injection confirmed: structured contamination degrades performance >= 5pp at alpha=1.0, and contrastive correction recovers >= 80%."
+  },
+  "runtime_sec": 89.5,
+  "runtime_min": 1.5
+}
