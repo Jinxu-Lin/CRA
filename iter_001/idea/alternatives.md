@@ -1,70 +1,89 @@
-# CRA: Backup Ideas for Potential Pivot
+# CRA: Backup Ideas for Potential Pivot (Revised After Pilot)
 
-## Alternative 1: Hessian Quality Diagnosis Paper
+## Alternative 1: Attribution vs Retrieval Boundary Paper (cand_d)
 
-**Trigger**: K-FAC IF on Pythia-70M matches RepSim performance (H6 falsified), proving FM1/FM2 are downstream symptoms of Hessian approximation error.
+**Trigger**: Retrieval baselines (Contriever/GTR) match RepSim on 2+ DATE-LM tasks.
 
-**Pivot Thesis**: "The primary bottleneck of parameter-space TDA on LLMs is Hessian approximation quality, not inherent signal processing defects. Representation-space methods succeed because they implicitly bypass the Hessian entirely, computing a near-optimal attribution score without curvature correction."
+**Pivot Thesis**: "Representation-space TDA on semantic tasks is largely equivalent to dense retrieval. The genuine value of model-internal attribution lies in behavioral detection tasks (toxicity), where gradient-based methods capture behavioral properties invisible to semantic similarity. We characterize this attribution-retrieval boundary and provide task-dependent method selection criteria."
 
 **Key Experiments**:
-1. Hessian quality ladder: Diagonal -> K-FAC diagonal -> K-FAC full eigendecomp -> exact (Pythia-70M), measuring attribution quality at each level
-2. Correlation between Hessian eigenvalue approximation error (Hong et al. 2509.23437) and attribution quality degradation
-3. Representation-space methods as "implicit Hessian-free attribution": show that RepSim ~ IF with M=I works because representation covariance is near-isotropic (no curvature correction needed)
+1. Multi-retriever comparison: Contriever, GTR-T5, E5 vs RepSim on all 3 DATE-LM tasks
+2. Gradient norm analysis on toxicity: demonstrate that gradient norms directly correlate with toxic content (Cohen's d=2.66 from pilot)
+3. Hybrid method: Retrieval for semantic tasks + gradient-based for behavioral tasks
+4. Task feature analysis: what makes a task "retrieval-solvable" vs "attribution-requiring"?
 
-**Strengths**: Novel and surprising finding; directly builds on Hong et al. (2509.23437); strong mechanistic story
-**Weaknesses**: Less novel framework contribution (no phi^T psi unification); may be seen as "just an engineering insight"
-**Venue fit**: NeurIPS 2026 poster (engineering contribution)
+**Strengths**: Novel contribution defining a previously unrecognized boundary; practical impact on method selection; builds on pilot's strongest finding (toxicity reversal)
+**Weaknesses**: May be perceived as negative/incremental; "retrieval = attribution" is deflating for the TDA community
+**Venue fit**: EMNLP 2026 or NeurIPS 2026 poster
+**Pilot support**: BM25 R@50=1.0 on counterfact; RepSim cosine similarity is structurally similar to retrieval; toxicity reversal confirms gradient-based methods capture different information
 
 ---
 
-## Alternative 2: Representation-Space TDA Benchmark and Survey
+## Alternative 2: Representation-Space TDA Benchmark and Survey (cand_b fallback)
 
-**Trigger**: 2x2 factorial interaction term too large (H3 falsified), or phi^T psi framework fails to generate predictive power.
+**Trigger**: phi^T M psi framework shows no predictive power AND FM2 is undetectable even with continuous metrics AND PCA whitening fails. The paper becomes purely empirical.
 
-**Pivot Thesis**: "We systematically benchmark five representation-space TDA methods on DATE-LM, revealing that all succeed via similar mechanisms (semantic similarity in representation space) but with task-dependent performance profiles. We provide the first comprehensive comparison and practitioner guide for method selection."
+**Pivot Thesis**: "We provide the first comprehensive benchmark of representation-space TDA methods on DATE-LM, revealing task-dependent performance profiles. We organize methods under a common bilinear framework and discover that the parameter-vs-representation gap is task-type-dependent, not universal."
 
 **Key Experiments**:
-1. Multi-method tournament on DATE-LM: all 5 representation methods + TRAK + BM25 + k-NN
-2. Per-task analysis revealing which methods excel where (data selection vs. toxicity vs. factual attribution)
-3. Layer selection analysis across methods (middle layers optimal per Vitel & Chhabra)
-4. Computational cost comparison (wall-clock time, memory, ease of implementation)
+1. Full multi-method tournament: RepSim, RepT, AirRep, In-the-Wild (if feasible), TRAK, DDA, LoGra, BM25, k-NN, Contriever
+2. Per-task leaderboard with confidence intervals
+3. Layer selection analysis (7 layers x 3 tasks)
+4. Computational cost comparison (wall-clock, memory, implementation complexity)
+5. Practitioner decision tree: which method for which task type?
 
-**Strengths**: Immediately useful to practitioners; lower risk (benchmark papers rarely fail); comprehensive coverage
-**Weaknesses**: Perceived as "just a benchmark" without theoretical depth; phi^T psi framework demoted to notation
-**Venue fit**: EMNLP 2026 or COLM 2026 (empirical contribution)
+**Strengths**: Immediately useful; low risk; comprehensive; fills a real gap (DATE-LM itself noted "no single method dominates")
+**Weaknesses**: Perceived as "just a benchmark" without theoretical depth
+**Venue fit**: EMNLP 2026 or COLM 2026
+**Pilot support**: All infrastructure validated; 2x2 factorial already executed; toxicity reversal adds novelty beyond pure benchmark
 
 ---
 
-## Alternative 3: Matched Filter Theory for Data Attribution
+## Alternative 3: Matched Filter Theory for Data Attribution (cand_c elevated)
 
-**Trigger**: Whitened attribution (H7) succeeds dramatically, suggesting the signal processing theory is the main contribution.
+**Trigger**: PCA-reduced whitened attribution succeeds dramatically (+5pp on 2+ tasks) AND SNR-accuracy correlation strengthens at full scale (r > 0.4).
 
-**Pivot Thesis**: "Representation-space TDA is mathematically equivalent to matched filtering in colored noise. We derive the optimal attribution score phi^T Sigma_noise^{-1} psi from detection theory, provide per-query reliability estimates via output SNR, and demonstrate 3-8pp improvement over standard RepSim on DATE-LM."
+**Pivot Thesis**: "Representation-space TDA is mathematically equivalent to signal detection in colored noise. We derive the optimal attribution score from Neyman-Pearson theory, demonstrate practical improvement via PCA-reduced whitening, and provide the first per-query reliability estimate for TDA via output SNR."
 
 **Key Experiments**:
-1. Whitened RepSim vs. standard RepSim across all DATE-LM tasks
-2. Per-query SNR_out prediction of attribution accuracy (r > 0.5 validation)
-3. CFAR-normalized attribution for cross-query calibration
-4. Noise covariance structure analysis (is FM2 really "colored noise" or white noise?)
+1. PCA-whitened RepSim across k in {16, 32, 64, 128, 256, 512} on all 3 tasks
+2. Per-query SNR_out prediction of attribution accuracy (target r > 0.4)
+3. CFAR-normalized attribution for cross-query calibration (from Interdisciplinary radar angle)
+4. OS-CFAR variants (median/trimmed-mean subtraction) vs global mean subtraction
+5. Noise covariance structure analysis: eigenspectrum of residual after mean subtraction
 
-**Strengths**: Strong theoretical grounding (Neyman-Pearson optimality); novel connection between signal processing and TDA; practical improvement with reliability estimates
-**Weaknesses**: Narrower scope (single contribution rather than diagnostic framework); may not work if common influence covariance is near-isotropic
-**Venue fit**: NeurIPS 2026 spotlight (if SNR prediction validates)
+**Strengths**: Strong theoretical grounding; practical improvement; per-query reliability is novel and useful
+**Weaknesses**: Narrower scope; depends entirely on whitening succeeding; pilot showed only directional support (r=0.34)
+**Venue fit**: NeurIPS 2026 spotlight (if results are strong)
+**Pilot support**: SNR-accuracy r=0.34 on counterfact; ftrace showed +6.8pp DDA whitening gain; concept directionally validated
 
 ---
 
-## Alternative 4: Causal Deconfounding Framework for TDA
+## Alternative 4: FM1 as a Window Into LLM Representation Geometry
 
-**Trigger**: FM2 analysis (Theorems 3-4) proves especially compelling; DiD parallel trends assumption validated (H7 pilot passes).
+**Trigger**: Full-scale eigenspectrum reveals surprising structure (BBP transition, sqrt(d) scaling, or multi-modal eigenvalue distribution) that goes beyond the simple "r_eff << d" story.
 
-**Pivot Thesis**: "Training data attribution is a causal inference problem: standard scores are confounded by pre-training knowledge. We provide the first formal bias decomposition, prove that mean subtraction is a consistent deconfounding estimator, and introduce Difference-in-Differences attribution as a principled alternative when pre/post checkpoints are available."
+**Pivot Thesis**: "The gradient eigenspectrum of fine-tuned LLMs reveals a rank-10 signal subspace that captures 85% of task-relevant variation. We characterize this subspace geometry, show it corresponds to a BBP-type phase transition in the signal detection sense, and demonstrate that this low-rank structure is a fundamental property of fine-tuned representations that explains multiple phenomena beyond TDA."
 
 **Key Experiments**:
-1. Bias decomposition validation: measure ||phi_shared||/||phi_task|| in parameter vs. representation space
-2. Mean subtraction vs. DiD vs. DDA comparison on DATE-LM
-3. Parallel trends validation for DiD
-4. Task-dependent FM2 severity index
+1. Full-scale eigenspectrum at multiple N values (100, 500, 1000, 2000, 5000)
+2. Marchenko-Pastur bulk fitting to identify signal eigenvalues above noise floor
+3. Cross-model scaling: Pythia-{70M, 160M, 410M, 1B} eigenspectrum comparison
+4. Signal subspace visualization: what do the top-10 gradient eigenvectors encode?
+5. Connection to representation geometry: do the top gradient eigenvectors align with representation PCA components?
 
-**Strengths**: Novel theoretical framing connecting TDA to causal inference; formal guarantees under stated assumptions; builds on well-established econometrics methodology
-**Weaknesses**: DiD may fail if parallel trends violated (55% success probability); may be seen as incremental over DDA
-**Venue fit**: ICML 2027 poster to spotlight
+**Strengths**: Fundamental contribution to understanding LLM representations; generalizes beyond TDA; connects to statistical physics (BBP) and neuroscience (RSA) literatures
+**Weaknesses**: Ambitious scope; may require extensive follow-up; eigenspectrum alone may not be sufficient for a full paper
+**Venue fit**: ICLR 2027 or NeurIPS 2026 (if results are striking)
+**Pilot support**: r_eff=10 with 85.6% top-5 variance is already a striking finding; pilot eigenspectrum data is the strongest part of the CRA evidence base
+
+---
+
+## Decision Timeline
+
+| Decision Point | Experiment | Outcome -> Action |
+|---------------|-----------|-------------------|
+| After Priority 1 (~1h) | FM2 verification | FM2 detected -> keep in cand_a; undetected -> narrow to FM1 paper |
+| After Priority 3 (~5h) | Retrieval baselines | Retrieval = RepSim -> promote cand_d; RepSim >> retrieval -> stay with cand_a |
+| After Priority 5 (~7.5h) | PCA whitening | Whitening works -> promote cand_c elements; fails -> cand_a is final |
+| After Priority 2 (~4h) | Full eigenspectrum | Surprising structure -> consider cand_e (Alt 4); expected -> cand_a confirmed |

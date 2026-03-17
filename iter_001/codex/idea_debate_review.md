@@ -5,88 +5,44 @@
 
 ## 评审意见
 
-**Overall Verdict: 6/10 (promising, but currently over-claimed and under-identified)**
+### 1. 被忽视的风险（盲点）
 
-The proposal is strong in ambition and experimental effort, but its central narrative is vulnerable: it tries to explain a broad empirical phenomenon with a two-factor causal story (FM1/FM2) using benchmarks and proxies that are not yet sufficient to uniquely identify that story.
+- **因果过度声明风险**: 标题和论点（"Signal Dilution, Not Hessian Error"）相对于自身证据过于强硬——FM1 不充分（TRAK-PCA@k=d 与 RepSim 之间仍存在 30.8pp 的持续性缺口）。团队有证据反驳一种机制，但并未给出完整的诊断。
+- **特征质量混淆未被充分解决**: 团队承认"维度 vs 特征质量"未解决，但实验计划仍以 FM1 重型诊断为中心。如果表示特征更好地编码了语义，那么谱集中度可能是表观现象而非根因。
+- **Benchmark 有效性风险**: BM25 在 counterfact 上 R@50=1.0 表明某些任务可能作为检索而非归因来解决。如果任务信号是词汇/近重复密集的，方法对比的有效性部分存疑。
+- **泛化风险**: 毒性任务逆转（TRAK 0.926 > RepSim 0.685）表明强烈的任务依赖性。这不仅仅是"范围限制"；除非任务体制被正式表征，否则会威胁到核心论断。
+- **计算预算现实性风险**: 在 4x RTX 4090 上 24 GPU 小时完成五个实验包（包括机制分解和检索基线）对于稳健的重复实验、消融和不确定性量化来说可能过于紧张。
 
-### 1. Overlooked Risks
-1. **Identifiability risk**: FM1 and FM2 may be *descriptive decompositions*, not causal mechanisms. Many alternative decompositions can fit the same attribution patterns.
-2. **Interaction-order risk**: Pairwise/bilinear attribution can miss higher-order training-example interactions; this is a direct threat to "orthogonal independent failure modes."
-3. **Estimator-variance confound**: Representation-space gains may mostly come from variance reduction/regularization, not from "true signal subspace recovery."
-4. **Metric-target mismatch**: "Influence," "factual support," and "retrieval relevance" are different objectives; optimizing one can degrade another.
-5. **Covariance inversion fragility**: Whitened scoring can amplify noisy small-eigenvalue directions unless shrinkage/regularization is very carefully controlled.
-6. **Stage dependence**: FM1/FM2 may differ across pretraining vs instruction tuning vs alignment phases; one global diagnosis may be false.
-7. **Artifact dependence**: DATE-LM uses counterfactual corruption/paraphrasing choices; method ranking can depend on those design knobs.
-8. **Multiple-comparison risk**: With many sweeps/cells, false-positive "effects" are likely without strict pre-registration and correction.
+### 2. 方法论缺陷
 
-### 2. Methodological Weaknesses
-1. **No hard ground truth for causality**: Most evaluation remains proxy-based; removal/retrain or intervention-based validation is still sparse.
-2. **Orthogonality test may be underpowered**: A 2x2 factorial is not enough unless effect-size targets and power are pre-specified.
-3. **Scale extrapolation weakness**: Eigenspectrum and Hessian analyses at 70M may not transfer to 1B+ behavior.
-4. **Unequal method tuning**: If hyperparameter effort differs across families, conclusions about "space" (param vs repr) are confounded.
-5. **Runtime/compute fairness unclear**: Without compute-normalized Pareto comparisons, practical superiority claims are weak.
-6. **Insufficient robustness checks**: Needs adversarial lexical controls, template controls, and OOD queries as default, not appendix.
-7. **Potential leakage via reference design**: If reference/query construction encodes lexical/format biases, contrastive methods may be advantaged.
-8. **No calibration analysis**: Top-k retrieval wins do not show calibrated influence scores.
+- **评估协议失败已经发生**: H2 依赖于对均值平移不变的 rank 指标，产生了保证为零的效果。这是严重的设计有效性失误，而非小 bug。
+- **统计可靠性不明确**: 未提及置信区间、配对显著性检验、基于查询的 bootstrap、或多重假设校正——尽管存在大量方法-任务比较。
+- **潜在的泄漏/重叠检查缺失**: 鉴于检索基线如此强大，需要明确的训练-测试词汇和语义重叠审计；否则关于"归因"的结论是薄弱的。
+- **病态协方差处理本可预见**: H7 在 N/d=0.049 下使用白化并灾难性失败（-8 至 -11pp）。这应该通过条件数诊断和预先设计的收缩/PCA 方案来预防。
+- **机制识别是薄弱的**: P4"缺口分解 + 层扫描"是相关性的，除非包含干预手段（如特征置乱、受控投影扰动、因果中介风格测试）。
 
-### 3. Assumption Gaps
-1. Assumes attribution signal is low-rank in a stable way across tasks/models.
-2. Assumes FM1 and FM2 are independent, not coupled manifestations of anisotropic gradients.
-3. Assumes linear bilinear form is expressive enough for practical TDA behaviors.
-4. Assumes matched-filter "optimality" objective matches the paper's actual downstream utility objective.
-5. Assumes noise covariance can be estimated robustly in realistic high-dimensional, nonstationary settings.
-6. Assumes benchmark "factual attribution" approximates real causal provenance.
-7. Assumes single-example attribution is the right granularity despite known group/curriculum effects.
+### 3. 新颖性评估
 
-### 4. Novelty Assessment
-1. **Diagnosis framing** is interesting but not yet clearly novel in mechanism.
-2. **Bilinear unification** risks being viewed as mostly notational unless you add strict constraints + nontrivial falsifiable predictions.
-3. **Whitened attribution** is a known signal-processing idea; novelty is in empirical adaptation, not core theory.
-4. Net: likely **incremental-to-moderate novelty** unless causal identification and non-vacuous theory are strengthened.
+- **最强新颖性**: 系统性诊断框架 + 参数空间 vs 表示空间 TDA 的受控 benchmark 对比是有用的，可能可发表。
+- **中等新颖性**: 双线性形式 phi^T M psi 主要是统一符号/分类学，除非它产生可证伪的预测和具有实际优势的新方法类别。
+- **对于 NeurIPS/ICML 的当前水平**: 处于边界。目前看起来更像是一个具有尖锐阴性发现的扎实实证研究，而非高影响力的方法论进展。要获得 NeurIPS/ICML 接受，可能需要 (a) 超越 FM1 的经验证新机制，或 (b) 能够弥合 30.8pp 缺口的显著部分的新方法。
 
-### 5. Competitive Landscape / Scoop Risk
-High risk. Relevant work is already very close:
-1. **Scalable Influence and Fact Tracing** (arXiv Oct 2024, ICLR 2025) already reports attribution-vs-influence misalignment and BM25 tension.
-2. **DATE-LM** (arXiv July 2025, NeurIPS 2025) shows no single method dominates and results are evaluation-sensitive.
-3. **AirRep** (arXiv May 2025, NeurIPS 2025) pushes representation-based scalable attribution strongly.
-4. **Do Influence Functions Work on LLMs?** (EMNLP Findings Nov 2025) already documents IF failure modes.
-5. **Scalable Multi-Stage IF** (IJCAI 2025; revised Feb 2026) continues to improve parameter-space IF.
-6. **Concept Influence** (arXiv Feb 2026) shifts toward behavior-level semantic attribution and may outflank your representation narrative.
+### 4. 逻辑一致性
 
-### 6. Framing Risks (Alternative Explanations)
-1. "Representation-space wins" could be mostly from better conditioning and normalization.
-2. "Contrastive fixes FM2" could just be subtracting frequency/common-template effects (an IR-style reweighting effect).
-3. "Whitening works" could be regularization benefit, not matched-filter optimality.
-4. FM1/FM2 could be one shared geometry problem, not two orthogonal defects.
+- 修订后的内部逻辑部分一致（"FM1 真实但不充分"），但框架表述仍然过度延伸。
+- **矛盾**: 论证 FM1 为主要失败模式，但毒性逆转和大残差缺口表明 FM1 无法可靠地预测跨任务的结果。
+- **矛盾**: 将 phi^T M psi 作为核心呈现，但同时承认预测能力不确定；这削弱了"理论"声明。
 
-### 7. Specific Improvement Suggestions
-1. **Pre-register** 3 primary hypotheses and analysis plans (effect sizes, alpha correction, stopping rules).
-2. Add a **synthetic known-ground-truth testbed** where true influence is controllable.
-3. Include **group-interaction attribution tests** (pair/triple removal) to stress non-additivity.
-4. Report **compute-normalized Pareto frontiers** (quality vs GPU-hours vs memory).
-5. For whitening, compare **diagonal / low-rank / shrinkage / full** covariance with condition-number diagnostics.
-6. Add strict **negative controls**: shuffled labels, query-template swaps, lexical-overlap-matched decoys.
-7. Do **cross-phase analysis** (pretrain, SFT, aligned checkpoints) before claiming universal FM1/FM2.
-8. Downgrade claim language from "optimal" to **"optimal under explicit assumptions"**, then test assumption violations.
-9. Add **calibration metrics** (not just ranking): score stability, uncertainty, and intervention consistency.
-10. Convert bilinear unification into a **non-vacuous theorem** with constraints that exclude at least one plausible method family.
+### 5. 具体改进建议（可操作）
 
-### Score Justification
-**6/10** because the project is coherent and potentially publishable, but current claims outpace causal evidence and novelty insulation. With stronger identification, pre-registered confirmatory design, and tighter claim scope, this could move to ~7.5+.
-
-### References
-- https://arxiv.org/abs/2410.17413
-- https://arxiv.org/abs/2507.09424
-- https://openreview.net/pdf/c10cde391483c2539edf72a397e3ea5ebe7d4123.pdf
-- https://arxiv.org/abs/2505.18513
-- https://aclanthology.org/2025.findings-emnlp.775/
-- https://arxiv.org/abs/2505.05017
-- https://arxiv.org/abs/2602.14869
-- https://arxiv.org/abs/2303.08114
-- https://arxiv.org/abs/2303.14186
-- https://aclanthology.org/2022.findings-emnlp.180/
-- https://aclanthology.org/2025.acl-demo.18/
+1. **降低论点声明**: 重新框定为"FM1 是经验证的贡献因素，而非完整解释"，并将 30.8pp 残差作为首要研究问题。
+2. **修复评估统计**: 添加 Kendall/Spearman（已计划），加上 bootstrap 置信区间、配对置换检验、以及所有方法-任务假设的 FDR 校正。
+3. **强化 Benchmark 有效性**: 添加重叠诊断（n-gram、嵌入最近邻重叠），去重受污染样本，并按重叠程度分层报告性能。
+4. **直接测试特征质量 vs 维度**: 运行维度匹配但语义不同的受控实验（随机旋转、保语义投影、逐层特征交换）。
+5. **强化白化研究**: 用收缩 + PCA 截断白化 + 样本量缩放曲线替代朴素逆协方差；基于条件数和 N/d 阈值预注册失败标准。
 
 ## 评分
 
-6/10
+**7.2/10**
+
+**理由**: 强大的实证直觉、有用的阴性结果、以及相关的研究问题。但重大的协议失误（H2）、过强的因果框架表述、未解决的核心机制（30.8pp 残差）、以及 benchmark 有效性问题目前限制了影响力。如果将残差缺口问题转化为核心议题并加强统计和 benchmark 有效性的严谨性，可以成为一篇强有力的 NeurIPS/ICML 投稿。
