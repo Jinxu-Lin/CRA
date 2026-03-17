@@ -1,19 +1,14 @@
 {
-  "resume_action_type": "skill",
+  "resume_action_type": "bash",
   "resume_action": {
-    "action_type": "skill",
+    "action_type": "bash",
     "agents": null,
-    "skills": [
-      {
-        "name": "sibyl-idea-validation-decision",
-        "args": "/Users/jinxulin/Research/sibyl-research-system/workspaces/CRA/current"
-      }
-    ],
+    "skills": null,
     "team": null,
-    "bash_command": null,
+    "bash_command": "echo \"All experiment tasks blocked by dependencies\"",
     "gpu_poll": null,
-    "description": "Review pilot evidence and decide ADVANCE / REFINE / PIVOT",
-    "stage": "idea_validation_decision",
+    "description": "实验任务被依赖阻塞",
+    "stage": "experiment_cycle",
     "iteration": 0,
     "estimated_minutes": 0,
     "checkpoint_info": null,
@@ -21,27 +16,28 @@
     "language": "zh"
   },
   "background_agent_required": false,
-  "pending_sync_count": 10,
+  "pending_sync_count": 11,
   "pending_hooks": [
     {
       "name": "lark_sync",
-      "pending_count": 10,
+      "pending_count": 11,
       "path": "/Users/jinxulin/Research/sibyl-research-system/workspaces/CRA/lark_sync/pending_sync.jsonl",
       "resume_hint": "restart the sibyl-lark-sync background agent before continuing the loop"
     }
   ],
   "pending_background_agents": [],
   "breadcrumb": {
-    "ts": 1773734978.94901,
-    "stage": "pilot_experiments",
-    "action_type": "completed",
+    "ts": 1773735161.92475,
+    "stage": "experiment_cycle",
+    "action_type": "gpu_poll",
+    "iteration": 0,
     "workspace_path": "/Users/jinxulin/Research/sibyl-research-system/workspaces/CRA",
-    "in_loop": false,
-    "loop_type": "",
-    "description": "Stage 'pilot_experiments' completed, advancing to next"
+    "in_loop": true,
+    "loop_type": "gpu_poll",
+    "description": "轮询等待空闲 GPU（最多 4 张，每 10min 通过 SSH MCP 检查，无限等待）（流氓模式：<25% 显存占用也抢）"
   },
   "recovery_state_path": "/Users/jinxulin/Research/sibyl-research-system/workspaces/CRA/.sibyl/recovery_state.json",
   "source": "cli_next",
-  "saved_at": 1773734984.489931,
+  "saved_at": 1773741021.1629848,
   "path": "/Users/jinxulin/Research/sibyl-research-system/workspaces/CRA/.sibyl/recovery_state.json"
 }

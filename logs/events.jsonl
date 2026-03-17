@@ -40,3 +40,5 @@
 {"ts": 1773734888.487367, "event": "stage_start", "stage": "pilot_experiments", "iteration": 0, "action_type": "skill", "description": "Run pilot experiments"}
 {"ts": 1773734978.949131, "event": "stage_end", "stage": "pilot_experiments", "iteration": 0, "duration_sec": 96.92950296401978, "score": null, "next_stage": "idea_validation_decision"}
 {"ts": 1773734984.490442, "event": "stage_start", "stage": "idea_validation_decision", "iteration": 0, "action_type": "skill", "description": "Review pilot evidence and decide ADVANCE / REFINE / PIVOT"}
+{"ts": 1773735156.186496, "event": "stage_end", "stage": "idea_validation_decision", "iteration": 0, "duration_sec": 177.28570103645325, "score": null, "next_stage": "experiment_cycle"}
+{"ts": 1773741021.163769, "event": "stage_start", "stage": "experiment_cycle", "iteration": 0, "action_type": "bash", "description": "实验任务被依赖阻塞"}
