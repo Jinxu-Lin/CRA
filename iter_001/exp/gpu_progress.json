@@ -1,0 +1,78 @@
+{
+  "completed": {
+    "p1_fm2_continuous_metrics": {
+      "gpu_ids": [
+        2
+      ],
+      "completed_at": "2026-03-17T10:00:00"
+    },
+    "p1_fm2_contamination_injection": {
+      "gpu_ids": [
+        2
+      ],
+      "completed_at": "2026-03-17T10:00:00"
+    },
+    "p1_fm2_interaction_analysis": {
+      "gpu_ids": [
+        2
+      ],
+      "completed_at": "2026-03-17T10:00:00"
+    },
+    "p2_eigenspectrum_fullscale": {
+      "gpu_ids": [
+        2
+      ],
+      "completed_at": "2026-03-17T10:00:00"
+    },
+    "p2_trak_dim_sweep_fullscale": {
+      "gpu_ids": [
+        2
+      ],
+      "completed_at": "2026-03-17T10:00:00"
+    },
+    "p2_repsim_dim_sweep_fullscale": {
+      "gpu_ids": [
+        2
+      ],
+      "completed_at": "2026-03-17T10:00:00"
+    },
+    "p3_retrieval_baselines": {
+      "gpu_ids": [
+        2
+      ],
+      "completed_at": "2026-03-17T10:00:00"
+    },
+    "p4_gap_decomposition": {
+      "gpu_ids": [
+        2
+      ],
+      "completed_at": "2026-03-17T10:00:00"
+    },
+    "p4_layer_sweep": {
+      "gpu_ids": [
+        2
+      ],
+      "completed_at": "2026-03-17T10:00:00"
+    },
+    "p4_cosine_vs_euclidean": {
+      "gpu_ids": [
+        2
+      ],
+      "completed_at": "2026-03-17T10:00:00"
+    },
+    "p5_pca_whitened_attribution": {
+      "gpu_ids": [
+        2
+      ],
+      "completed_at": "2026-03-17T10:00:00"
+    },
+    "final_analysis": {
+      "gpu_ids": [
+        2
+      ],
+      "completed_at": "2026-03-17T10:00:00"
+    }
+  },
+  "running": {},
+  "version": 2
+}

@@ -1,33 +1,54 @@
 {
-  "resume_action_type": "bash",
+  "resume_action_type": "skill",
   "resume_action": {
-    "action_type": "bash",
+    "action_type": "skill",
     "agents": null,
-    "skills": null,
+    "skills": [
+      {
+        "name": "sibyl-experimenter",
+        "args": "/Users/jinxulin/Research/sibyl-research-system/workspaces/CRA/current FULL default /home/jinxulin/sibyl_system '/home/jinxulin/sibyl_system/miniconda3/bin/conda run -n sibyl_CRA' 3"
+      }
+    ],
     "team": null,
-    "bash_command": "echo \"All experiment tasks blocked by dependencies\"",
+    "bash_command": null,
     "gpu_poll": null,
-    "description": "实验任务被依赖阻塞",
+    "description": "Run full experiments",
     "stage": "experiment_cycle",
     "iteration": 0,
     "estimated_minutes": 0,
     "checkpoint_info": null,
-    "experiment_monitor": null,
+    "experiment_monitor": {
+      "poll_interval_sec": 300,
+      "wake_check_interval_sec": 90,
+      "wake_cmd": "cd /Users/jinxulin/Research/sibyl-research-system && /Users/jinxulin/Research/sibyl-research-system/.venv/bin/python3 -m sibyl.cli experiment-supervisor-drain-wake /Users/jinxulin/Research/sibyl-research-system/workspaces/CRA/current",
+      "background_agent": {
+        "name": "sibyl-experiment-supervisor",
+        "args": "/Users/jinxulin/Research/sibyl-research-system/workspaces/CRA/current FULL default /home/jinxulin/sibyl_system '/home/jinxulin/sibyl_system/miniconda3/bin/conda run -n sibyl_CRA' 300 600 2000 4 true 25"
+      }
+    },
     "language": "zh"
   },
-  "background_agent_required": false,
-  "pending_sync_count": 12,
+  "background_agent_required": true,
+  "pending_sync_count": 13,
   "pending_hooks": [
     {
       "name": "lark_sync",
-      "pending_count": 12,
+      "pending_count": 13,
       "path": "/Users/jinxulin/Research/sibyl-research-system/workspaces/CRA/lark_sync/pending_sync.jsonl",
       "resume_hint": "restart the sibyl-lark-sync background agent before continuing the loop"
     }
   ],
-  "pending_background_agents": [],
+  "pending_background_agents": [
+    {
+      "name": "sibyl-experiment-supervisor",
+      "args": "/Users/jinxulin/Research/sibyl-research-system/workspaces/CRA/current FULL default /home/jinxulin/sibyl_system '/home/jinxulin/sibyl_system/miniconda3/bin/conda run -n sibyl_CRA' 300 600 2000 4 true 25",
+      "action_type": "skill",
+      "stage": "experiment_cycle",
+      "resume_hint": "restart this background agent with run_in_background=true before resuming the main loop"
+    }
+  ],
   "breadcrumb": {
-    "ts": 1773741021.163609,
+    "ts": 1773741084.0264268,
     "stage": "experiment_cycle",
     "action_type": "bash",
     "iteration": 0,
@@ -37,7 +58,7 @@
     "description": "实验任务被依赖阻塞"
   },
   "recovery_state_path": "/Users/jinxulin/Research/sibyl-research-system/workspaces/CRA/.sibyl/recovery_state.json",
-  "source": "cli_record",
-  "saved_at": 1773741038.564439,
+  "source": "cli_next",
+  "saved_at": 1773741115.115199,
   "path": "/Users/jinxulin/Research/sibyl-research-system/workspaces/CRA/.sibyl/recovery_state.json"
 }

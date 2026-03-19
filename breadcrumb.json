@@ -1,9 +1,10 @@
 {
-  "ts": 1773741038.564766,
+  "ts": 1773741115.115581,
   "stage": "experiment_cycle",
-  "action_type": "completed",
+  "action_type": "skill",
+  "iteration": 0,
   "workspace_path": "/Users/jinxulin/Research/sibyl-research-system/workspaces/CRA",
   "in_loop": false,
   "loop_type": "",
-  "description": "Stage 'experiment_cycle' completed, advancing to next"
+  "description": "Run full experiments"
 }
