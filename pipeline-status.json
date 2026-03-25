@@ -1,0 +1,23 @@
+{
+  "active_module": "research",
+  "assimilated": true,
+  "assimilation_date": "2026-03-25",
+  "assimilation_sources": [
+    {
+      "name": "CRA_old",
+      "path": "~/Research/CRA_old",
+      "system": "Noesis V1",
+      "status": "Strategic Review PASSED, no code/experiments",
+      "contribution": "Primary direction (TDA diagnostic framework, FM1/FM2, unified taxonomy)"
+    },
+    {
+      "name": "CRA",
+      "path": "~/Research/CRA",
+      "system": "Sibyl",
+      "status": "Pilot completed (Phase 0 GO), awaiting Phase 1",
+      "contribution": "Secondary (VLA pilot results, methodology reference)"
+    }
+  ],
+  "target_venue": "NeurIPS 2026",
+  "last_updated": "2026-03-25T23:34:15.439306"
+}

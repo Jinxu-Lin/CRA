@@ -1,53 +1,38 @@
 {
+  "schema_version": 1,
   "tasks": {
-    "p1_fm2_continuous_metrics": {
+    "setup_env": {
       "status": "completed",
-      "task_id": "p1_fm2_continuous_metrics"
+      "gpu_ids": [
+        1
+      ],
+      "pid_file": "/home/jinxulin/sibyl_system/projects/cross-task-influence/exp/results/setup_env.pid",
+      "registered_at": "2026-03-17T17:41:10.091969",
+      "completed_at": "2026-03-17T18:06:00"
     },
-    "p1_fm2_contamination_injection": {
+    "pilot_phase0": {
       "status": "completed",
-      "task_id": "p1_fm2_contamination_injection"
+      "gpu_ids": [
+        0
+      ],
+      "pid_file": "/home/jinxulin/sibyl_system/projects/cross-task-influence/exp/results/pilot_phase0.pid",
+      "registered_at": "2026-03-17T18:09:09.296984",
+      "completed_at": "2026-03-17T18:30:15"
     },
-    "p1_fm2_interaction_analysis": {
+    "cloto_baseline": {
       "status": "completed",
-      "task_id": "p1_fm2_interaction_analysis"
-    },
-    "p2_eigenspectrum_fullscale": {
-      "status": "completed",
-      "task_id": "p2_eigenspectrum_fullscale"
-    },
-    "p2_trak_dim_sweep_fullscale": {
-      "status": "completed",
-      "task_id": "p2_trak_dim_sweep_fullscale"
-    },
-    "p2_repsim_dim_sweep_fullscale": {
-      "status": "completed",
-      "task_id": "p2_repsim_dim_sweep_fullscale"
-    },
-    "p3_retrieval_baselines": {
-      "status": "completed",
-      "task_id": "p3_retrieval_baselines"
-    },
-    "p4_gap_decomposition": {
-      "status": "completed",
-      "task_id": "p4_gap_decomposition"
-    },
-    "p4_layer_sweep": {
-      "status": "completed",
-      "task_id": "p4_layer_sweep"
-    },
-    "p4_cosine_vs_euclidean": {
-      "status": "completed",
-      "task_id": "p4_cosine_vs_euclidean"
-    },
-    "p5_pca_whitened_attribution": {
-      "status": "completed",
-      "task_id": "p5_pca_whitened_attribution"
-    },
-    "final_analysis": {
-      "status": "completed",
-      "task_id": "final_analysis"
+      "gpu_ids": [
+        0
+      ],
+      "pid_file": "/home/jinxulin/sibyl_system/projects/cross-task-influence/exp/results/cloto_baseline.pid",
+      "registered_at": "2026-03-17T18:35:40.230922",
+      "completed_at": "2026-03-17T19:13:23"
     }
   },
-  "version": 2
+  "last_recovery_at": "2026-03-17T14:20:15.864304",
+  "recovery_log": [
+    "[2026-03-17T14:18:29.784381] setup_env: unknown status, marked failed",
+    "[2026-03-17T14:20:15.864304] setup_env: marked for retry (previous_status=running, reason=never_launched_no_pid_no_progress_no_done)",
+    "[2026-03-17T18:06:00] setup_env: completed successfully (env on /mnt/hdd_1 due to home quota)"
+  ]
 }

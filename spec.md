@@ -1,73 +1,118 @@
-# 项目: CRA (Contrastive Representation Attribution)
+# 项目: cross-task-influence
 
 ## 研究主题
-诊断参数空间 TDA 的两个信号处理缺陷（信号稀释 FM1 + 公共影响污染 FM2），将 5 种表示空间 TDA 方法统一为 φ^T·ψ 双线性框架，并在 DATE-LM 标准 benchmark 上系统验证。
+
+Multi-Task VLA 的跨任务数据交互图谱：系统识别哪些任务的训练数据互助、哪些互害，诊断负迁移机制，并基于 task-to-task influence 矩阵优化数据混合策略。
 
 ## 背景与动机
-Training Data Attribution (TDA) 在 LLM 上系统性失败。5 种独立提出的表示空间方法（RepSim, RepT, In-the-Wild, Concept Influence, AirRep）各自在特定任务上优于参数空间方法，但：
-1. 从未被识别为一个方法家族
-2. 没有统一的诊断解释为什么它们有效
-3. 从未在同一 benchmark 上系统评估
-4. 实践者缺乏方法选择指南
 
-核心假设：参数空间 TDA 失败源于两个独立的信号处理缺陷：
-- **FM1 (Signal Dilution)**: 参数梯度在 ℝ^B 空间中近乎正交（JL 现象），任务信号 SNR 坍塌。表示空间操作通过维度约化（ℝ^B → ℝ^4096）修复。
-- **FM2 (Common Influence Contamination)**: 标准 IF 被预训练知识主导。DDA 消融：移除 debias 下降 55pp，移除 denoise 仅 9pp。对比打分修复。
+### 领域痛点
 
-两个缺陷与 Hessian 近似误差正交——三者是互补瓶颈。
+2025-2026 年 VLA 领域的核心趋势是 scaling——所有头部团队（Physical Intelligence π0、Google RT-2、NVIDIA GR00T、开源 Octo/OpenVLA）都在将来自 N 个任务、M 个机器人、K 个环境的异构数据混合训练。但数据配比目前完全靠手调或均匀混合，缺乏 principled 的工具来理解和优化跨任务数据交互。
+
+**核心问题**：往训练集里加入 task B 的数据可能 hurt task A 的性能（负迁移），但目前没有人能系统地诊断：哪些任务对互助、哪些互害、以及为什么。
+
+### 已知相关工作及其局限
+
+**数据归因 (TDA) 类**：
+- **QoQ** (2603.09056, ICRA 2026)：归一化梯度内积做 single-task 内的样本归因。只回答"task X 的训练集里哪条轨迹有用"，不涉及跨任务交互。
+- **CUPID** (2506.19121, CoRL 2025)：标准 IF 应用于 Diffusion Policy 的数据策展，同样是 single-task scope。
+- **SCIZOR** (2505.22626)：自监督 transition-level 数据策展，Open-X 100 万+ 轨迹 + Octo VLA 验证。大规模但黑盒评分，不解释任务间关系。
+- **DataMIL** (2505.09603)：Datamodels 框架，60+ 任务验证，但 single-task scope，不涉及跨任务。
+- **MISS** (2409.18153)：证明集合影响力不可加——暗示多任务负迁移不能通过单样本 IF 简单聚合分析。
+
+**数据混合 (Data Mixing) 类**：
+- **Re-Mix** (2408.14037)：DRO 域级权重优化，Open X-Embodiment 上 +38%。但是黑盒优化，无归因——只告诉你"权重应该是 X"，不解释为什么。
+- **Diversity 论文** (2507.06219, AgiBot World)：发现任务多样性 power-law、单本体可超多本体。群体级消融，无样本级或任务级归因。
+- **LESS** (2402.04333, ICML 2024)：LLM 梯度相似度 data selection，5% 数据常优于全量。但是 NLP 领域，未适配 robot/VLA。
+
+**空白**：**没有任何工作在 VLA 上做 task-to-task 级别的数据交互归因**。现有 TDA 工作全是 intra-task，现有 data mixing 工作全是黑盒。
+
+### 来自 VITA 项目的经验教训
+
+我们之前在 ~/Research/VITA 项目中做了两轮 Pilot 实验（Pilot v1 和 Pilot v2），尝试在 frozen backbone VLA (RDT-1B) 上做梯度 TDA。两轮都失败了（SC-1 ≈ 0）——frozen backbone 下 action head 梯度不编码 task-discriminative 信号。但关键可复用资产包括：
+- AgiBot World 数据处理 pipeline
+- EK-FAC / cosine scoring / MC averaging 代码
+- 评估指标体系（SC-1, LOO, Precision@K）
+- DPI (Data Processing Inequality) 信息瓶颈理论分析
+
+**重要教训**：本项目应使用 LoRA fine-tuning（QoQ 已验证可行），避免重蹈 frozen backbone 的覆辙。
+
+### 为什么这个方向不与 QoQ 竞争
+
+QoQ 回答的是 intra-task attribution："task X 的训练集里哪条轨迹有用？"
+本项目回答的是 cross-task attribution："task Y 的数据对 task X 的性能影响是什么？通过什么机制？"
+
+这是完全正交的问题。QoQ 甚至可以作为本项目的 building block（用 QoQ/IF 计算跨任务 influence）。
 
 ## 初始想法
-- **攻击角度 A（核心）**: 2×2 消融矩阵 {参数空间, 表示空间} × {标准打分, 对比打分}，在 DATE-LM + Li et al. 两套 benchmark 上评估
-- **攻击角度 B（可选升维）**: Fixed-IF — 用理论预测设计参数空间修复（projected IF + contrastive gradient），验证诊断框架的预测力
-- **统一框架**: 所有表示空间方法可表达为 φ(z_test)^T · ψ(z_train) 双线性形式
-- **信号处理理论类比**: 匹配滤波（维度约化 → 修复 FM1）⊥ 差分检测（对比打分 → 修复 FM2），70+ 年正交性理论基础
 
-### 已完成的前期工作（来自 ~/Research/CRA）
-项目已完成 Startup → Crystallize → Strategic Review 阶段：
-- 6 维辩论（创新者/务实者/理论家/反对者/跨学科者/实验主义者）→ 共识 "Go with focus"
-- 4 方战略审查（反对者/比较分析者/务实者/跨学科者）
-- Codex 外部评审（5/10 分，要求加强机制证据）
-- 完整的 problem-statement.md 和 contribution.md
-- **可直接从 Probe 阶段开始**
+### 核心方法
 
-### 关键研究问题
-- **RQ1**: RepSim/RepT 在 DATE-LM 全部 3 个任务上 vs TRAK/LoGra 的表现？
-- **RQ2**: 对比打分是否通用改善参数空间和表示空间方法？（≥2/3 任务 >3pp）
-- **RQ3**: FM1 和 FM2 修复增益是否近似可加？（交互项 <30% min 主效应）
+1. **Task-to-Task Influence 矩阵**：定义 $M_{ij} = \mathbb{E}_{z \in \mathcal{D}_i, z' \in \mathcal{D}_j} [\mathcal{I}(z, z')]$，量化任务 $i$ 的训练数据对任务 $j$ 性能的平均影响。
+   - 正值 → 互助（正迁移）
+   - 负值 → 互害（负迁移）
+   - 近零 → 独立
 
-### 预注册否证条件
-- RepSim < TRAK − 5pp on DATE-LM LDS → "系统性优于"叙事破裂
-- 对比打分在 ≥1/3 方法上导致性能下降 >3pp → 通用性不成立
-- 2×2 ANOVA 交互项 >30% of min(主效应) → 正交性不成立
+2. **负迁移机制诊断**：对识别出的负迁移任务对，进一步分析其机制：
+   - **Representation conflict**：相似 state 但不同最优 action（e.g., 同一个物体在不同任务中需要不同操作）
+   - **Optimization conflict**：梯度方向系统性矛盾
+   - **Action distribution mismatch**：训练分布的 action space 不兼容
+
+3. **Influence-guided data mixing**：基于 influence 矩阵优化数据配比——对互助任务对增加共训权重，对互害任务对降低或分离。与 Re-Mix (DRO) 和均匀混合做正面对比。
+
+### 预期贡献
+
+- **C1**: Task-to-task influence 矩阵框架——首次在 VLA 上提供任务间数据交互的量化图谱
+- **C2**: 负迁移机制分类——不只是检测，还诊断"为什么"
+- **C3**: Influence-guided data mixing 策略——实验证明优于均匀混合和 Re-Mix
+- **C4** (Bonus): 与 Diversity 论文的经验发现建立因果连接——解释"为什么单本体可超多本体"
+
+### Pilot 验证方案
+
+在 AgiBot World 上选取 5-10 个任务子集（~1K 轨迹），用 LoRA fine-tuning 的 RDT-1B 或 OpenVLA：
+1. 计算 task-to-task influence 矩阵（5×5 或 10×10）
+2. 验证 influence 矩阵是否能预测"加入/移除某任务数据后的性能变化"（反事实验证）
+3. 如果矩阵中确实存在显著负值（负迁移信号），则方向可行
 
 ## 关键参考文献
-- Li et al. 2025 (2409.19998) — RepSim vs IF 在 LLM 上的表现差异
-- DDA (2410.01285) — 对比打分使 IF 超越 BM25 (AUC 91.64%)
-- RepT (2510.02334) — 表示梯度追踪 (P@10=0.97-1.00)
-- DATE-LM (2507.09424) — LLM TDA 标准 benchmark (NeurIPS 2025)
-- Better Hessians Matter (2509.23437) — Hessian 层级证据（核心对手）
-- In-the-Wild (2602.11079) — DPO 场景下的表示空间 TDA
-- Concept Influence (2602.14869) — 概念级表示空间 TDA
-- AirRep (2501.12345) — 学习的表示空间 TDA
-- Episteme 知识库: ~/Research/Episteme (49 篇 TDA 论文深度分析)
+
+- QoQ: 2603.09056 (ICRA 2026) — VLA gradient TDA baseline
+- CUPID: 2506.19121 (CoRL 2025) — Robot IF data curation
+- SCIZOR: 2505.22626 — Self-supervised VLA data curation at scale
+- DataMIL: 2505.09603 — Datamodels for robot data selection
+- Re-Mix: 2408.14037 — DRO data mixing for IL
+- Diversity: 2507.06219 — VLA data scaling (AgiBot World)
+- MISS: 2409.18153 — Set influence is non-additive
+- LESS: 2402.04333 (ICML 2024) — LLM gradient data selection
+- IF-Diffusion: 2410.13850 — GGN^model framework for diffusion
+- TrackStar: 2410.17413 — Large-scale gradient TDA
+- AirRep: 2505.18513 (NeurIPS 2025) — Representation-based TDA
+- ASTRA: 2507.14740 — EKFAC-Preconditioned Neumann IF
 
 ## 可用资源
-- GPU: 4x RTX 4090 on xuchang3
-- 服务器: ssh -p 8222 jinxulin@xuchang-lab3.staff.sydney.edu.au
+
+- GPU: 4x RTX A6000 48GB（共享服务器，通过 SSH MCP）
+- 服务器: default (SSH MCP connection)
 - 远程路径: /home/jinxulin/sibyl_system
-- 本地知识库: ~/Research/Episteme, ~/Research/CRA (已有前期工作)
+- 本地已有 VITA 项目代码（~/Research/VITA/Codes/）可部分复用
 
 ## 实验约束
-- 实验类型: 轻量训练（fine-tuning based TDA 评估，不训练新模型）
-- 模型规模: 中等 — Pythia-1B (pilot), Llama-2-7B (full)
-- 时间预算: Pilot ≤1 GPU-day, 核心实验 2-3 周
-- 单个实验控制在 1 小时内
+
+- 实验类型: 轻量训练（LoRA fine-tuning on 1B-7B VLA）
+- 模型规模: RDT-1B (1.2B) 或 OpenVLA-7B
+- 数据集: AgiBot World (公开, 217 任务类别, 100 万轨迹)
+- 时间预算: Pilot ~1-2 GPU-days, 中规模 ~10-15 GPU-days
+- 关键约束: 必须用 LoRA 而非 frozen backbone（VITA 已证明 frozen backbone 下梯度 TDA 失败）
 
 ## 目标产出
-- 论文 — 目标 NeurIPS 2026 / ICML 2027
-- 贡献天花板: poster ~ spotlight（若加 Fixed-IF 可升至 oral）
+
+- 论文：目标 CoRL 2026 / RSS 2026（降级目标：ICRA 2027）
+- 核心产出：Task-to-task influence 矩阵 + 负迁移机制分类 + influence-guided data mixing
 
 ## 特殊需求
-- 项目已有前期工作在 ~/Research/CRA，包括完整的 problem-statement、debate 记录、strategic review。建议直接利用这些产出，从 Probe 阶段开始
-- Episteme 知识库 (~/Research/Episteme) 包含 49 篇 TDA 论文的深度分析，可作为文献调研基础
-- 已知核心风险：RepSim 在 DATE-LM LDS（反事实指标）上可能表现差（相关性≠因果性）
+
+- 本项目与 VITA 项目（~/Research/VITA）有知识和代码继承关系，但方向完全不同
+- AgiBot World 数据处理 pipeline 可从 VITA 复用
+- 论文中需要正面对比 QoQ (intra-task) 和本方法 (cross-task)，说明两者互补而非替代
+- 如果 Pilot 阶段发现 task-to-task influence 矩阵中没有显著的负迁移信号（所有任务都互助或独立），需要有 Plan B：转向"positive transfer 的量化和利用"

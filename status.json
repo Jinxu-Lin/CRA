@@ -1,7 +1,7 @@
 {
-  "stage": "result_debate",
-  "started_at": 1773662442.492464,
-  "updated_at": 1773929190.813349,
+  "stage": "pilot_experiments",
+  "started_at": 1773671462.023357,
+  "updated_at": 1773674730.654505,
   "iteration": 0,
   "errors": [],
   "paused": false,
@@ -9,5 +9,5 @@
   "stop_requested": false,
   "stop_requested_at": null,
   "iteration_dirs": true,
-  "stage_started_at": 1773929190.813348
+  "stage_started_at": 1773674730.6545038
 }

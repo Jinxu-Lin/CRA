@@ -1,229 +1,238 @@
-# Contrarian Perspective: CRA Research Proposal
+# Contrarian Perspective: Cross-Task Influence in Multi-Task VLA
 
-## Executive Summary
+## Core Thesis: The Entire Premise May Be Wrong
 
-The CRA proposal is intellectually elegant but built on foundations that are shakier than the team acknowledges. After systematic stress-testing against the pilot evidence, literature, and logical consistency, I identify **three widely-held assumptions** that the CRA thesis depends on -- and challenge each with concrete evidence. My conclusion: the CRA framework risks being a beautiful theory destroyed by ugly facts. The pilot data already contains warning signs that the team is selectively interpreting.
-
----
-
-## Assumption 1: "Parameter-Space Methods Fail Because of Signal Processing Defects (FM1/FM2)"
-
-### The CRA Claim
-
-Parameter-space TDA methods (TRAK, IF) fail on LLMs due to two independent signal processing defects: FM1 (signal dilution via rank deficiency in gradient space) and FM2 (common influence contamination from pre-training knowledge). Representation-space methods succeed because they implicitly fix FM1.
-
-### The Contrarian Challenge: It Is Simpler Than Signal Processing -- It Is Just Cosine Similarity Being a Better Proxy for Semantic Relatedness
-
-**Evidence 1: The pilot data itself refutes the FM1 narrative on toxicity.**
-TRAK (parameter-space) achieves 0.926 AUPRC vs. RepSim's 0.685 on the toxicity task -- a **24pp reversal** of the predicted direction. The CRA team dismisses this as a "task-type boundary" or "gradient norm artifact," but this is post-hoc rationalization. If FM1 were a genuine signal processing defect, it would degrade parameter-space methods uniformly across tasks, not selectively. The fact that parameter-space methods *dominate* on toxicity suggests that the performance difference is task-specific, not space-specific.
-
-**Evidence 2: BM25 achieves perfect R@50=1.0 on counterfact -- the task where RepSim "wins."**
-On the very task where RepSim supposedly demonstrates FM1-fixing superiority (counterfact, R@50=0.994), a trivial lexical baseline (BM25) achieves R@50=1.0. This means the "FM1 advantage" of representation space may simply be that cosine similarity of last-layer hidden states captures lexical/semantic overlap -- exactly what BM25 does, but with more parameters. RepSim's advantage may be *retrieval quality*, not *attribution quality*.
-
-**Evidence 3: k-NN (0.809) outperforms RepSim (0.685) on toxicity.**
-Both k-NN and RepSim operate in representation space, so FM1 is equally "fixed" for both. Yet k-NN uses a nonlinear similarity measure and substantially outperforms RepSim. This directly contradicts the CRA thesis that the *space* (parameter vs. representation) is the critical factor. The similarity *function* matters more than the space.
-
-**Evidence 4: Cosine similarity has known pathologies in high-dimensional LLM representations.**
-Steck, Ekanadham & Kallus (2403.05440) proved that cosine similarity of learned embeddings can yield *arbitrary* similarities depending on implicit regularization. Draganov et al. (2406.16468) showed gradients of cosine similarity go to zero for high-magnitude embeddings -- a known issue for LLM hidden states. The CRA framework assumes representation-space cosine similarity is a meaningful attribution signal, but this assumption is undermined by fundamental mathematical properties of cosine similarity in the spaces where LLMs operate. Bouhsine (2602.19393) recently showed the "problem with cosine similarity is not cosine similarity -- it is the failure to normalize," but CRA's RepSim uses unnormalized representations.
-
-**Counter-proposal:** The performance gap between RepSim and TRAK is better explained by *task-specific information content* of different similarity measures than by "signal processing defects." On tasks where semantic similarity is the primary signal (counterfact, ftrace), cosine similarity of representations naturally captures this. On tasks where behavioral properties matter (toxicity), gradient norms capture this better. No FM1/FM2 framework is needed.
-
-### Risk to CRA
-
-If the "FM1/FM2 defect" narrative is reducible to "different similarity measures capture different information," the entire diagnostic framework collapses into a tautology: "methods that measure the right thing perform better."
-
-### Falsification Test
-
-Run the 2x2 factorial with **Euclidean distance** instead of cosine similarity in representation space. If RepSim-Euclidean matches RepSim-cosine, the similarity function is irrelevant and FM1 may hold. If RepSim-Euclidean degrades significantly, it is the similarity function, not the space, that matters.
+The proposal's central assumption -- that we can build a reliable task-to-task influence matrix, diagnose negative transfer mechanisms, and use this to optimize data mixing -- rests on a chain of beliefs, each of which has serious counter-evidence. I challenge three foundational assumptions and propose research directions that exploit the gaps.
 
 ---
 
-## Assumption 2: "The phi^T M psi Bilinear Framework Has Predictive Power Beyond Notational Convenience"
+## Challenged Assumption 1: Influence Functions Can Reliably Quantify Cross-Task Effects in Deep Policy Networks
 
-### The CRA Claim
+### The Mainstream Belief
+The proposal assumes that influence functions (or their gradient-projected proxies like LESS) can produce a meaningful task-to-task influence matrix $M_{ij}$ for VLA models. The innovator, pragmatist, and theorist all build on this assumption -- they disagree on *which* proxy to use but agree that *some* gradient-based signal will work.
 
-All five representation-space TDA methods can be unified under phi(z_test)^T M psi(z_train), and this framework generates non-trivial predictions: (1) whitened attribution (M = Sigma_noise^{-1}) should outperform M = I, (2) contrastive scoring should help universally, (3) the framework predicts a TRAK dimension sweep saturation curve.
+### The Counter-Evidence
 
-### The Contrarian Challenge: The Framework Is Vacuously Universal and Its Predictions Have Already Failed
+**Influence functions are provably fragile in deep networks.** Basu et al. (ICLR 2021, arXiv 2006.14651) demonstrated that influence function estimates in deep learning are "fragile" -- they fail catastrophically for deep architectures like ResNet-50 due to:
+- Non-convexity of the loss function, which violates the core theoretical assumption
+- Initialization sensitivity: different random seeds during leave-one-out retraining produce wildly different parameter trajectories
+- Inverse-Hessian approximation error grows super-linearly with network depth
 
-**Evidence 1: The framework is too general to be falsifiable.**
-Any bilinear scoring function can be written as phi^T M psi. This includes random baselines, nonsensical methods, and everything in between. The theoretical perspective already flagged this: "The phi^T M psi framework, as currently stated, is *too general* -- almost any bilinear scoring function can be written in this form." The CRA team claims non-trivial predictions rescue the framework from vacuity. But how have those predictions fared?
+Epifano et al. (2023, arXiv 2303.12922) confirmed that the observed fragility is not just a validation artifact -- the underlying approximation genuinely breaks down for non-convex models. Class-based influence functions (Nguyen-Duc et al., 2023, arXiv 2305.01384) showed that cross-class influence estimates are *systematically unreliable*, which is exactly the regime we operate in: cross-task influence is inherently cross-distribution.
 
-**Evidence 2: H7 (whitened attribution) fails catastrophically.**
-The framework's most distinctive prediction -- that M = Sigma_noise^{-1} should improve over M = I -- is falsified across all three tasks:
-- Toxicity: -10.9pp
-- Counterfact: -8.0pp
-- ftrace: -10.6pp
+Li et al. (2025, arXiv 2512.09103) proved that standard TRAK scores, while accurate as point estimates, are "geometrically fragile" -- naive Euclidean robustness analysis yields **0% certification** for neural network attribution on CIFAR-10/ResNet-18. Their Natural Wasserstein metric reduces worst-case sensitivity by 76x, but this fix has never been validated for policy networks.
 
-The team attributes this to N/d ratio (0.049, underdetermined covariance). But this is a fundamental problem, not a pilot-scale artifact. For Pythia-1B (d=2048), achieving N/d >> 1 requires N >> 2048 training examples per task. DATE-LM's counterfact task has only 5,473 examples total. Even at full scale, N/d ~ 2.7 -- still marginal for covariance estimation. The Ledoit-Wolf shrinkage estimator cannot rescue this: it was designed for N ~ d, not N/d ~ 3.
+Vitel & Chhabra (2025, arXiv 2511.04715) showed that even the *choice of which layer to compute influence from* produces contradictory results -- first layers vs. middle layers vs. last layers give different rankings, contradicting the seminal Yeh et al. (2022) recommendation.
 
-**Evidence 3: H2 (contrastive scoring) shows zero effect.**
-Contrastive scoring (the framework's FM2 correction) produced exactly 0.0pp gain across all 12 method-task combinations. The team blames rank-based metrics. But this reveals a deeper problem: if the FM2 "correction" preserves rank ordering exactly, then FM2 contamination does not affect the *relative* ordering of training examples -- which is the only thing that matters for attribution. A "defect" that does not change rankings is not a defect for ranking-based tasks.
+**The policy learning setting makes things worse.** VLA models have:
+- Sequential, non-i.i.d. data (trajectories, not independent images)
+- Multi-modal action distributions (diffusion heads, GMMs) where the loss landscape is highly non-convex
+- Closed-loop deployment where small parameter perturbations can cascade into dramatically different trajectories
 
-**Evidence 4: H9 (representation isotropy) is falsified -- direction completely reversed.**
-The framework predicts representation covariance condition number < 100 (near-isotropic, hence M = I suffices). Actual measurement: condition number = 4.45 x 10^7. Representations are *extremely* anisotropic. This undermines the theoretical justification for why M = I works in representation space -- the claimed near-isotropy that supposedly makes curvature correction unnecessary simply does not exist.
+Matelsky et al. (2024, arXiv 2406.00509) tested empirical influence functions on both CNNs and LLMs and found that basic desiderata (transitivity, noise invariance, logical consistency) are *violated* -- neural networks "cannot generalize or perform logic in the way they appear to" when probed via fine-tuning influence.
 
-**Evidence 5: The 30.8pp gap between TRAK-PCA at k=d and RepSim.**
-The framework predicts that TRAK with PCA projection onto the top-d gradient eigenvectors should approach RepSim performance (the "smoking gun" for FM1). Instead, TRAK-PCA at k=d achieves R@50=0.686, still 30.8pp below RepSim (0.994). This gap is enormous and suggests factors far beyond projection dimension drive the performance difference. The framework cannot explain this gap.
+### The Contrarian Research Direction
 
-**Counter-proposal:** The phi^T M psi framework is notational, not explanatory. It organizes existing methods into a taxonomy (valuable) but generates no predictions that survive empirical testing (not a theory). The CRA paper should be restructured as a **systematic benchmark with post-hoc analysis**, not a "diagnostic framework with predictive theory."
+**Direction 1: Falsification-First Influence Validation for VLA**
 
-### Risk to CRA
+Instead of assuming influence-based analysis works and building a whole methodology on it, start with a rigorous falsification study:
 
-A framework whose three major predictions (H7, H2/H3, H9) are all either falsified or trivially satisfied has no predictive power. Reviewers will ask: "What does this framework predict that we did not already know?"
+1. Compute influence matrix $M_{ij}$ using LESS/GPTA on LIBERO-10 with a small policy
+2. Compute the *same* matrix using 5 different random seeds for the base model training
+3. Measure the **seed-to-seed Kendall-$\tau$ correlation** of influence rankings
+4. If $\tau < 0.5$ (rankings are unstable across seeds), the entire influence-guided mixing approach is built on sand
 
-### Falsification Test
+**Prediction**: Based on the fragility literature, I predict $\tau \approx 0.3$-$0.4$ for deep policy networks -- marginally better than random. The VLA setting (sequential data, multi-modal actions) will amplify instability beyond what was observed for image classification.
 
-Identify one prediction of the phi^T M psi framework that is:
-(a) non-trivial (not already known from prior work),
-(b) testable at full scale, and
-(c) not already falsified by pilot data.
+**If confirmed**, this is itself a strong negative result paper: "Influence Functions Fail for Multi-Task Robot Policy Learning" -- directly challenging CUPID (arXiv 2506.19121), DataMIL (arXiv 2505.09603), and every influence-based robot data curation method.
 
-If no such prediction exists, demote the framework from "theoretical contribution" to "notation."
+**Computational cost**: ~45 min (5 training runs x 5 min + gradient features x 5 + comparison)
 
----
+**Success probability**: 60% (that influence *does* fail; 40% chance it works better than expected, in which case we pivot to using it)
 
-## Assumption 3: "Representation-Space Methods Succeed Because They Operate in the 'Signal-Rich R^d Subspace'"
-
-### The CRA Claim
-
-Representations live in R^d where d << B, and this subspace concentrates the attribution signal. Gradient-space methods fail because they operate in R^B where most dimensions are noise.
-
-### The Contrarian Challenge: The "Signal-Rich Subspace" Story Is Backwards -- Representations Succeed Because They Are High-Level Features, Not Because They Are Low-Dimensional
-
-**Evidence 1: RepSim PCA dimension sweep shows saturation at k=64, not k=d=2048.**
-The pilot shows RepSim performance saturates at PCA k=64 across all tasks with N=100. If the "signal-rich R^d subspace" story were correct, you would need all d=2048 dimensions. Instead, only ~64 dimensions carry attribution-relevant information. This means representation space itself has massive redundancy -- the "signal" lives in a ~64-dimensional subspace of the 2048-dimensional representation space.
-
-**Evidence 2: The effective rank of representations (r_eff_95=63) is almost identical to gradients (r_eff_95=53 for target layers).**
-The eigenspectrum data shows that both spaces have similar effective dimensionality (~50-60 at N=100). If FM1 were about dimensionality mismatch, representation-space and gradient-space methods should perform similarly when both are projected to comparable effective dimensions. The 30+pp gap between them suggests dimensionality is not the explanation.
-
-**Evidence 3: What representations actually capture is semantic similarity, not "attribution signal."**
-RepSim computes cosine similarity of last-layer hidden states. These hidden states encode semantic content of the input text -- they are the features the model uses for next-token prediction. High RepSim between training example and test example means "these texts are semantically similar." This is fundamentally a *retrieval* operation, not an *attribution* operation. The distinction matters: attribution asks "did this training example *cause* the model's behavior on the test example?", while retrieval asks "is this training example *similar to* the test example?" These are different questions, and RepSim answers the retrieval question.
-
-**Evidence 4: AirRep (Sun et al., 2505.18513) explicitly learns task-specific representations for attribution -- if raw representations were "signal-rich," this would be unnecessary.**
-AirRep trains a specialized encoder optimized for attribution quality and matches gradient-based methods while being 100x cheaper at inference. The key insight: *generic* representations are not optimized for attribution. AirRep's success actually undermines the CRA claim that representation space is *inherently* superior -- it suggests that representation space is superior only when the representations are *designed* for attribution, which raw last-layer hidden states are not.
-
-**Evidence 5: Denoised Representation Attribution (Pan et al., 2502.11411) shows that raw representations contain "noise" for attribution purposes.**
-Pan et al. identify that unsafe target texts contain neutral tokens whose representations dilute the attribution signal -- exactly the kind of contamination CRA attributes to parameter space (FM2). This means FM2-type contamination exists in representation space too, contradicting the CRA narrative that representation space inherently avoids FM2.
-
-**Evidence 6: Influence dynamics are non-static (Lee et al., 2510.12071).**
-Training data attribution treats influence as static, but Lee et al. show influence changes non-monotonically during training, including sign flips at developmental transitions. The phi^T M psi framework operates at a single checkpoint and cannot capture these dynamics. This is a fundamental limitation, not a minor gap.
-
-**Counter-proposal:** RepSim succeeds not because of low-dimensional signal concentration, but because last-layer representations encode high-level semantic features that happen to correlate with training data relevance for certain tasks (counterfact, ftrace). For tasks where relevance is behavioral rather than semantic (toxicity), this correlation breaks down. The correct explanation is **feature quality**, not **dimensionality**.
-
-### Risk to CRA
-
-If the advantage of representation space is feature quality rather than dimensionality, the entire FM1 formalism (signal dilution, rank deficiency, dimension sweep predictions) becomes explanatorily irrelevant. The paper loses its signal processing framing.
-
-### Falsification Test
-
-Compare RepSim using *random* representations (randomly initialized, untrained model, same d=2048) against RepSim using *trained* representations. If FM1 (dimensionality) is the explanation, random representations should perform comparably (same d). If feature quality is the explanation, random representations should fail.
+### Key References
+- Basu et al. (arXiv 2006.14651, ICLR 2021): "Influence Functions in Deep Learning Are Fragile"
+- Epifano et al. (arXiv 2303.12922): "Revisiting the Fragility of Influence Functions"
+- Li et al. (arXiv 2512.09103): Natural Geometry of Robust Data Attribution -- 0% Euclidean certification for TRAK
+- Vitel & Chhabra (arXiv 2511.04715): Layer choice produces contradictory influence rankings
+- Matelsky et al. (arXiv 2406.00509): Empirical influence functions violate basic logical desiderata
+- MISS (arXiv 2409.18153): Set influence is non-additive, undermining pairwise matrices
 
 ---
 
-## Additional Contrarian Observations from the Pilot Data
+## Challenged Assumption 2: The Right Intervention Level is Data Mixing, Not Architecture
 
-### Observation 1: The Pilot Sample Size (N=100) Makes Most Results Unreliable
+### The Mainstream Belief
+The proposal treats architecture as fixed and optimizes the data mixture. All three prior perspectives (innovator, pragmatist, theorist) share this assumption -- they debate *how* to compute influence and *how* to derive mixing weights, but never question whether data mixing is the right lever to pull.
 
-With N=100, at most 99 nonzero eigenvalues exist. The eigenspectrum analysis, condition number estimates, and covariance-based methods are all fundamentally limited. Yet the CRA team draws strong conclusions about spectral properties from this data. The pilot summary's "GO" recommendation at confidence 0.60 is generous -- the evidence is directional at best, and several key findings (H9 falsification, H7 failure) might reverse at full scale. Or they might not -- we simply cannot tell.
+### The Counter-Evidence
 
-### Observation 2: The "TRAK Dimension Sweep Non-Monotonicity" Is Suspicious
+**Parameter isolation trivially eliminates the problem.** CORAL (arXiv 2603.09298, March 2026) freezes a single VLA backbone and attaches one LoRA expert per task. This "strict parameter isolation avoids complex gating networks and prevents parameter-level cross-task interference by construction." CORAL **substantially outperforms** joint training on LIBERO, WidowX, and Google Robot -- without any influence analysis, without any data mixing optimization, without any mechanism diagnosis.
 
-TRAK R@50 peaks at k=256 (0.785) then *decreases* to 0.670 at k=2048. Non-monotonic performance as a function of projection dimension is unusual and may indicate implementation bugs, numerical instability, or overfitting to the small test set (N=100). The CRA team interprets this as supporting H5, but non-monotonicity contradicts the smooth saturation curve predicted by the signal subspace theory.
+MergeVLA (arXiv 2511.18810) found that directly merging VLA experts trained on different tasks results in **near-zero success rates** and identified the root cause: "finetuning drives LoRA adapters toward divergent, task-specific directions beyond the capacity of existing merging methods to unify." Their solution -- sparsely activated task masks -- again bypasses the data mixing problem entirely.
 
-### Observation 3: DDA (Parameter-Space + Contrastive) Does Not Outperform TRAK (Parameter-Space, Standard)
+CDSP-MoE (arXiv 2512.20291) uses gradient conflict not to *analyze* interference but as a *structural supervisory signal* to prune conflicting pathways in a shared parameter manifold. This shifts the problem from "which data to mix" to "which parameters to share."
 
-DDA achieves 0.876 AUPRC on toxicity vs. TRAK's 0.926. DDA's "debias" step (the supposed 55pp improvement) does not appear here. If FM2 correction is so powerful, why does DDA not dominate? The CRA team does not discuss this discrepancy.
+**The implication is devastating for the proposal**: if a $0.1\%$-parameter LoRA adapter per task eliminates negative transfer more effectively than any data mixing strategy, then the entire influence matrix apparatus is solving a problem that architecture already solves more cheaply.
 
-### Observation 4: The 36-Cell Contrastive Matrix Shows Universal Zero Gain
+**PiKE's inconvenient finding.** PiKE (arXiv 2502.06244) found that large-scale pretraining often exhibits *little to no gradient conflict*. If VLA pretraining is similarly low-conflict, then the "negative transfer" we're trying to diagnose may be an artifact of (a) insufficient model capacity, (b) poor optimization, or (c) distribution shift -- none of which are addressable by data mixing.
 
-Not a single method-task combination benefits from contrastive scoring. This is not a metric limitation -- it is evidence that mean-subtraction does not change the relative ordering of attribution scores. If FM2 contamination were a real "defect," it should introduce *systematic* errors in ordering (biasing toward high-common-influence examples). The fact that rank ordering is invariant to mean subtraction suggests FM2 is a constant offset, not a source of ordering errors.
+### The Contrarian Research Direction
 
----
+**Direction 2: Architecture vs. Data -- A Controlled Ablation Study**
 
-## Contrarian Research Directions
+Run a head-to-head comparison that the field has never done:
 
-### Direction 1: The "RepSim Is Just Retrieval" Hypothesis
+| Configuration | Architecture | Data Strategy | Expected Outcome |
+|---|---|---|---|
+| Baseline | Shared trunk + shared head | Uniform mixing | Worst (negative transfer) |
+| Influence-guided | Shared trunk + shared head | Optimized mixing (our method) | Moderate improvement? |
+| Per-task LoRA | Shared trunk + LoRA per task | Uniform mixing | Strong (CORAL-style) |
+| Per-task LoRA + Influence | Shared trunk + LoRA per task | Optimized mixing | Marginal gain over LoRA alone? |
 
-**Claim:** RepSim's success on attribution benchmarks is a measurement artifact -- current attribution benchmarks (including DATE-LM) inadvertently measure retrieval quality rather than genuine causal influence.
+**The critical test**: Does influence-guided mixing on a shared architecture *ever* match per-task LoRA with uniform mixing? If not, the entire data mixing research direction is dominated by a simpler architectural solution.
 
-**Evidence:**
-- BM25 (pure retrieval) is competitive or superior on factual attribution
-- RepSim (semantic retrieval) dominates on tasks where relevant training data is semantically similar to test data
-- TRAK (gradient-based) dominates on toxicity where the relevant signal is behavioral, not semantic
+**My prediction**: Per-task LoRA with uniform mixing will match or beat influence-guided shared-architecture training. The marginal gain of influence-guided mixing *on top of* LoRA will be <2% -- within noise. This suggests the field should invest in better routing/isolation architectures, not better data mixing.
 
-**Experiment:** Compare RepSim against a strong retrieval baseline (e.g., Contriever, GTR) on DATE-LM. If dedicated retrieval models match or beat RepSim, the "attribution vs. retrieval" distinction is confirmed. Estimated cost: 2 GPU-hours on Pythia-1B.
+**However**, there is a scenario where data mixing matters: when the task is *unknown* at test time (truly zero-shot generalization). Per-task LoRA requires a task router, which fails on novel tasks. In this regime, the shared model must generalize, and data mixing optimization may help. This is the only setting where the proposal's approach is not dominated.
 
-**P(success): 60%.** BM25's strong performance on counterfact strongly suggests retrieval confounds.
+**Computational cost**: ~50 min (4 training runs x 10 min + evaluation)
 
-### Direction 2: The Nonlinear Attribution Hypothesis
+**Success probability**: 55% (that architecture dominates data mixing; 45% that data mixing shows non-trivial gains)
 
-**Claim:** The phi^T M psi bilinear framework is fundamentally limited because attribution involves nonlinear interactions. k-NN's superiority over RepSim on toxicity (0.809 vs. 0.685) demonstrates this.
-
-**Evidence:**
-- k-NN outperforms all bilinear methods on toxicity
-- The 30.8pp TRAK-PCA gap cannot be explained within the bilinear framework
-- Kernel methods (RBF, polynomial) in representation space may capture nonlinear attribution patterns
-
-**Experiment:** Run RBF-kernel attribution (phi_i^T phi_j -> exp(-||phi_i - phi_j||^2 / sigma^2)) on all three DATE-LM tasks and compare against RepSim. If RBF-kernel consistently outperforms, the bilinear assumption is a bottleneck. Estimated cost: 1 GPU-hour.
-
-**P(success): 50%.** k-NN's toxicity advantage is suggestive but may be task-specific.
-
-### Direction 3: The "Attribution Benchmarks Measure the Wrong Thing" Hypothesis
-
-**Claim:** DATE-LM's metrics (LDS, AUPRC, R@K) are rank-based and cannot detect the phenomena CRA claims to diagnose. A benchmark that measures *calibrated influence scores* (not just rankings) would reveal different method dynamics.
-
-**Evidence:**
-- Contrastive scoring has zero effect on all rank-based metrics but changes raw scores
-- FM2 contamination, if real, would manifest as a constant offset that is invisible to rank metrics
-- The entire H2/H3 analysis is uninformative because the metrics cannot detect the claimed effects
-
-**Experiment:** Evaluate methods using Kendall-tau correlation between predicted influence scores and leave-one-out retrained ground truth, or use the Linear Datamodeling Score at score level (not rank level). Estimated cost: 4 GPU-hours for LDS ground truth computation.
-
-**P(success): 70%.** This is a legitimate gap in the current evaluation methodology.
+### Key References
+- CORAL (arXiv 2603.09298): Per-task LoRA substantially outperforms joint training
+- MergeVLA (arXiv 2511.18810): Near-zero success rate from naive VLA expert merging
+- CDSP-MoE (arXiv 2512.20291): Gradient conflict as structural signal, not analytical signal
+- PiKE (arXiv 2502.06244): Large-scale pretraining shows low gradient conflict
+- STRAP (arXiv 2412.15182): Test-time retrieval outperforms multi-task generalist policies
 
 ---
 
-## Risk Assessment Summary
+## Challenged Assumption 3: Task-Level Analysis is the Right Granularity
 
-| Challenged Assumption | Severity | P(CRA narrative survives) | Evidence Strength |
-|----------------------|----------|--------------------------|-------------------|
-| FM1/FM2 as signal processing defects | Critical | 40% | Strong (toxicity reversal, BM25 competitive, k-NN > RepSim) |
-| phi^T M psi predictive power | Critical | 30% | Very strong (H7 fails, H2 trivial, H9 falsified, 30.8pp gap) |
-| R^d "signal-rich subspace" | High | 50% | Moderate (PCA saturation at k=64, r_eff similar across spaces) |
+### The Mainstream Belief
+The proposal frames everything at the task level: task-to-task influence, task-level mixing weights, task-pair mechanism diagnosis. The innovator partially challenges this with "Temporal Influence Tomography" (sub-skill phases), but still treats tasks as the fundamental unit for data mixing.
 
-**Overall assessment:** The CRA proposal has a compelling narrative but the pilot evidence does not support it as strongly as the team believes. I estimate a **35% probability** that the core thesis survives full-scale experiments intact. The most likely outcome is that the paper needs significant narrative revision -- from "signal processing diagnosis of two independent defects" to "systematic empirical comparison with post-hoc signal processing interpretation."
+### The Counter-Evidence
 
-**Strongest recommendation:** Before investing in full-scale experiments, run the three falsification tests proposed above (RepSim-Euclidean, random-representation RepSim, retrieval model comparison). Total cost: ~5 GPU-hours. If all three support CRA, proceed with high confidence. If any fail, the narrative must be revised before scaling up.
+**"It's a Match!" (arXiv 2301.02873) proved that simple pairwise task affinity scores correlate poorly with actual MTL performance.** This isn't just a "use a better proxy" problem -- it's a fundamental issue with task-level analysis. Tasks are *not* atomic units of knowledge transfer.
+
+**MISS (arXiv 2409.18153)** formalized that set influence is non-additive -- the influence of task set $\{B, C\}$ on task $A$ is NOT the sum of $B$'s influence and $C$'s influence. This means any pairwise matrix $M_{ij}$ is *inherently incomplete*. The theorist's superadditivity bound (Proposition 3) attempts to quantify this gap but relies on the same fragile Hessian approximation.
+
+**The real unit of transfer is the data point, not the task.** CUPID (arXiv 2506.19121) demonstrated that within a single task, individual demonstrations have wildly different influence on policy performance -- some demonstrations *within the target task's own dataset* are harmful. If intra-task variation exceeds inter-task variation (which is plausible for heterogeneous demonstration datasets), then task-level analysis smooths away the actual signal.
+
+**STRAP (arXiv 2412.15182)** showed that sub-trajectory retrieval at test time outperforms both full-trajectory retrieval and multi-task generalist policies. The granularity that matters is sub-trajectory, not task. This aligns with the observation that robot tasks share low-level behaviors (approach, grasp) while diverging on high-level strategies.
+
+### The Contrarian Research Direction
+
+**Direction 3: Instance-Level Data Valuation Beats Task-Level Influence Matrices**
+
+Instead of building a $T \times T$ task influence matrix, build an $N$-dimensional per-sample value score and show it captures everything the task matrix captures -- plus more:
+
+1. Train a base multi-task model on LIBERO-10
+2. Use CUPID-style per-demonstration influence to rank ALL demonstrations across ALL tasks
+3. Cluster demonstrations by influence pattern (not by task label) using k-means on gradient features
+4. Show that the emergent clusters do NOT align with task boundaries -- demonstrations from different tasks cluster together when they share low-level manipulation primitives
+5. Use cluster-aware data selection (keep high-value demonstrations, remove harmful ones regardless of task) and compare against task-level mixing optimization
+
+**Hypothesis**: Removing the bottom 20% of demonstrations (ranked by per-sample influence) will improve multi-task performance more than any task-level mixing strategy. The harmful demonstrations are not uniformly distributed across tasks -- they concentrate in specific, identifiable patterns (e.g., demonstrations with unusual grasp strategies, demonstrations near workspace boundaries where different tasks conflict).
+
+**Why this is contrarian**: The proposal's entire conceptual framework is "tasks interact." I'm arguing: "No -- *demonstrations* interact, and task labels are a poor proxy for the actual structure of data interactions."
+
+**Computational cost**: ~40 min (base training + gradient features + clustering + validation)
+
+**Success probability**: 50% (ambitious but grounded -- CUPID already showed 33% data removal improves performance)
+
+### Key References
+- CUPID (arXiv 2506.19121): Per-demonstration influence for robot data curation -- training with <33% curated data matches full-data performance
+- MISS (arXiv 2409.18153): Set influence is non-additive, pairwise matrices are incomplete
+- "It's a Match!" (arXiv 2301.02873): Task affinity scores predict MTL performance poorly
+- STRAP (arXiv 2412.15182): Sub-trajectory granularity outperforms task-level
 
 ---
 
-## Key References Supporting Contrarian Arguments
+## Meta-Critique: The Proposal is a Solution in Search of a Problem
 
-- Steck, Ekanadham & Kallus (2403.05440): *Is Cosine-Similarity of Embeddings Really About Similarity?* -- cosine similarity yields arbitrary similarities depending on regularization
-- Draganov, Vadgama & Bekkers (2406.16468): *The Hidden Pitfalls of the Cosine Similarity Loss* -- gradients of cosine similarity go to zero for high-magnitude embeddings
-- Bouhsine (2602.19393): *In Defense of Cosine Similarity* -- normalization eliminates gauge freedom; failure to normalize is the real problem
-- Sun et al. / AirRep (2505.18513): *Enhancing Training Data Attribution with Representational Optimization* -- learned representations outperform raw representations for TDA, undermining "inherent superiority" of representation space
-- Pan et al. / DRA (2502.11411): *Detecting and Filtering Unsafe Training Data via Data Attribution with Denoised Representation* -- raw representations contain attribution-irrelevant noise, contradicting FM2-free narrative
-- Lee et al. (2510.12071): *Influence Dynamics and Stagewise Data Attribution* -- influence is non-static, changes non-monotonically, undermining single-checkpoint phi^T M psi framework
-- Mlodozeniec et al. / d-TDA (2506.12965): *Distributional Training Data Attribution* -- stochasticity in training fundamentally limits deterministic attribution approaches
-- Yang et al. / Integrated Influence (2508.05089): *Data Attribution with Baseline* -- LOO-based methods overlook collective influence, suggesting bilinear pairwise frameworks are fundamentally incomplete
-- Rubinstein & Hopkins / RIF (2506.06656): *Rescaled Influence Functions* -- influence functions systematically underestimate effect of sample removals in high dimensions
-- DATE-LM / Jiao et al. (2507.09424): *Benchmarking Data Attribution Evaluation for LLMs* -- "no single method dominates across all tasks" is the benchmark's own conclusion
-- Wang et al. (2409.05657): *Adversarial Attacks on Data Attribution* -- attribution methods exploitable via outlier bias, questioning fundamental reliability
+Let me be blunt about the overall research narrative:
+
+1. **If negative transfer is weak** (PiKE's finding): There's no problem to solve. The "influence matrix" will be mostly zeros with noise.
+
+2. **If negative transfer is strong** (CORAL's motivation): Architecture already solves it more cheaply. Per-task LoRA eliminates the need for influence analysis.
+
+3. **If negative transfer is moderate and nuanced**: Then task-level analysis is too coarse (MISS, "It's a Match!"), influence functions are too fragile (Basu et al., Li et al.), and instance-level curation (CUPID, SCIZOR) is the better path.
+
+In every scenario, the proposed "task-to-task influence matrix + mechanism diagnosis + data mixing optimization" pipeline is either unnecessary or insufficient.
+
+### The One Scenario Where the Proposal Wins
+
+There IS a narrow but important scenario: **open-vocabulary generalization with a shared model**. When you cannot enumerate tasks at training time (truly open-ended manipulation), per-task LoRA is impossible and instance-level curation doesn't have test-task labels. In this setting:
+- You need a shared model
+- You need to understand cross-task data interactions to maximize the shared model's generalization
+- Task-level influence analysis (or sub-task influence, per the innovator) becomes the only viable approach
+
+If the paper focuses on THIS scenario -- "How should we compose training data for an open-world VLA that must generalize to novel tasks?" -- rather than the generic "diagnose negative transfer" framing, it becomes much more compelling and harder to dismiss with the counter-arguments above.
 
 ---
 
-## Constructive Recommendations
+## Recommended Contrarian Contribution: "When Does Influence-Guided Mixing Actually Help?"
 
-Despite the contrarian critique, the CRA proposal has genuine value if repositioned correctly:
+Rather than assuming the proposed approach works, I recommend the following paper structure:
 
-1. **Lead with the benchmark, not the theory.** The 2x2 factorial on DATE-LM with multiple methods has never been done. This alone is publishable. Let the data tell the story rather than imposing a signal processing narrative.
+### Study 1: Fragility Audit (Contrarian Direction 1)
+- Measure seed-to-seed stability of influence matrices for VLA
+- Identify the regime (model size, dataset size, loss curvature) where influence becomes reliable
+- **Expected finding**: Influence is only stable for small, near-convex models -- exactly the models nobody deploys
 
-2. **Reframe FM1/FM2 as post-hoc interpretive lenses, not causal diagnoses.** "Parameter-space and representation-space methods capture different information" is defensible. "Two independent signal processing defects explain performance gaps" is not supported by the evidence.
+### Study 2: Architecture vs. Data Head-to-Head (Contrarian Direction 2)
+- Controlled comparison: influence-guided mixing vs. per-task LoRA vs. both
+- **Expected finding**: Architecture dominates for known tasks; data mixing matters only for open-vocabulary generalization
 
-3. **Add retrieval baselines.** Contriever, GTR-T5, or any dedicated dense retriever should be included. If RepSim performs comparably to these, it confirms the "attribution as retrieval" interpretation.
+### Study 3: Task-Level vs. Instance-Level (Contrarian Direction 3)
+- Compare task-to-task influence matrix against per-sample data valuation
+- **Expected finding**: Instance-level captures strictly more signal; task labels are a lossy aggregation
 
-4. **Abandon whitened attribution as a contribution.** H7 has failed. The N/d ratio problem is structural, not fixable at DATE-LM scale. Whitened attribution requires either much larger datasets or much lower-dimensional representations to work.
+### Study 4: The Positive Transfer Opportunity (Contrarian Reframing)
+- Instead of "mitigating negative transfer," focus on "amplifying positive transfer"
+- Identify demonstrations that help the *most* tasks simultaneously (universal positives)
+- Show that curating a small set of universal-positive demonstrations improves all tasks without any mixing optimization
+- **Connection**: This reframes data curation as finding "foundation demonstrations" for robotics -- analogous to foundation model pretraining data curation
 
-5. **Investigate the toxicity reversal seriously.** This is the most interesting finding in the pilot data and currently the most under-analyzed. Why does TRAK dominate on toxicity? Understanding this could lead to a genuine contribution: task-dependent method selection criteria grounded in the information content of different scoring mechanisms.
+### Computational Budget
+| Study | Experiment Tasks | Wall-Clock |
+|---|---|---|
+| Fragility Audit | 5 | ~50 min |
+| Architecture vs. Data | 4 | ~50 min |
+| Task vs. Instance Level | 3 | ~40 min |
+| Positive Transfer | 3 | ~30 min |
+| **Total** | **15** | **~3 hrs** |
+
+---
+
+## Risk Assessment: What If I'm Wrong?
+
+### If influence functions ARE stable for VLA (my Direction 1 fails):
+- The proposal's approach is validated, and we proceed with it. My fragility audit becomes a positive validation result rather than a negative finding.
+- **Fallback**: Reframe as "Conditions for Reliable Influence Estimation in Policy Learning" -- still a useful contribution since nobody has verified this.
+
+### If data mixing DOES beat architecture (my Direction 2 fails):
+- This would be genuinely surprising and very publishable: "When Data Mixing Outperforms Parameter Isolation in Multi-Task Robot Learning."
+- **Fallback**: Identify the specific conditions (dataset heterogeneity? task similarity?) where mixing wins.
+
+### If task-level analysis IS sufficient (my Direction 3 fails):
+- Then the proposal is essentially correct and my contrarian perspective strengthened it by stress-testing.
+- **Fallback**: The instance-level analysis still provides additional signal even if task-level is sufficient.
+
+**In every case, the contrarian experiments produce publishable findings** -- either validating or falsifying the core assumptions. This is the mark of a well-designed research program.
+
+---
+
+## Summary: Three Assumptions, Three Challenges, Three Directions
+
+| # | Assumption Challenged | Counter-Evidence | Proposed Direction | Success Prob. |
+|---|---|---|---|---|
+| 1 | Influence functions work for VLA | Fragility in deep nets (Basu 2021), 0% certification (Li 2025), layer choice contradictions (Vitel 2025) | Falsification-first fragility audit | 60% |
+| 2 | Data mixing is the right lever | CORAL's LoRA isolation, PiKE's low-conflict finding, MergeVLA's parameter divergence | Architecture vs. data head-to-head | 55% |
+| 3 | Task-level is the right granularity | "It's a Match!" poor correlation, MISS non-additivity, CUPID instance-level success | Instance-level data valuation | 50% |
+
+**My strongest recommendation**: Lead with Direction 2 (architecture vs. data). This is the most devastating challenge to the proposal AND produces the most actionable insight. If architecture wins (likely), pivot the paper to: "Understanding When Shared-Model Multi-Task Learning is Worth the Complexity" -- a paper that characterizes the narrow conditions under which influence-guided data mixing outperforms simpler architectural solutions. This is a contribution the field genuinely needs.

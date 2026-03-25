@@ -1,11 +1,11 @@
 {
-  "workspace_path": "/Users/jinxulin/Research/sibyl-research-system/workspaces/CRA",
-  "workspace_scope": "CRA_31018c0eb4",
-  "project_name": "CRA",
+  "workspace_path": "/Users/jinxulin/Research/sibyl-research-system/workspaces/cross-task-influence",
+  "workspace_scope": "cross-task-influence_3d9f8acb91",
+  "project_name": "cross-task-influence",
   "session_id": "",
-  "tmux_pane": "%0",
-  "saved_at": 1773662750.2945302,
-  "ralph_prompt_path": "/Users/jinxulin/Research/sibyl-research-system/workspaces/CRA/.claude/ralph-prompt.txt",
+  "tmux_pane": "%2",
+  "saved_at": 1773671914.870424,
+  "ralph_prompt_path": "/Users/jinxulin/Research/sibyl-research-system/workspaces/cross-task-influence/.claude/ralph-prompt.txt",
   "ownership_conflict": false,
   "conflicts": []
 }

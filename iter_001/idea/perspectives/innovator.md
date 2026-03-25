@@ -1,256 +1,191 @@
-# Innovator Perspective: CRA Research Proposal
+# Innovator Perspective: Cross-Task Influence in Multi-Task VLA
 
-## Summary of Creative Angles
+## Meta-Observation
 
-I propose three unconventional angles that push the CRA framework beyond its current "diagnose + unify + benchmark" formulation. The core proposal maintains the FM1/FM2 diagnostic thesis but adds a **prescriptive, adaptive** dimension that transforms it from a retrospective analysis into a forward-looking method design principle.
+The current proposal (influence matrix + mechanism diagnosis + guided mixing) is solid but methodologically conservative -- it applies existing TDA tools (influence functions, gradient similarity) to a new domain (VLA). The core risk is that it becomes an "application paper" rather than a methods contribution. Below I propose three unconventional angles that could elevate the work from "influence functions applied to robots" to "a new framework for understanding multi-task data interactions."
 
 ---
 
-## Angle 1: Multi-Scale Attribution Telescope -- Layer-Adaptive Bilinear Attribution (LABA)
+## Angle 1: Sub-Skill Decomposition as the Natural Unit of Cross-Task Influence (Improve Existing)
 
-### The Counter-Intuitive Insight
-
-The current CRA proposal treats representation-space attribution as a monolithic operation at a fixed layer (typically last-layer or a single "best" layer). But Vitel & Chhabra (2511.04715) demonstrated that **middle attention layers** outperform both first and last layers, contradicting the prior consensus. This finding is devastating for the fixed-layer phi^T M psi framework -- it suggests that **the optimal attribution signal lives at different depths for different queries**.
+### Counter-Intuitive Claim
+**Task-level influence matrices are the wrong abstraction.** Robot manipulation tasks share sub-skills (approach, grasp, lift, place, retreat) at a much finer granularity than task labels suggest. Two tasks labeled "pick-and-place" vs. "drawer-open" may share 70% of their trajectory (approach + grasp) while conflicting only in the last 30% (lift-place vs. pull). A task-level influence score averages over these complementary dynamics and produces a misleading "mildly positive" signal that hides both strong positive transfer in shared sub-skills and strong negative transfer in divergent ones.
 
 ### Hypothesis
+**H1**: Decomposing trajectories into sub-skill segments and computing influence at the sub-skill level reveals a *block-diagonal* structure in the influence matrix -- sub-skills cluster into "transferable" and "conflicting" blocks that are invisible at the task level.
 
-**H-Innov-1**: The FM1 signal dilution severity varies across layers in a predictable, query-dependent pattern. Specifically, the effective rank r_eff(l) of layer-l gradient covariance follows a U-shaped curve (high at embedding, low at middle layers, rising again at output), and the optimal attribution layer for each query correlates with the layer where its task-specific signal-to-noise ratio peaks.
-
-### Proposed Method: LABA (Layer-Adaptive Bilinear Attribution)
-
-Instead of phi_L^T M psi_L at a fixed layer L, compute:
-
-```
-score(z_test, z_train) = sum_l w_l(z_test) * phi_l(z_test)^T M_l psi_l(z_train)
-```
-
-where w_l(z_test) are **query-adaptive layer weights** derived from each layer's local SNR estimate:
-
-```
-w_l(z_test) = softmax(SNR_l(z_test))
-SNR_l(z_test) = ||phi_l(z_test) - mean(phi_l)||^2 / var(phi_l)
-```
-
-This turns the phi^T M psi framework from a descriptive taxonomy into a **prescriptive multi-scale detector** -- a "telescope" that automatically focuses on the layer where the attribution signal is strongest.
+### Method: Temporal Influence Tomography (TIT)
+1. **Sub-skill segmentation**: Use a simple change-point detection on action velocity/gripper state to segment each trajectory into 3-5 phases (e.g., approach, contact, manipulate, retreat). Alternatively, use the VLA's attention map over time steps as a learned segmentation signal.
+2. **Phase-conditioned influence**: For each phase $p$, compute a separate influence matrix $M^{(p)}_{ij}$ using LESS-style gradient projections restricted to time steps within phase $p$. This gives us a *tensor* $\mathcal{M} \in \mathbb{R}^{T \times T \times P}$ instead of a flat matrix.
+3. **Conflict localization**: Identify which phases drive negative transfer. Prediction: "approach" phases will show near-universal positive transfer, while "manipulation" phases will show task-specific conflicts.
+4. **Phase-aware mixing**: Weight training data not uniformly per task, but per (task, phase) pair. Up-weight shared approach data from all tasks; down-weight conflicting manipulation data from interfering tasks.
 
 ### Why This Is Novel
+- STRAP (2024) does sub-trajectory *retrieval* but never computes influence at this granularity.
+- MISS (2024) proves set influence is non-additive -- our temporal decomposition is one concrete way to capture the non-additivity by showing it arises from phase-level interactions.
+- No existing work computes a *temporal influence tensor* for policy learning.
 
-- Vitel & Chhabra showed middle layers are better *on average* but did not propose query-adaptive selection
-- AirRep (2505.18513) learns a fixed encoder; LABA adapts *per-query* without training
-- The signal processing analogy: LABA is a **multi-band matched filter** where each layer is a frequency band, and the query determines which band to attend to
-
-### Experimental Plan
-
-1. **Layer SNR profile** (30 min): On Pythia-1B, compute r_eff(l) and per-query SNR_l for l in {0, 4, 8, 12, 16, 20, 24, 28, 32} across 500 DATE-LM test queries. Verify U-shaped r_eff curve.
-2. **LABA vs. fixed-layer RepSim** (30 min): Compare LABA-weighted attribution vs. last-layer, middle-layer, and oracle-layer RepSim on DATE-LM data selection (LDS).
-3. **Ablation of weighting schemes** (30 min): uniform, SNR-adaptive, attention-norm-adaptive, learned (logistic regression on layer features)
+### Experimental Plan (<=1hr per experiment)
+- **Dataset**: LIBERO-10 (10 tasks, ~50 demos each) or AgiBot World 5-task subset
+- **Model**: Small policy (ResNet-18 + MLP action head, or Qwen-0.5B LoRA adapter on a tiny VLA)
+- **Step 1** (15 min): Segment trajectories using gripper-state change points
+- **Step 2** (30 min): Compute phase-conditioned gradient features (LESS-style random projection, d=256)
+- **Step 3** (15 min): Compare task-level vs. phase-level influence matrices; measure whether phase-level reveals block structure invisible at task level
+- **Validation**: LOO at phase level -- remove all "manipulation phase" data from task B, check if task A performance on its manipulation phase improves (confirming phase-specific negative transfer)
 
 ### Computational Cost
+- Gradient computation: ~20 min for 500 trajectories x 5 tasks on single A6000
+- Influence scoring: ~10 min (LESS random projection is O(nd) per sample)
+- Total pilot: ~45 min
 
-- Total: ~1.5 hours on 1x RTX 4090
-- Storage: 9 layers x 2048-dim representations for ~10K training points = ~150 MB
-- No model retraining required
+### Success Probability: 65%
+### Failure Modes
+- Change-point segmentation may not align with meaningful sub-skill boundaries
+- Phase-level influence may be too noisy with small data
+- The block-diagonal structure may not emerge if tasks are too similar
+
+### Key References
+- STRAP (arXiv 2412.15182): sub-trajectory retrieval for cross-task sharing
+- MISS (arXiv 2409.18153): set influence non-additivity
+- LESS (arXiv 2402.04333): gradient projection for efficient influence
+- Influence Dynamics (arXiv 2510.12071): stagewise data attribution with sign flips
+
+---
+
+## Angle 2: Higher-Order Task Interactions via Combinatorial Influence (Cross-Domain Transfer)
+
+### Counter-Intuitive Claim
+**Pairwise task affinity is provably insufficient.** Li et al. (2023, arXiv 2306.14009) showed that higher-order task affinities predict negative transfer more accurately than pairwise measures in graph tasks. "It's a Match!" (2023) demonstrated that simple pairwise affinity scores correlate poorly with actual MTL performance. The reason: negative transfer often requires a *coalition* -- task C alone doesn't hurt task A, but tasks B+C together create a conflicting gradient subspace that harms A. This coalition effect is exactly what MISS (2024) formalizes as non-additive set influence.
+
+### Hypothesis
+**H2**: In VLA multi-task training, the dominant negative transfer events are driven by *coalitions* of 2-3 interfering tasks, not by single pairwise conflicts. A higher-order influence tensor $\mathcal{I}_{ij|S}$ (influence of task $i$ on task $j$ in the presence of task set $S$) will reveal "toxic coalitions" invisible to pairwise analysis.
+
+### Method: Coalition Influence Probing (CIP)
+1. **Efficient higher-order estimation**: Instead of training $2^T$ models, use the Grad-TAG linearization trick (arXiv 2409.06091) -- train one base model on all tasks, then estimate the loss for any task subset via gradient-based linear approximation. Cost: one training run + O(T^2) gradient inner products.
+2. **Coalition discovery**: For each target task $j$, compute $\Delta_S(j) = L_j(\theta_{-S}) - L_j(\theta_{all})$ for all subsets $S$ of size 1, 2, 3. Identify "toxic coalitions" where $\Delta_S(j)$ is large but $\sum_{i \in S} \Delta_{\{i\}}(j)$ is small (super-additive harm).
+3. **Shapley-like decomposition**: Use the one-sample-fits-all framework (arXiv 2410.23808) to efficiently compute Shapley values for each task's contribution to every other task's performance.
+4. **Coalition-aware mixing**: Design a data mixing strategy that breaks toxic coalitions by never co-training conflicting task groups at full weight simultaneously. This is a constrained optimization: maximize total performance subject to coalition toxicity constraints.
+
+### Why This Is Novel
+- Grad-TAG (2024) computes pairwise and higher-order affinity but only for classification tasks on graphs, never for sequential policy learning.
+- Li et al. (2023) proved higher-order affinity outperforms pairwise for task grouping, but this has never been applied to robotics.
+- The "toxic coalition" concept and coalition-aware mixing strategy are entirely new.
+
+### Experimental Plan (<=1hr per experiment)
+- **Dataset**: LIBERO-10 or Meta-World MT10
+- **Model**: Small MLP policy or tiny LoRA VLA
+- **Step 1** (20 min): Train base model on all 10 tasks
+- **Step 2** (20 min): Compute Grad-TAG linearized loss estimates for all $\binom{10}{1} + \binom{10}{2} + \binom{10}{3} = 175$ subsets
+- **Step 3** (20 min): Identify super-additive harm coalitions; validate top-3 by actual LOO retraining
+- **Metric**: Correlation between predicted and actual LOO performance for subsets of size 2-3
+
+### Computational Cost
+- Base training: ~15 min on A6000
+- Gradient features: ~5 min (Grad-TAG uses d=128 random projection)
+- Subset evaluation: ~20 min (175 linear regressions)
+- Validation retraining (top-3): ~15 min
+- Total: ~55 min
+
+### Success Probability: 50%
+### Failure Modes
+- Linearization may be inaccurate for policy networks (non-convex loss landscape)
+- With only 10 tasks, higher-order effects may be weak
+- Computational cost scales as $O(T^3)$ for triplets, limiting scalability beyond ~20 tasks
+
+### Key References
+- Li et al. (arXiv 2306.14009): higher-order task affinities via spectral clustering
+- Grad-TAG (arXiv 2409.06091): gradient-based task affinity estimation at 3% FLOPs
+- MISS (arXiv 2409.18153): non-additive set influence
+- "It's a Match!" (arXiv 2301.02873): pairwise affinity scores are unreliable
+- One-for-all Shapley (arXiv 2410.23808): efficient probabilistic value estimation
+
+---
+
+## Angle 3: Representation Fingerprinting -- Influence Without Gradients (New Method)
+
+### Counter-Intuitive Claim
+**You don't need gradients or influence functions to build a task interaction map.** Gradient-based methods (IF, LESS, Grad-TAG) are computationally expensive and fragile for large models. The VITA project already proved that frozen-backbone gradients carry no task-discriminative signal. But there's a simpler signal hiding in plain sight: **the representation geometry itself encodes task compatibility.**
+
+If two tasks induce similar feature subspaces (measured by CKA, linear probes, or attention patterns), their data is likely to transfer positively. If they induce *orthogonal* but non-conflicting subspaces, they're independent. If they compete for the *same* feature dimensions with *different* optimal directions, they conflict. This geometric view is gradient-free, works on frozen or fine-tuned models, and scales trivially.
+
+### Hypothesis
+**H3**: A representation-based task interaction score, computed from CKA similarity of layer-wise activations conditioned on task identity, predicts actual multi-task performance changes with higher fidelity than gradient-based affinity scores (Grad-TAG, ETAP), at 10x lower computational cost.
+
+### Method: Representation Fingerprinting (RepFinger)
+1. **Task-conditioned feature extraction**: For each task $i$, collect activations $\{h^{(l)}_i\}$ at every layer $l$ of the VLA on task $i$'s validation data.
+2. **Layer-wise CKA matrix**: Compute CKA$(h^{(l)}_i, h^{(l)}_j)$ for all task pairs $(i,j)$ at each layer $l$. This gives a 3D tensor $\mathcal{C} \in \mathbb{R}^{T \times T \times L}$.
+3. **Conflict detection via directional analysis**: For task pairs with high CKA (shared subspace), check if the *linear readout directions* agree. Fit a linear probe $W_i$ for task $i$'s action prediction from layer $l$ features. Compute $\cos(W_i, W_j)$. High CKA + low cosine(W_i, W_j) = representation conflict (same features, different readouts). This is the precise mechanism behind negative transfer.
+4. **RepFinger score**: $RF_{ij} = \sum_l \alpha_l \cdot \text{CKA}^{(l)}_{ij} \cdot \text{sign}(\cos(W^{(l)}_i, W^{(l)}_j))$ where $\alpha_l$ is a layer importance weight (learned or uniform).
+5. **Downstream application**: Use RF scores as drop-in replacement for influence scores in data mixing optimization.
+
+### Why This Is Novel
+- AirRep (arXiv 2505.18513, NeurIPS 2025) uses representation-based TDA but only for single-task data valuation, not cross-task interaction.
+- Rep-MTL (arXiv 2507.21049) analyzes representation-level task saliency but for dense prediction, not policy learning, and doesn't combine CKA with directional conflict detection.
+- SGW-based MTL (arXiv 2410.03778) uses information bottleneck to reduce inter-task interference but doesn't provide a diagnostic tool.
+- The CKA + linear probe direction combination is a new diagnostic that directly operationalizes "representation conflict" -- the mechanism most cited but never precisely measured.
+- Hiratani (arXiv 2405.20236) analytically showed that high input feature similarity + low readout similarity is catastrophic for transfer. RepFinger is the *empirical operationalization* of this theoretical insight.
+
+### Experimental Plan (<=1hr per experiment)
+- **Dataset**: LIBERO-10 or AgiBot World 5-task subset
+- **Model**: Pre-trained OpenVLA-7B (frozen, just extract features) or a trained small policy
+- **Step 1** (15 min): Forward pass all validation data through the model, cache activations at 4-6 layers
+- **Step 2** (10 min): Compute CKA matrices (mini-batch CKA, O(batch^2) per layer)
+- **Step 3** (10 min): Fit linear probes per task per layer; compute readout direction cosines
+- **Step 4** (10 min): Compute RepFinger scores
+- **Step 5** (15 min): Validate against actual LOO performance (use cached results from Angle 1/2 or quick 5-task LOO)
+- **Metric**: Spearman correlation between RepFinger scores and actual task-pair influence
+
+### Computational Cost
+- Feature extraction: ~10 min (single forward pass, no backprop)
+- CKA computation: ~5 min
+- Linear probes: ~10 min (simple least squares)
+- Total: ~30 min, **no gradient computation needed**
 
 ### Success Probability: 55%
-
-**Risk**: If representation covariance is approximately isotropic at ALL layers (H9 holds uniformly), then w_l will be nearly uniform and LABA degenerates to ensemble averaging with no query-adaptive benefit. Mitigation: even uniform multi-layer averaging may outperform single-layer by ~2-3pp through variance reduction (an acceptable fallback finding).
-
 ### Failure Modes
+- CKA may not capture fine-grained differences relevant to policy performance
+- Linear probes may be too simple to capture the action space conflict (robot actions are high-dimensional and multimodal)
+- The method may only work well for frozen backbones (where representations are stable) but poorly for LoRA-tuned models (where representations shift)
 
-- Layer representations may be highly correlated (consecutive layers differ by small residuals), making multi-layer combination redundant
-- SNR estimation from finite samples may be noisy, especially for rare query types
-- If the U-shaped r_eff curve does not hold, the theoretical motivation collapses
-
----
-
-## Angle 2: Causal Attribution via Temporal Contrastive Learning (CATCL) -- Exploiting Checkpoint Trajectories
-
-### The Cross-Domain Transfer
-
-The current CRA proposal treats FM2 (common influence contamination) as a static bias to be subtracted. But in causal inference, the gold standard for removing confounders is **Difference-in-Differences (DiD)**, which exploits temporal variation. Modern LLM training produces a trajectory of checkpoints -- this temporal structure is an untapped goldmine for attribution.
-
-The cross-domain insight comes from **econometrics**: just as DiD uses pre/post treatment variation to remove time-invariant confounders, we can use pre/post fine-tuning checkpoint differences to remove pre-training knowledge contamination (FM2) mechanistically rather than statistically.
-
-### Hypothesis
-
-**H-Innov-2**: Temporal contrastive attribution, defined as:
-
-```
-score_DiD(z_test, z_train) = [phi_post(z_test) - phi_pre(z_test)]^T [psi_post(z_train) - psi_pre(z_train)]
-```
-
-where phi_pre, phi_post are representations from pre-trained and fine-tuned checkpoints respectively, will:
-(a) Eliminate FM2 contamination without requiring explicit mean-subtraction heuristics
-(b) Outperform standard contrastive scoring (mean-subtraction) by >=3pp on DATE-LM factual attribution
-(c) Satisfy the "parallel trends" assumption: pre-training representation drift is approximately uniform across training examples
-
-### Why This Is Novel
-
-- DDA (2410.01285) uses debias scoring but as an ad-hoc mean subtraction, not grounded in causal econometrics
-- In-the-Wild (2602.11079) uses activation differences but only for DPO preference pairs, not general attribution
-- RepT (2510.02334) uses gradient-based tracking through training but not the checkpoint-difference formulation
-- No existing work frames TDA deconfounding as a proper DiD estimator with testable parallel trends
-
-### The phi^T M psi Integration
-
-CATCL is a natural instantiation of the bilinear framework:
-
-```
-phi(z) = phi_post(z) - phi_pre(z)     (temporal difference feature map)
-psi(z) = psi_post(z) - psi_pre(z)     (temporal difference feature map)
-M = I                                   (identity -- FM2 already removed by differencing)
-```
-
-This provides the bilinear framework with **causal interpretation**: M=I works because temporal differencing has already removed the structured confounding that M=Sigma_noise^{-1} was designed to address. This is a testable prediction: whitened CATCL (M != I) should NOT outperform standard CATCL (M=I), whereas whitened RepSim SHOULD outperform standard RepSim.
-
-### Experimental Plan
-
-1. **Checkpoint extraction** (15 min): Save Pythia-1B representations at pre-training checkpoint and after fine-tuning on DATE-LM training set. Both representations needed anyway for baseline experiments.
-2. **Parallel trends test** (15 min): For 1000 training examples, compute ||phi_post - phi_pre|| variance across examples. If CV (coefficient of variation) < 0.5, parallel trends approximately holds.
-3. **CATCL vs. RepSim vs. DDA** (30 min): Head-to-head comparison on DATE-LM factual attribution (P@K) and data selection (LDS).
-4. **Whitening ablation** (30 min): Verify prediction that whitening improves RepSim but not CATCL.
-
-### Computational Cost
-
-- Total: ~1.5 hours on 1x RTX 4090
-- Requires access to pre-trained Pythia-1B checkpoint (publicly available on HuggingFace)
-- Storage: 2x representation matrices (pre + post) = ~160 MB
-
-### Success Probability: 45%
-
-**Risk**: The parallel trends assumption may fail badly -- pre-training representations drift non-uniformly, especially for in-distribution vs. out-of-distribution training examples. Mitigation: report DiD with reweighting (IPW-DiD) as a robustness check. Even if CATCL doesn't beat mean-subtraction, the causal framing provides theoretical grounding for WHY mean-subtraction works.
-
-### Failure Modes
-
-- Fine-tuning may not change representations enough for the difference signal to dominate noise (especially for Pythia-1B with limited fine-tuning)
-- Parallel trends violation could introduce new biases worse than FM2
-- The pre-trained checkpoint may encode domain-specific structure that gets removed by differencing, accidentally discarding useful attribution signal
+### Key References
+- AirRep (arXiv 2505.18513): representation-based TDA
+- Hiratani (arXiv 2405.20236): theoretical analysis of feature similarity vs. readout similarity in transfer
+- Rep-MTL (arXiv 2507.21049): representation-level task saliency
+- CKA (Kornblith et al., ICML 2019): centered kernel alignment for representation comparison
 
 ---
 
-## Angle 3: The Attribution Uncertainty Principle -- FM1 and FM2 Are Conjugate (New Theoretical Framework)
+## Recommended Synthesis: The Three Angles Are Complementary
 
-### The Boldest Claim
+The three angles attack different limitations of the baseline proposal:
 
-The current CRA proposal treats FM1 (signal dilution) and FM2 (common influence contamination) as **independent, orthogonal** defects with H3 testing their additivity. I propose a more radical theoretical claim: FM1 and FM2 are **conjugate** in the sense of the uncertainty principle -- they represent complementary views of the same underlying information bottleneck.
+| Angle | Limitation Addressed | Key Innovation | Risk Level |
+|-------|---------------------|---------------|------------|
+| 1. Temporal Influence Tomography | Task-level averaging hides phase-specific dynamics | Influence *tensor* over (task, task, phase) | Medium |
+| 2. Coalition Influence Probing | Pairwise affinity misses higher-order interactions | Toxic coalition discovery + coalition-aware mixing | High |
+| 3. Representation Fingerprinting | Gradient-based methods are expensive and fragile | Gradient-free geometric diagnostic | Medium |
 
-### The Theoretical Argument
+**My strongest recommendation**: Lead with **Angle 3 (RepFinger)** as the primary diagnostic tool -- it's cheap, novel, and directly operationalizes the "representation conflict" mechanism that every paper cites but nobody measures. Use **Angle 1 (TIT)** as the temporal refinement that makes influence analysis actionable for robot manipulation specifically. Keep **Angle 2 (CIP)** as a theoretical contribution/analysis tool rather than the main method, since its computational scaling is limited.
 
-Consider the attribution score as a detection problem. The test statistic is:
+**Proposed narrative**: "We first diagnose cross-task interactions using RepFinger (fast, gradient-free), then localize conflicts to specific trajectory phases using TIT (temporal precision), and validate that the discovered interactions are non-additive using CIP (theoretical grounding). Together, these three tools form a *multi-resolution diagnostic framework* for understanding data interactions in multi-task VLA training."
 
-```
-T(z_test, z_train) = phi(z_test)^T M psi(z_train)
-```
-
-There are two noise sources:
-- **FM1 noise**: high-dimensional projection noise (random directions in R^B dominate signal)
-- **FM2 noise**: structured bias (pre-training knowledge creates correlated background)
-
-The key insight from signal processing: **dimension reduction (fixing FM1) amplifies structured bias (worsening FM2), while bias removal (fixing FM2) increases variance (worsening FM1)**. This is exactly the bias-variance tradeoff recast in signal processing language.
-
-Formally, for any linear attribution method in the phi^T M psi family:
-
-```
-MSE(T) = Bias^2(T) + Var(T)
-       = [FM2 severity]^2 + [FM1 severity]
-```
-
-where:
-- FM1 severity = trace(M * Sigma_noise) / ||phi_signal||^2  (variance term, grows with dimension)
-- FM2 severity = phi_shared^T M phi_shared / ||phi_task||^2  (bias term, structured)
-
-The "uncertainty principle" states:
-
-```
-FM1_severity * FM2_severity >= C * ||phi_signal||^2 / ||phi_total||^2
-```
-
-This lower bound means you cannot simultaneously minimize both FM1 and FM2 without improving the underlying signal strength (phi_signal). The optimal tradeoff is achieved by M = Sigma_total^{-1} (the Wiener filter), which is exactly the whitened matched filter proposed in the original CRA paper -- but now with a **fundamental optimality guarantee** rather than a heuristic motivation.
-
-### Why This Is Novel and Counter-Intuitive
-
-- The original CRA proposal predicts FM1 and FM2 are **approximately additive** (H3)
-- The conjugate hypothesis predicts **sub-additivity** -- fixing both simultaneously should yield less than the sum of individual fixes
-- This reframes the 2x2 factorial result: a negative interaction term is not a failure of orthogonality, but evidence of conjugacy
-- It provides a **fundamental lower bound** on attribution error for any linear method, similar to the Cramer-Rao bound in estimation theory
-
-### Testable Predictions
-
-**H-Innov-3a**: The 2x2 factorial interaction term is **negative** (sub-additive) on at least 2/3 DATE-LM tasks. This is the opposite of what a "synergistic" interaction would predict.
-
-**H-Innov-3b**: The whitened matched filter (M = Sigma_noise^{-1}) achieves the lowest MSE among all M choices in the phi^T M psi family, and its improvement over M=I is larger when FM1 and FM2 severities are more balanced (neither dominates).
-
-**H-Innov-3c**: For fixed representation dimension d, there exists an optimal contrastive strength alpha* (interpolating between standard and fully contrastive scoring) that minimizes MSE. Neither alpha=0 (no contrastive) nor alpha=1 (full contrastive) is optimal -- the optimum lies at 0 < alpha* < 1.
-
-### Experimental Plan
-
-1. **Interaction sign test** (0 min, reuses 2x2 factorial data): Check sign of interaction term in 2x2 ANOVA. If negative on >=2/3 tasks, supports conjugacy over independence.
-2. **FM1/FM2 severity measurement** (30 min): For each DATE-LM task, directly compute FM1 severity (trace ratio) and FM2 severity (bias ratio) at each layer. Plot FM1 vs FM2 tradeoff curve.
-3. **Contrastive strength sweep** (45 min): Sweep alpha in {0, 0.1, 0.2, ..., 1.0} for RepSim on all 3 DATE-LM tasks. Check whether optimal alpha is interior (supports conjugacy) or boundary (supports independence).
-4. **Wiener filter attribution** (30 min): Compute M = Sigma_total^{-1} (Ledoit-Wolf regularized). Compare with M=I and M=Sigma_noise^{-1}. If Wiener filter is optimal, supports the MSE decomposition.
-
-### Computational Cost
-
-- Total: ~1.75 hours on 1x RTX 4090 (much of it reuses factorial experiment data)
-- Additional storage: covariance matrices at multiple regularization strengths
-
-### Success Probability: 35%
-
-**Risk**: The FM1/FM2 interaction may genuinely be near-zero (truly independent), in which case the conjugacy framework is wrong but the original orthogonality claim is strengthened. This is a "win either way" situation for the paper.
-
-### Failure Modes
-
-- The bias-variance decomposition may not cleanly separate into FM1/FM2 components in practice
-- The uncertainty bound may be too loose to be informative (C may be very small)
-- Contrastive strength sweep may show monotonic improvement (alpha*=1 is optimal), refuting the interior optimum prediction
-- Sigma_total estimation may be too noisy for Wiener filter to outperform ridge-regularized alternatives
+This framing elevates the paper from "influence functions for robots" to "a new diagnostic framework for multi-task policy learning" -- a much stronger contribution.
 
 ---
 
-## Synthesis: How These Angles Strengthen the Core CRA Paper
+## Risk Assessment and Plan B
 
-### Integration Strategy
+**If all three angles produce weak signals** (no clear negative transfer, no phase structure, no coalition effects):
+- This itself is a publishable finding: "Negative transfer in VLA training is weaker than assumed; the real bottleneck is capacity, not interference." This would directly challenge CORAL's premise and reframe the field.
+- Pivot to: "Positive Transfer Cartography" -- map which tasks actively help each other and design *amplification* strategies rather than *mitigation* strategies.
 
-The three angles are ordered by risk and novelty:
-1. **LABA (Angle 1)**: Low risk, immediate practical payoff. Extends phi^T M psi to multi-layer, adds query-adaptive capability. Easy to integrate as "Section 5.1: Multi-Scale Extensions."
-2. **CATCL (Angle 2)**: Medium risk, strong theoretical novelty. Provides causal grounding for FM2 correction. Integrates as "Section 4.3: Causal Interpretation of Contrastive Attribution."
-3. **Conjugacy (Angle 3)**: High risk, potentially transformative. Replaces "orthogonal defects" with "conjugate tradeoff." If validated, upgrades the theoretical contribution from taxonomy to fundamental bound.
+**If gradient-based methods fail (VITA redux)**:
+- RepFinger (Angle 3) is the safety net -- it requires no gradients at all.
+- If even representation geometry shows no task-discriminative signal, the model likely suffers from "information collapse" (LangForce, 2026), and the right intervention is architectural, not data-level.
 
-### Recommended Priority
+## Additional Literature Found During Search
 
-**If the 2x2 factorial shows near-zero interaction (H3 holds)**: Lead with Angle 1 (LABA) as the practical extension, mention Angle 2 as theoretical grounding for FM2, treat conjugacy as "discussion" material.
-
-**If the 2x2 factorial shows negative interaction (H3 partially fails)**: This is actually the more exciting outcome. Lead with Angle 3 (Conjugacy) as the theoretical framework, use Angle 2 (CATCL) to demonstrate the optimal tradeoff, and Angle 1 (LABA) as practical mitigation.
-
-### Total Additional Experimental Budget
-
-- Angle 1: 1.5 GPU-hours
-- Angle 2: 1.5 GPU-hours
-- Angle 3: 1.75 GPU-hours (partially overlapping with core experiments)
-- **Total**: ~4 GPU-hours incremental beyond core experiments
-- All experiments fit within the 1-hour-per-task constraint when parallelized across 4x RTX 4090
-
----
-
-## Key References Integrated
-
-- Vitel & Chhabra (2511.04715): Layer selection for influence estimation -- middle layers better than first/last, contradicts prior consensus. Directly motivates Angle 1 (LABA).
-- AirRep / Sun et al. (2505.18513): Learned representations for attribution -- shows representation optimization is viable. LABA extends this with per-query adaptation without training.
-- IF-GUIDE / Coalson et al. (2506.01790): Token-level attribution for toxicity -- shows fine-grained attribution beyond sample-level. Tangential but validates representation-space methods for safety applications.
-- In-the-Wild / Xiao & Aranguri (2602.11079): Activation-difference vectors for DPO attribution -- partial precedent for temporal contrastive (Angle 2), but limited to DPO setting without DiD formalization.
-- DATE-LM / Jiao et al. (2507.09424): Standard benchmark confirming "no single method dominates" -- supports the need for adaptive (Angle 1) and theoretically grounded (Angle 3) approaches.
-- Scalable Forward-Only Attribution / Ma & Nyarko (2511.19803): Forward-only inference for attribution -- orthogonal efficiency improvement compatible with all three angles.
-- Hyperparameter Sensitivity / Wang et al. (2505.24261): Shows attribution methods are sensitive to hyperparameters, especially regularization -- supports Angle 3's claim that optimal M (regularization) depends on FM1/FM2 balance.
-- Data Kernel Perspective Space (2602.05106): Kernel-theoretic framework for training data -- provides complementary mathematical language for the phi^T M psi bilinear structure.
-
----
-
-## Risk Assessment Summary
-
-| Angle | Novelty | Risk | P(success) | Fallback Value |
-|-------|---------|------|------------|---------------|
-| 1. LABA | Medium-High | Low | 55% | Even uniform multi-layer averages likely improve by ~2pp |
-| 2. CATCL | High | Medium | 45% | Causal framing of mean-subtraction is valuable even if DiD doesn't beat it |
-| 3. Conjugacy | Very High | High | 35% | Negative result (true independence) strengthens original H3 claim |
-
-**Expected value calculation**: At least one angle succeeds with P = 1 - (0.45)(0.55)(0.65) = 83.9%. The paper gains at least one novel extension with high probability.
+- **AC-ODM** (arXiv 2505.23878): Actor-critic based online data mixing for LLM pre-training, captures intra-domain interactions with reward function. Could inspire an online/adaptive version of our influence-guided mixing.
+- **DGA** (arXiv 2410.02498): Dynamic Gradient Alignment for online data mixing, scalable gradient alignment with minimal overhead. Relevant as a baseline for our mixing optimization.
+- **Datamodel Matching for Unlearning** (arXiv 2410.23232): Uses datamodels to predict counterfactual model outputs. The "predict output without subset" idea maps directly to our task LOO setting.
+- **D3M** (arXiv 2406.16846): Data debiasing via datamodels -- isolates specific training examples driving failures. Analogous to our goal of isolating task data driving negative transfer.

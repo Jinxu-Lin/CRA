@@ -2,104 +2,65 @@
   "candidates": [
     {
       "candidate_id": "cand_a",
-      "title": "CRA: FM1 Spectral Diagnosis + Systematic Benchmark + Task-Type Boundary",
+      "title": "Multi-Resolution Diagnostic Framework (BCS + GPTA + LP Mixing)",
       "status": "front_runner",
-      "summary": "Lead with empirical contributions: (1) First direct measurement of gradient covariance effective rank at LLM scale showing r_eff << d << B; (2) First systematic 2x2 factorial on DATE-LM with both rank and continuous metrics; (3) Task-type boundary discovery (semantic vs behavioral attribution); (4) phi^T M psi as organizational taxonomy. FM2 validation and PCA whitening as conditional extensions depending on Priority 1 and 5 outcomes.",
-      "hypotheses": [
-        "H1: RepSim > TRAK on semantic tasks (+15pp counterfact, +10pp ftrace); reversed on toxicity",
-        "H4-rev: Gradient r_eff in O(10-100), confirming extreme signal concentration",
-        "H5-rev: TRAK saturates at k << d (around d/8 to d/4)",
-        "H10: 30.8pp TRAK-PCA gap decomposes into layer mixing + cosine normalization + semantic features",
-        "H11: Controlled FM2 injection degrades performance; contrastive scoring recovers it",
-        "H2-rev: Continuous metrics detect FM2 asymmetry (param > rep improvement)",
-        "H7-rev: PCA-reduced whitening outperforms M=I at k=64-128 where N/k >> 40"
+      "summary": "Three-level diagnostic: gradient-free BCS for fast screening, gradient-based GPTA for precise quantification, and influence-linearized minimax LP for optimal mixing. Falsification-first experimental design with C-LOTO ground truth, pre-registered thresholds, architecture-vs-data ablation, and OOD generalization test.",
+      "hypotheses": ["H1: Existence of negative transfer", "H2: Proxy reliability (rho > 0.6)", "H3: BCS mechanism detection", "H4: Mixing effectiveness (>=5% improvement)"],
+      "pilot_focus": "Quick LOO on 5 LIBERO tasks to detect negative transfer signal; BCS computation and visualization; GPTA vs. 5 LOO correlation check",
+      "key_strengths": [
+        "Multi-resolution design covers fast/cheap to precise/actionable",
+        "Falsification-first methodology makes every outcome publishable",
+        "Architecture ablation addresses contrarian's strongest objection",
+        "Formal theory (spectral interaction theorem, minimax optimality) elevates beyond application paper"
       ],
-      "pilot_focus": "Pilot complete. All 14 tasks executed. FM1 strongly supported, FM2 untested, H7/H9 failed at pilot scale. Ready for full-scale.",
       "key_risks": [
-        "Retrieval models match RepSim -> reposition as attribution-vs-retrieval boundary paper",
-        "FM2 undetectable even with continuous metrics -> narrow to FM1-only + benchmark paper",
-        "PCA whitening fails at all k -> framework is taxonomic not prescriptive",
-        "30.8pp gap doesn't decompose -> 'feature quality not dimensionality' dominates"
+        "LIBERO-10 may lack strong negative transfer (35% probability)",
+        "Gradient-based proxies may be fragile for policy networks (30%)",
+        "Per-task LoRA may dominate data mixing (45%)"
       ],
-      "estimated_compute": "24 GPU-hours total (~7.5h wall-clock on 4x RTX 4090)",
-      "evidence_status": {
-        "fm1_spectral": "strong (pilot confirmed, needs full-scale replication)",
-        "fm2_contamination": "untested (evaluation protocol failed, redesigned)",
-        "task_type_boundary": "strong (toxicity reversal systematic)",
-        "whitened_attribution": "failed at pilot scale, PCA reduction planned",
-        "framework_predictive": "weak (3/3 distinctive predictions failed or trivial)"
-      }
+      "estimated_total_hours": 14
     },
     {
       "candidate_id": "cand_b",
-      "title": "Hessian Quality Diagnosis Paper",
-      "status": "dropped",
-      "summary": "K-FAC IF control experiment (H6) confirmed: RepSim > K-FAC IF by 17.4pp on counterfact. FM1 is independent of Hessian quality. This pivot path is closed.",
-      "drop_reason": "H6 confirmed at pilot scale. Even with high-quality Hessian (K-FAC full eigendecomp), parameter-space IF still fails vs RepSim by large margin.",
-      "hypotheses": [],
-      "pilot_focus": "Complete (dropped)",
-      "key_risks": [],
-      "estimated_compute": "0"
+      "title": "Positive Transfer Cartography + Foundation Demonstrations",
+      "status": "backup",
+      "summary": "Map the positive transfer landscape in multi-task VLA. Identify 'universal-positive' demonstrations that improve all tasks simultaneously. Curate a minimal demonstration set that provides strong initialization for any downstream task. Directly connects to AgiBot World diversity findings.",
+      "hypotheses": ["Positive transfer is stronger and more common than negative transfer", "A curated 30% subset of demonstrations matches full-data training", "Single-embodiment advantage explained by positive transfer structure"],
+      "pilot_focus": "After computing influence matrix, check ratio of positive vs. negative entries. If positive dominates, pivot here.",
+      "key_strengths": [
+        "Novel and practically useful framing",
+        "Robust to negative-transfer-is-weak scenario",
+        "Connects to hot topic (data curation for foundation models)"
+      ],
+      "key_risks": [
+        "Less novelty if CUPID/SCIZOR already covers instance-level curation",
+        "May require larger-scale experiments for convincing results"
+      ],
+      "estimated_total_hours": 15
     },
     {
       "candidate_id": "cand_c",
-      "title": "Matched Filter Theory for Optimal Data Attribution",
+      "title": "Architecture vs. Data: When Does Shared Multi-Task Learning Pay Off?",
       "status": "backup",
-      "summary": "If PCA-reduced whitened attribution (H7-revised) succeeds at full scale (+3pp or more), elevate the signal processing theory to a primary contribution. Derive optimal M from detection theory, provide per-query SNR reliability estimates.",
-      "hypotheses": [
-        "H7-rev: PCA-whitened RepSim outperforms standard RepSim by 3-5pp at k=64-128",
-        "Per-query SNR_out predicts attribution accuracy (r > 0.3, pilot showed r=0.34)",
-        "Whitening improvement correlates with representation anisotropy (Prop 2.2)"
+      "summary": "Systematic empirical study comparing shared-model training with influence-guided mixing vs. per-task LoRA isolation across axes of task similarity, model capacity, and number of tasks. Provides a practitioner decision tree.",
+      "hypotheses": ["H5: Per-task LoRA beats shared model for known tasks", "Shared model wins only for open-vocabulary generalization", "Crossover point exists at a specific task-similarity threshold"],
+      "pilot_focus": "Quick comparison of shared model vs. per-task LoRA on 2-3 tasks from Phase 3 architecture ablation.",
+      "key_strengths": [
+        "Addresses the most devastating contrarian challenge",
+        "Highly practical -- gives practitioners clear guidance",
+        "Publishable regardless of outcome"
       ],
-      "pilot_focus": "PCA whitening at full scale (Priority 5 experiment)",
       "key_risks": [
-        "Covariance estimation still marginal even with PCA reduction",
-        "SNR correlation may not generalize beyond pilot",
-        "Narrower scope than cand_a if FM1 spectral evidence is the stronger story"
+        "May be seen as 'just an ablation study' without enough novelty",
+        "Regime boundaries may be fuzzy rather than sharp"
       ],
-      "estimated_compute": "3.5 GPU-hours (incremental over cand_a)",
-      "promotion_criteria": "PCA-whitened attribution at any k outperforms RepSim by >= 5pp on >= 2 tasks"
-    },
-    {
-      "candidate_id": "cand_d",
-      "title": "Attribution vs Retrieval: When Does Model-Internal Information Matter?",
-      "status": "backup",
-      "summary": "If retrieval baselines (Contriever/GTR) match RepSim on semantic tasks, the paper pivots to characterizing the boundary between attribution (model-internal) and retrieval (model-external) quality. Toxicity reversal becomes the anchor: it is the clearest case where model-internal gradient information provides genuine attribution signal that retrieval cannot capture.",
-      "hypotheses": [
-        "H8-rev: Retrieval models match RepSim on counterfact/ftrace but fail on toxicity",
-        "Gradient norm directly correlates with toxicity (behavioral signal)",
-        "Semantic similarity is necessary but not sufficient for attribution on behavioral tasks"
-      ],
-      "pilot_focus": "Retrieval baseline comparison (Priority 3 experiment)",
-      "key_risks": [
-        "May be seen as a negative result paper rather than a contribution",
-        "Toxicity reversal alone may be insufficient for a full paper"
-      ],
-      "estimated_compute": "2.5 GPU-hours (incremental over cand_a)",
-      "promotion_criteria": "Contriever/GTR < 3pp gap with RepSim on 2+ tasks"
+      "estimated_total_hours": 8
     }
   ],
-  "decision_criteria": {
-    "promote_cand_c": "PCA-whitened attribution at any k outperforms RepSim by >= 5pp on >= 2 tasks",
-    "promote_cand_d": "Contriever/GTR achieves < 3pp gap with RepSim on 2+ tasks",
-    "drop_cand_c": "PCA-whitened attribution fails to outperform RepSim by >= 3pp at any k on any task",
-    "drop_cand_d": "RepSim > Contriever/GTR by >= 10pp on 2+ tasks (attribution clearly differs from retrieval)"
-  },
-  "metadata": {
-    "iteration": 1,
-    "date": "2026-03-17",
-    "source_perspectives": ["innovator", "pragmatist", "theoretical", "contrarian", "interdisciplinary", "empiricist"],
-    "debate_rounds_completed": 4,
-    "pilot_completed": true,
-    "pilot_summary": "GO with narrative revisions. FM1 strongly supported (r_eff=10, spectral concentration). FM2 untested (eval protocol failure). H7 failed (N/d=0.049). H9 falsified (direction reversed). Toxicity reversal defines task-type boundary.",
-    "synthesizer_reasoning": "Front-runner restructured from theory-first to evidence-first approach based on pilot outcomes. Key shifts: (1) FM1 spectral diagnosis is the strongest empirical pillar -- lead with it. (2) FM2 needs causal validation via controlled injection before any claims. (3) phi^T M psi is taxonomic until H7-revised succeeds at full scale. (4) Task-type boundary (toxicity reversal) is a genuine new contribution, not a failure. (5) Contrarian's 'RepSim is retrieval' challenge must be addressed via retrieval baselines before claiming attribution quality. Empiricist (9.0), Pragmatist (8.5), and Contrarian (8.5) weighted most heavily due to superior pilot evidence interpretation.",
-    "perspective_weights": {
-      "empiricist": 9.0,
-      "pragmatist": 8.5,
-      "contrarian": 8.5,
-      "theoretical": 7.0,
-      "innovator": 6.5,
-      "interdisciplinary": 6.5
-    }
+  "dropped": [],
+  "meta": {
+    "iteration": 0,
+    "synthesized_from": ["innovator", "pragmatist", "theoretical", "contrarian", "interdisciplinary", "empiricist"],
+    "decision_rationale": "Front-runner (cand_a) synthesizes the strongest elements from all 6 perspectives: innovator's multi-resolution insight, pragmatist's BCS/GPTA methods, theorist's formal guarantees, contrarian's falsification-first design, interdisciplinary's ecological stability analysis, and empiricist's rigorous experimental protocol. Backups cover the two most likely failure modes: negative transfer is weak (cand_b) or architecture dominates data mixing (cand_c). No candidates dropped at this stage -- all three are viable and produce publishable results."
   }
 }

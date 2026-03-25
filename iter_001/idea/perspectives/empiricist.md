@@ -1,425 +1,375 @@
-# Empiricist Perspective: CRA Research Proposal
+# Empiricist Perspective: Cross-Task Influence in Multi-Task VLA
 
-## Executive Summary
+## Evaluation Through an Experimentalist's Lens
 
-The CRA proposal aims to diagnose two signal processing defects (FM1: signal dilution; FM2: common influence contamination) in parameter-space TDA, unify five representation-space methods under a bilinear framework phi^T M psi, and validate this on DATE-LM. After rigorous examination of the pilot evidence (N=100, 14 tasks, ~28 min runtime), I find the proposal has **one strong empirical core (FM1 spectral evidence + TRAK saturation) surrounded by multiple unvalidated or falsified claims (FM2 untested, H7 whitened attribution failed, H9 isotropy reversed)**. Below I redesign the experimental methodology to maximize measurable, reproducible, confound-free evidence -- prioritizing what can actually be measured over what sounds theoretically elegant.
+The preceding perspectives offer creative methods (innovator), practical engineering (pragmatist), rigorous theory (theorist), and healthy skepticism (contrarian). What none of them provides is an **airtight experimental protocol** -- the kind where every comparison is controlled, every confounder is identified, every success criterion is pre-registered, and every claimed effect has a falsification test. This perspective fills that gap.
 
----
-
-## Critical Assessment of Existing Pilot Evidence
-
-Before proposing new experiments, I must honestly evaluate what the pilot data actually shows. An experimentalist who ignores inconvenient data is not an experimentalist.
-
-### What the Pilot Data Supports
-
-1. **FM1 spectral concentration is real.** Full-model gradient top-5 eigenvalues capture 85.6% of variance vs 34.9% for representations (Pythia-70M, N=100). The gradient signal is extremely low-rank (r_eff=10 for full model). This directly measures the dimensional mismatch the CRA thesis predicts.
-
-2. **TRAK dimension saturation is real.** On counterfact (R@50), TRAK peaks at k=256 (k/d=0.12) and degrades non-monotonically after. This pattern is consistent with projecting a low-rank signal through random matrices -- though the saturation point (k=256) is much lower than the predicted k~d=2048.
-
-3. **RepSim > TRAK on attribution tasks.** On counterfact (+32.4pp) and ftrace (+16.6pp), representation-space methods dominate. The K-FAC IF control confirms this is not merely a Hessian approximation artifact (RepSim > K-FAC IF by 17.4pp on counterfact).
-
-### What the Pilot Data Refutes or Leaves Unresolved
-
-1. **FM2 is completely untested.** Contrastive scoring (mean subtraction) produced exactly 0.0pp gain across all 12 method-task cells. Root cause: mean subtraction is a rank-preserving affine transformation, so rank-based metrics (AUPRC, R@K) are invariant to it by construction. This is not "FM2 doesn't exist" -- it is "the experiment was unable to detect FM2 with these metrics." This is a **design flaw in the evaluation protocol**, not evidence for or against FM2.
-
-2. **H7 whitened attribution fails catastrophically.** RepSim-whitened degrades by 8-11pp on all three tasks. The stated cause (N/d=0.049, covariance underdetermined) is plausible but requires verification at full scale. Even at full DATE-LM scale (N=5,473 for counterfact, d=2048), N/d=2.7 is still marginal for Ledoit-Wolf estimation (the estimator assumes N >> d for consistency).
-
-3. **H9 isotropy is reversed.** Representation condition number = 3.1e10 (extremely anisotropic), gradient condition number = 3,589. This is the exact opposite of the theoretical prediction. The representation covariance N=100 < d=512 caveat applies, but the direction of falsification is concerning.
-
-4. **Toxicity task reversal.** TRAK (0.926) > RepSim (0.685) on toxicity AUPRC, a 24pp reversal of the FM1 prediction. k-NN (0.809) also outperforms RepSim. This is not noise -- it is a systematic pattern where gradient-norm correlates directly with toxicity. The contrarian correctly identifies this as evidence that the similarity *function* (not the space) may be the primary driver.
-
-5. **30.8pp TRAK-PCA to RepSim gap.** If FM1 were the full story, TRAK with PCA projection onto the top-d gradient eigenvectors should approach RepSim. The 30.8pp gap (0.686 vs 0.994 on counterfact R@50) shows FM1 is necessary but grossly insufficient. Something else drives RepSim's advantage -- possibly the nonlinearity of the representation map, or the semantic structure of hidden states vs gradient structure.
+I approach the topic with three questions:
+1. **What can actually be measured?** -- Not every theoretically appealing quantity is empirically accessible at the scale and budget we have.
+2. **What confounders are lurking?** -- Multi-task policy learning has many hidden variables (task ordering, demo quality, simulation stochasticity) that can masquerade as cross-task influence.
+3. **What experiment would convince a hostile reviewer?** -- Design around the weakest link in the argument chain.
 
 ---
 
-## Proposal: Experiment-Driven Research Plan with Hardened Controls
+## Critical Assessment of Measurability
 
-I propose three experiment packages, each designed to produce falsifiable, confound-controlled evidence. Every experiment specifies: **exact protocol, baselines, ablation plan, falsification criteria, pilot validation estimate, and computational cost.**
+### What the Proposal Needs to Measure
 
----
+The core claim is a Task-to-Task Influence Matrix $M_{ij}$ that quantifies how task $i$'s training data affects task $j$'s performance. This requires:
 
-## Experiment Package 1: The FM1 Diagnostic Suite (Priority: Critical)
+1. A **ground truth** definition of influence (what $M_{ij}$ "really is")
+2. A **cheap proxy** that approximates the ground truth (gradient cosine, BCS, RepFinger, etc.)
+3. A **downstream application** (data mixing) where the proxy demonstrably outperforms baselines
 
-### Goal
+Each of these has serious measurement challenges that the other perspectives gloss over.
 
-Establish whether the parameter-to-representation performance gap is causally explained by gradient rank deficiency, or merely correlated with it.
+### Ground Truth Problem: LOO Retraining Is Not Ground Truth
 
-### Experiment 1.1: Full-Scale Eigenspectrum with Controlled N
+Everyone treats Leave-One-Task-Out (LOTO) retraining as "ground truth," but this is deeply problematic:
 
-**Rationale.** Pilot eigenspectrum (N=100) is unreliable because N < d for representations. We need N >> d for both spaces.
+**Confounder 1: Training stochasticity.** A single LOTO run has variance from random initialization, data shuffling, and optimization noise. The pragmatist estimates each training run at ~5 min on ResNet-18 + MLP. But the *signal* we're trying to detect -- the performance change from removing one task out of ten -- may be 1-3% in success rate. With LIBERO's stochastic evaluation (50 rollouts typical), 95% CI on success rate is roughly $\pm \sqrt{p(1-p)/50} \approx \pm 7\%$ at $p=0.5$. **The noise floor exceeds the expected signal.**
 
-**Protocol:**
-1. Model: Pythia-70M (d=512, B=70M). Use DATE-LM toxicity task (N=10,187 train).
-2. Sample N in {100, 500, 1000, 2000, 5000} training examples.
-3. For each N:
-   - Compute representation covariance (d x d = 512 x 512) eigenvalues via exact SVD.
-   - Compute gradient covariance top-500 eigenvalues via Lanczos (using `torch.lobpcg` or `scipy.sparse.linalg.eigsh` with implicit matrix-vector products via `torch.func.vmap`).
-   - Record: r_eff(80%), r_eff(90%), r_eff(95%), condition number, top-5 variance fraction.
-4. Cross-validate on Pythia-160M (d=768) at N=2000.
+**Confounder 2: Optimization path dependence.** With and without task $i$, the optimizer follows a different trajectory. The measured $\Delta_j$ conflates (a) the data content effect (what we want) with (b) the optimization dynamics effect (different effective learning rate, different loss landscape curvature). These are inseparable in a single LOTO experiment.
 
-**Key controls:**
-- Same training data subset for both spaces (eliminates data-selection confound).
-- Same random seed for sampling at each N.
-- Report eigenvalue decay curves (log-log plot), not just summary statistics.
+**Confounder 3: Sample size interaction.** Removing task $i$ also changes the total training set size. If task $i$ has 50 demos, removing it drops the dataset from 500 to 450 samples. The 10% reduction in data volume alone may affect task $j$ -- this is not a cross-task influence effect, it's a data scaling effect.
 
-**Falsification criteria:**
-- H4 (revised): If r_eff(95%) of gradient covariance > 10*d at N=5000, FM1 rank-deficiency narrative is weakened.
-- H9 (revised): If representation condition number < 100 at N=5000 (where N >> d=512), the original isotropy claim is rescued. If condition number remains > 10^4, isotropy is definitively falsified and the paper must explain why M=I works despite anisotropy.
+### Implication: We Need a Far More Rigorous Ground Truth Protocol
 
-**Computational cost:** ~2 GPU-hours on single RTX 4090. Each N sweep takes ~20 min.
+I propose **Controlled LOTO (C-LOTO)** as the proper ground truth:
 
-**Success probability:** 85% (the measurement itself is routine; the question is whether the numbers fall in a narratively useful range).
+1. **Multiple seeds**: Run each LOTO configuration with $k \geq 5$ random seeds. Report the mean and 95% CI of $\Delta_j^{(i)} = \text{SR}_j(\text{all tasks}) - \text{SR}_j(\text{without task } i)$.
+2. **Data-volume control**: When removing task $i$ (50 demos), replace with 50 additional demos *from the remaining tasks* (proportional upsampling). This isolates cross-task content effects from data volume effects.
+3. **Evaluation budget**: Use 200+ rollouts per condition (not 50). At 200 rollouts, 95% CI narrows to $\pm 3.5\%$ at $p=0.5$, which is barely sufficient for detecting 5% effects.
+4. **Statistical significance test**: Apply a paired permutation test (not just point comparison) to determine which $\Delta_j^{(i)}$ are significantly non-zero at $\alpha = 0.05$ after Bonferroni correction for $T(T-1) = 90$ comparisons.
 
-### Experiment 1.2: TRAK Dimension Sweep at Full Scale with PCA Comparison
-
-**Rationale.** Pilot sweep (N=100) showed saturation at k=256, far below d=2048. At full scale (N=5K-10K), the saturation point may shift. The TRAK-PCA comparison is the most direct FM1 test.
-
-**Protocol:**
-1. Model: Pythia-1B (d=2048). Task: counterfact (N=5,473 full).
-2. TRAK with random projection: k in {32, 64, 128, 256, 512, 1024, 2048, 4096}.
-3. TRAK with PCA projection: k in {32, 64, 128, 256, 512, 1024, 2048}.
-   - PCA eigenvectors from gradient covariance (Lanczos top-2048 on Pythia-1B target layers).
-   - If Pythia-1B Lanczos is infeasible, use Pythia-70M eigenvectors as surrogate (cross-model transfer test).
-4. Metrics: R@50, MRR, **Kendall tau** (continuous metric to detect FM2 effects).
-5. 3 random seeds for TRAK random projection; single deterministic run for PCA.
-6. Compute RepSim baseline at same N for direct comparison.
-
-**Key controls:**
-- Same train/test split across all k values.
-- Report wall-clock time and peak GPU memory per k to quantify compute-quality tradeoff.
-- Include k=d (2048) as the critical prediction point.
-
-**Falsification criteria:**
-- H5 (original): If TRAK-random shows no saturation up to k=4096 (continues improving log-linearly), FM1 rank deficiency does not explain TRAK's dimension sensitivity.
-- FM1 smoking gun: If TRAK-PCA at k=d closes to within 5pp of RepSim, FM1 is confirmed as the primary mechanism. If the gap remains > 15pp (pilot: 30.8pp), additional factors beyond dimension are at play.
-
-**Computational cost:** ~8 GPU-hours (parallelizable to ~2h on 4 GPUs). TRAK at k=4096 may OOM; cap at k=2048 if so.
-
-**Success probability:** 75% for measurement completion; 50% for TRAK-PCA closing the gap with RepSim.
-
-### Experiment 1.3: Representation Layer Sweep (Confound Control)
-
-**Rationale.** RepSim uses last-layer representations. But different layers have different d and different information content. If RepSim performance varies dramatically across layers, the "space" advantage is really a "which features you measure" advantage -- not FM1.
-
-**Protocol:**
-1. Model: Pythia-1B (24 layers). Task: counterfact + toxicity (N=full).
-2. Extract representations at layers {0, 4, 8, 12, 16, 20, 23} (every 4th + last).
-3. Compute RepSim (cosine similarity) at each layer.
-4. Also compute RepSim with **Euclidean distance** at each layer (contrarian's falsification test).
-5. Metrics: R@50, AUPRC, Kendall tau.
-
-**Key controls:**
-- Same train/test data across all layers.
-- Report representation dimensionality and condition number at each layer.
-- Compare cosine vs Euclidean to test whether similarity function or space matters more.
-
-**Falsification criteria:**
-- If RepSim-Euclidean at last layer matches RepSim-cosine within 3pp on 2/3 tasks, the similarity function is secondary and the space matters more (supports FM1).
-- If RepSim-Euclidean degrades by > 10pp, the similarity function dominates the space choice (weakens FM1, supports contrarian).
-- If middle layers (layer 12) outperform last layer by > 5pp, layer selection is a more important factor than FM1/FM2.
-
-**Computational cost:** ~3 GPU-hours. Representation extraction is the bottleneck (~20 min per layer per task).
-
-**Success probability:** 90% (trivially implementable).
+**Cost**: This is expensive. With 5 seeds $\times$ 11 configurations (10 LOTO + 1 baseline) $\times$ 5 min/run = ~275 min = 4.6 hours of training. Plus 11 $\times$ 10 $\times$ 200 = 22,000 evaluation rollouts. This is the real cost of a proper ground truth. The pragmatist's "50 min for LOO" is an underestimate by ~5x once you account for adequate statistical power.
 
 ---
 
-## Experiment Package 2: The FM2 Detection Suite (Priority: Critical)
+## Proposal: Three Experiment-Driven Research Ideas
 
-### Goal
+### Idea 1: Pre-Registered Proxy Benchmark with Blinded Evaluation (Improve Existing)
 
-Design experiments that can actually detect FM2 (common influence contamination), since the pilot evaluation protocol was unable to do so.
+#### Hypothesis (Pre-Registered)
+**H1**: At least one cheap proxy (among GradCos, GPTA, BCS, RepFinger, Kernel Surrogate) achieves Spearman $\rho > 0.6$ with C-LOTO ground truth on LIBERO-10. If no proxy exceeds $\rho = 0.4$, we declare the task-level influence estimation problem **practically unsolvable** at this scale.
 
-### The Core Problem
+#### Why This Specific Threshold
+- $\rho = 0.6$ is the minimum for a useful predictive tool (explains ~36% of variance)
+- $\rho = 0.4$ is the noise floor observed in the influence function fragility literature (Basu et al., arXiv 2006.14651)
+- Pre-registering thresholds prevents post-hoc narrative adjustment
 
-Mean subtraction is a rank-preserving affine transformation: if score(z_i) = s_i, then contrastive_score(z_i) = s_i - mean(s) preserves the ordering of all z_i. Therefore rank-based metrics (AUPRC, R@K, MRR) are mathematically guaranteed to be invariant to mean subtraction. **The pilot "found" zero FM2 effect because the evaluation was incapable of detecting it.**
+#### Experimental Design
 
-This is an evaluation protocol failure, not an FM2 non-existence result. The CRA team acknowledged this but has not yet proposed a fix. I propose three complementary FM2 detection approaches.
+**Phase 1 -- Ground Truth Construction** (~5 hours, distributed across experiment tasks)
 
-### Experiment 2.1: Continuous Score Metrics (Kendall Tau, Spearman Rho)
+| Step | Detail | Time |
+|------|--------|------|
+| Train all-tasks baseline | ResNet-18 + MLP, LIBERO-10, 5 seeds | 25 min |
+| 10 LOTO trainings | Each drops one task, 5 seeds each | 250 min |
+| Evaluation rollouts | 11 configs $\times$ 10 tasks $\times$ 200 rollouts, 5 seeds | ~3 hours |
+| Volume-controlled LOTOs | 10 configs with proportional upsampling, 5 seeds | 250 min |
 
-**Rationale.** While mean subtraction preserves *ranks*, it changes the *relative magnitudes* between scores. For regression-like evaluation (where the magnitude of attribution matters, not just ranking), continuous metrics can detect FM2 effects.
+Total ground truth effort: ~10 hours, distributed across ~20 experiment tasks. This is substantial but **necessary** -- without it, we're building on sand.
 
-**Protocol:**
-1. Compute raw attribution scores for all methods (RepSim, TRAK, DDA, LoGra) on all 3 DATE-LM tasks at full scale.
-2. Compute contrastive scores (global mean subtraction, task-conditional mean subtraction).
-3. Evaluate with: Kendall tau, Spearman rho, Pearson r (against DATE-LM ground-truth scores, not just labels).
-4. Also compute LDS (Linear Datamodeling Score) which is a continuous metric:
-   - LDS = correlation between predicted importance and actual retrain-and-compare effect.
-   - DATE-LM provides pre-computed counterfactual importance scores for LDS computation.
+**Phase 2 -- Proxy Computation** (1 experiment task, ~30 min)
+Compute all 5 proxies from the all-tasks model:
+1. **GradCos**: Average cosine of per-task mean gradients. Cost: 1 backward pass per task.
+2. **GPTA** (LESS-style): Random-projected gradient features, cosine scoring. Cost: 1 backward pass per sample + projection.
+3. **BCS** (pragmatist's Bottleneck Conflict Score): PCA subspace overlap $\times$ readout direction cosine at bottleneck layer. Cost: 1 forward pass + linear probes.
+4. **RepFinger** (innovator's CKA + readout): Layer-wise CKA + linear probe direction cosine. Cost: 1 forward pass per layer.
+5. **Kernel Surrogate** (Zhang et al., arXiv 2602.03783): Second-order task attribution via kernel ridge regression on gradient features. Cost: gradient features + kernel computation.
 
-**Key controls:**
-- Report both rank and continuous metrics side by side.
-- If DATE-LM does not provide continuous ground-truth scores, compute surrogate via leave-k-out retraining (k=100, 10 repeats).
+**Phase 3 -- Blinded Evaluation** (1 experiment task, ~15 min)
+- Proxy rankings computed without access to ground truth
+- Evaluation: Spearman $\rho$, Kendall $\tau$, and top-3/bottom-3 hit rate (does the proxy correctly identify the 3 most-positive and 3 most-negative task pairs?)
+- **Critical diagnostic**: Plot proxy scores vs. C-LOTO $\Delta$ values with error bars. If the error bars on $\Delta$ are so large that *any* monotone function fits, the ground truth is too noisy to discriminate proxies.
 
-**Falsification criteria:**
-- H2 (revised): If contrastive scoring improves Kendall tau by >= 0.05 on parameter-space methods but < 0.02 on representation-space methods (on at least 2/3 tasks), FM2 asymmetry is supported.
-- If contrastive scoring has zero effect on both rank and continuous metrics, FM2 may not be a real phenomenon for these tasks.
+#### Confounders Controlled
+- **Training stochasticity**: 5 seeds per configuration
+- **Data volume**: Volume-controlled LOTO isolates content from size effects
+- **Evaluation stochasticity**: 200 rollouts with CI reporting
+- **Post-hoc bias**: Pre-registered $\rho$ thresholds
+- **Multiple comparisons**: Bonferroni correction on 90 pairwise tests
 
-**Computational cost:** ~1 GPU-hour (scores already computed; metrics are cheap). LDS leave-k-out adds ~4 GPU-hours if needed.
+#### Falsification Criterion
+If **all** proxies score $\rho < 0.4$, we conclude: "Task-level influence estimation is unreliable for multi-task robot policy learning at the scale of LIBERO-10 (50 demos/task, ~5M param model)." This would redirect the field toward either (a) larger-scale estimation where signals are stronger, or (b) instance-level curation (CUPID/SCIZOR path).
 
-**Success probability:** 60%. The outcome depends entirely on whether DATE-LM provides continuous ground-truth scores. If it provides only binary labels, continuous metrics may be uninformative.
+#### Success Probability: 55%
+Lower than the pragmatist's 70% because we're holding ourselves to a stricter standard. The pragmatist's success criterion was "proxy correlates with LOO" -- but with single-seed LOO and 50 evaluation rollouts, even noise correlates. Under C-LOTO with 5 seeds and 200 rollouts, the bar is much higher.
 
-### Experiment 2.2: Controlled Contamination Injection
-
-**Rationale.** The cleanest way to test FM2 is to artificially introduce common influence contamination and measure whether contrastive scoring removes it.
-
-**Protocol:**
-1. Take Pythia-1B fine-tuned on DATE-LM task.
-2. Inject contamination: add a fixed bias vector b to all training representations:
-   - phi_contaminated(z) = phi(z) + alpha * b
-   - where b = mean(phi(z_train)) and alpha in {0, 0.1, 0.5, 1.0, 2.0, 5.0}.
-3. Compute attribution scores with and without contamination, with and without contrastive scoring.
-4. Measure: R@50, AUPRC, Kendall tau at each contamination level.
-
-**Key controls:**
-- alpha=0 is the uncontaminated baseline.
-- alpha=5.0 represents extreme contamination (bias 5x the mean norm).
-- The bias vector b is the mean representation (the exact quantity removed by contrastive scoring).
-
-**Falsification criteria:**
-- If contrastive scoring perfectly recovers alpha=0 performance at all contamination levels, FM2 correction via mean subtraction is validated mechanistically.
-- If contrastive scoring fails to recover performance at alpha >= 1.0, FM2 correction has limited effectiveness and may require more sophisticated debiasing (task-conditional mean, Sigma_noise^{-1} correction).
-
-**Computational cost:** ~2 GPU-hours. 6 alpha values x 2 scoring modes x 3 tasks, but each is a simple matrix operation on pre-computed representations.
-
-**Success probability:** 85%. This is a controlled experiment where we know the ground truth. The only risk is that the injection model does not match real FM2 contamination structure.
-
-### Experiment 2.3: DDA Ablation (Debias vs Denoise)
-
-**Rationale.** DDA (Pang et al., 2410.01285) reports that their "debias" step contributes ~55pp improvement. But DDA's debias is *not* simple mean subtraction -- it subtracts the *base model* influence, not the training mean. This distinction matters: if DDA's debias captures something beyond mean subtraction, FM2 may have a more complex structure than the CRA thesis assumes.
-
-**Protocol:**
-1. Implement three versions of DDA:
-   - DDA-full: original implementation (debias + denoise).
-   - DDA-debias-only: debias without denoise.
-   - DDA-mean-sub: replace DDA's debias with simple global mean subtraction.
-2. Run on all 3 DATE-LM tasks at full scale.
-3. Compare against CRA's contrastive scoring (global mean subtraction on RepSim).
-
-**Key controls:**
-- DDA-mean-sub directly tests whether CRA's FM2 correction captures the same phenomenon as DDA's debias.
-- If DDA-debias-only >> DDA-mean-sub, DDA's debias captures structure beyond simple FM2.
-
-**Falsification criteria:**
-- If DDA-mean-sub matches DDA-debias-only within 3pp on 2/3 tasks, CRA's FM2 = DDA's debias (the theories are equivalent).
-- If DDA-debias-only > DDA-mean-sub by > 10pp, FM2 is real but CRA's mean-subtraction fix is insufficient. The paper must acknowledge DDA's more sophisticated correction.
-
-**Computational cost:** ~4 GPU-hours (DDA implementation + evaluation).
-
-**Success probability:** 70%. Depends on DDA code availability and reproducibility.
+#### Key References
+- Basu et al. (arXiv 2006.14651, ICLR 2021): Influence function fragility -- baselines for expected correlation floors
+- Zhang et al. (arXiv 2602.03783): Kernel surrogate models for task attribution -- 25% higher correlation than linear surrogates
+- ETAP (arXiv 2602.18591): Ensemble task affinity predictor -- gradient + learned estimators
+- Grad-TAG (arXiv 2409.06091): Gradient-based task affinity at 3% FLOPs -- our GradCos/GPTA proxies derive from this
+- Li et al. (arXiv 2512.09103): 0% Euclidean certification for TRAK -- motivates our seed stability analysis
 
 ---
 
-## Experiment Package 3: Framework Validation with Hardened Controls (Priority: High)
+### Idea 2: Confounder-Controlled Negative Transfer Detection via Factorial Design (New Method)
 
-### Goal
+#### The Problem Nobody Addresses
+Every perspective assumes we *know* negative transfer exists in LIBERO-10 and just need to *measure* it. But has anyone actually demonstrated statistically significant negative transfer in this benchmark? CORAL (arXiv 2603.09298) claims "negative transfer" in joint VLA training but measures it as a gap between per-task LoRA and joint training -- which conflates capacity constraints with actual data interference.
 
-Test whether the phi^T M psi framework generates predictions beyond notational convenience. After pilot failures on H7 (whitened attribution), H9 (isotropy), and the 30.8pp TRAK-PCA gap, the framework's predictive power is in serious doubt. These experiments aim to rescue or definitively refute the framework.
+#### Hypothesis (Pre-Registered)
+**H2**: In LIBERO-10 with a ResNet-18+MLP policy, at least 3 task pairs exhibit statistically significant negative transfer ($\Delta_j^{(i)} > 0$ at $p < 0.05$ after Bonferroni correction with C-LOTO protocol). If fewer than 3 pairs are significant, negative transfer is **too weak to be a research target** at this model/data scale.
 
-### Experiment 3.1: Whitened Attribution with PCA-Reduced Covariance
+**H2-corollary**: Negative transfer is concentrated in task pairs that share visual scenes but require different manipulation strategies (same environment, different goals). This is the "Representation conflict" mechanism from the spec -- same state, different optimal action.
 
-**Rationale.** The pilot H7 failure (whitened RepSim -8 to -11pp) has a clear diagnosis: N/d=0.049 makes the full d-dimensional covariance estimation degenerate. The fix: whiten in a PCA-reduced subspace where N >> k.
+#### Experimental Design: 2-Level Factorial
 
-**Protocol:**
-1. Model: Pythia-1B. Tasks: all 3 DATE-LM at full scale.
-2. Compute representation covariance from training data.
-3. PCA-reduce representations to k dimensions, where k in {16, 32, 64, 128, 256, 512}.
-4. Estimate covariance in PCA space (k x k matrix, well-conditioned when N >> k).
-5. Compute whitened attribution: phi_PCA^T Sigma_PCA^{-1} psi_PCA.
-6. Also compute Ledoit-Wolf whitened attribution at full d=2048 for comparison.
-7. Ridge-regularized whitening: M = (Sigma + lambda*I)^{-1} with lambda in {0.01, 0.1, 1.0, 10.0}.
+Instead of the standard LOTO design (remove one task at a time), I propose a **fractional factorial design** that is statistically more powerful for detecting interactions:
 
-**Key controls:**
-- PCA k=d is equivalent to pilot H7 (should reproduce the failure).
-- PCA k=64 with N=5000 gives N/k=78 (well-conditioned).
-- Ridge regularization strength lambda provides a continuous tradeoff axis.
-- Compare against RepSim (M=I) and k-NN baselines.
+**Factor structure**: 10 binary factors $X_1, \ldots, X_{10}$ (task included vs. excluded). A full factorial has $2^{10} = 1024$ configurations -- infeasible. Instead, use a **Resolution IV fractional factorial** design with 64 runs (generated via Plackett-Burman or D-optimal design). This estimates:
+- All 10 main effects (each task's average contribution to all other tasks)
+- All 45 pairwise interactions (task $i$ $\times$ task $j$ synergy/conflict)
+- With confounding only between 3-way and higher interactions (which we assume negligible per Occam's razor)
 
-**Falsification criteria:**
-- H7 (revised): If PCA-whitened attribution at k=64 outperforms standard RepSim by >= 3pp on at least 1 task, the whitened matched filter concept is validated (just poorly conditioned at pilot scale).
-- If PCA-whitened attribution fails at *all* k values and regularization strengths, the whitened matched filter theory has no practical value for these task sizes and must be reported as a negative result.
+**Cost**: 64 training runs $\times$ 3 seeds $\times$ 5 min = 960 min = 16 hours. Distributed across ~32 experiment tasks.
 
-**Computational cost:** ~3 GPU-hours. PCA and covariance estimation are cheap; the cost is in score computation across the k x lambda grid.
+**Advantages over LOTO**:
+- LOTO estimates each $\Delta_j^{(i)}$ from 2 measurements (with vs. without). Factorial estimates from ~32 measurements each, giving ~4x higher statistical power.
+- Factorial directly estimates *interaction effects* (the innovator's "coalition influence") without additional computation.
+- The design is orthogonal, so main effects and interactions are estimated independently.
 
-**Success probability:** 55%. The theory predicts whitening should help, but the pilot data and the contrarian's H9 falsification are concerning. Even at N/k=78, the noise covariance may lack the structured anisotropy that whitening exploits.
+**Evaluation**: For each configuration, run 200 evaluation rollouts per task (with 3 seeds). Total evaluation: 64 $\times$ 3 $\times$ 10 $\times$ 200 = 384,000 rollouts. This is large but parallelizable (each seed is independent).
 
-### Experiment 3.2: Multi-Method Tournament (phi^T M psi Taxonomy Validation)
+**Analysis**:
+1. ANOVA with main effects + pairwise interactions. Test each effect at $\alpha = 0.05 / 55 = 0.0009$ (Bonferroni for 10 main + 45 interactions).
+2. Effect size: Cohen's $d$ for each significant effect. Practically significant only if $|d| > 0.5$.
+3. **Mechanism attribution**: For each significant negative-transfer pair, examine whether the pair shares the same LIBERO scene (visual overlap). Compute the BCS diagnostic for the pair vs. a control pair with similar visual overlap but no negative transfer. This tests the "representation conflict" mechanism.
 
-**Rationale.** The framework claims to unify 5 representation-space methods. If they can be shown to vary systematically along the phi/psi/M axes -- and their relative performance is predictable from the framework -- this is genuine predictive power beyond taxonomy.
+#### Confounders Controlled
+- **Multi-collinearity**: Orthogonal factorial design eliminates correlation between factors
+- **Data volume**: Each configuration trains on a different total number of demos. Include total dataset size as a covariate in the ANOVA.
+- **Task ordering**: Within each run, shuffle task data. Across runs, use the same shuffling seed.
+- **Evaluation variance**: 200 rollouts $\times$ 3 seeds per cell = 600 effective evaluations
 
-**Protocol:**
-1. Implement all 5 representation-space methods on DATE-LM:
-   - RepSim: phi=h_L(z), M=I (off-the-shelf, cosine similarity)
-   - RepT: phi=delta_h(z), M=I (from [GitHub: plumprc/RepT](https://github.com/plumprc/RepT))
-   - AirRep: phi=f_theta(z), M=I, learned (from [GitHub: sunnweiwei/AirRep](https://github.com/sunnweiwei/AirRep))
-   - In-the-Wild: phi=h_post-h_pre, M=I (temporal diff, requires pre/post checkpoints)
-   - Concept Influence: phi=encoder(z), M=I (concept-level)
-2. Run each on all 3 DATE-LM tasks. Metrics: R@50, AUPRC, Kendall tau.
-3. Additionally: apply contrastive scoring and PCA-whitening to each method as "plug-in" corrections.
-4. This yields a 5 methods x 3 scoring modes x 3 tasks = 45-cell matrix.
+#### Pilot Study (Must Complete in <15 min)
+Before committing to the full factorial:
+1. Train all-10-tasks model and a 5-task subset (tasks 1-5 only), 1 seed each, 5 min each
+2. Evaluate tasks 1-5 in both conditions, 50 rollouts each
+3. If performance difference for any task is $> 10\%$, there is enough signal to justify the full study
+4. If all differences are $< 3\%$, LIBERO-10 tasks are too homogeneous -- switch to a heterogeneous task set (see Risk Assessment)
 
-**Key controls:**
-- All methods use same model (Pythia-1B), same data, same evaluation script.
-- Methods that require special infrastructure (In-the-Wild needs DPO checkpoints; Concept Influence needs encoder) may not be feasible -- report as limitations.
-- Include TRAK, DDA as parameter-space baselines for completeness.
+#### Falsification Criterion
+If the factorial ANOVA finds no significant pairwise interactions ($p > 0.05$ after correction for all 45 pairs), negative transfer is not a meaningful phenomenon in LIBERO-10. The paper pivots to: "Negative Transfer in Multi-Task Robot Learning Is Weaker Than Assumed" -- a valuable empirical finding that challenges CORAL's premise.
 
-**Framework predictions (testable):**
-- Methods with similar phi/psi should have correlated performance patterns across tasks.
-- Contrastive scoring should help all methods uniformly (if FM2 is real).
-- Whitening should help methods with anisotropic noise more than those with isotropic noise.
-- AirRep (learned phi) should dominate other M=I methods because it optimizes the feature map.
+#### Success Probability: 50%
+This is deliberately a coin-flip because we genuinely do not know whether LIBERO-10 has meaningful negative transfer. Either outcome is publishable.
 
-**Falsification criteria:**
-- If the 5 methods show *no* systematic pattern explainable by their phi/psi/M configuration, the framework is taxonomic but not predictive.
-- If method performance is better predicted by "which layer" or "which similarity function" than by the phi^T M psi decomposition, the framework's axes are wrong.
-
-**Computational cost:** ~6-10 GPU-hours depending on method availability. AirRep and RepT have public code; In-the-Wild and Concept Influence may require significant implementation effort.
-
-**Success probability:** 60% for completing 3+ methods; 40% for demonstrating predictive framework power.
-
-### Experiment 3.3: The "Smoking Gun" Residual Analysis
-
-**Rationale.** The 30.8pp gap between TRAK-PCA at k=d and RepSim is the single biggest challenge to the CRA thesis. If FM1 fully explained the rep-vs-param gap, this gap should be near zero. Understanding what accounts for this gap is essential.
-
-**Protocol:**
-1. Decompose the RepSim score into components:
-   - RepSim(z_test, z_train) = phi(z_test)^T psi(z_train) [representation cosine]
-   - TRAK-d(z_test, z_train) = g_PCA(z_test)^T M g_PCA(z_train) [PCA-projected gradient]
-2. For each test example, compute:
-   - Residual = RepSim_rank - TRAK-PCA_rank (rank difference per training example)
-   - Characterize training examples where the residual is largest.
-3. Hypotheses for the gap:
-   - (a) Nonlinearity: RepSim captures nonlinear feature interactions that linear PCA misses.
-   - (b) Layer specificity: RepSim uses last-layer features; gradients mix all layers.
-   - (c) Normalization: cosine similarity normalizes by magnitude; TRAK does not.
-   - (d) Semantic alignment: representations encode semantic similarity; gradients encode loss-landscape similarity.
-4. Test (c) by computing TRAK-PCA with cosine-normalized projected gradients.
-5. Test (b) by computing TRAK using only last-layer gradients with PCA projection.
-
-**Falsification criteria:**
-- If last-layer-only TRAK-PCA closes to within 5pp of RepSim, the gap is a layer-mixing artifact, not fundamental.
-- If cosine-normalized TRAK-PCA closes within 5pp, the gap is a normalization artifact.
-- If neither closes the gap, the nonlinearity/semantic hypotheses (a/d) are supported, and FM1 is a partial explanation at best.
-
-**Computational cost:** ~2 GPU-hours.
-
-**Success probability:** 70% for identifying the dominant factor; 30% for fully closing the gap.
+#### Key References
+- CORAL (arXiv 2603.09298): Claims negative transfer in multi-task VLA -- our factorial design provides the rigorous test
+- Ortho-LoRA (arXiv 2601.09684): Gradient conflict in multi-task LoRA -- "negative cosine similarity between task gradients" but measured only as gradient statistics, never as actual task performance interaction
+- CMTA (arXiv 2311.01075): Addresses "negative transfer within the task" using contrastive modules with temporal attention on Meta-World
+- PiKE (arXiv 2502.06244): Found little gradient conflict at large scale -- our factorial tests whether this holds at small scale
+- "It's a Match!" (arXiv 2301.02873): Pairwise affinity scores predict MTL performance poorly -- our factorial estimates interactions directly from performance, not proxies
 
 ---
 
-## Summary: Experimental Priorities and Risk Mitigation
+### Idea 3: Intervention Study -- Does Influence-Guided Mixing Actually Improve Deployment Performance? (Cross-Domain Transfer)
 
-### Priority Ranking
+#### The Gap in All Prior Perspectives
+Every perspective (innovator, pragmatist, theorist, contrarian) evaluates mixing strategies by **training-time loss or validation success rate**. Nobody evaluates the downstream consequence that actually matters: **does the influence-optimized policy perform better when deployed on the target task in the simulation environment, across diverse initial conditions, with proper distribution shift?**
 
-| Rank | Experiment | Criticality | GPU-hours | P(success) | What it proves if successful |
-|------|-----------|-------------|-----------|------------|------------------------------|
-| 1 | 2.1 Continuous metrics | Critical | 1 | 60% | FM2 exists and is detectable |
-| 2 | 1.1 Full-scale eigenspectrum | Critical | 2 | 85% | FM1 quantitative prediction validated |
-| 3 | 1.2 TRAK dim sweep (full) | Critical | 8 | 75% | TRAK saturation at k~r_eff at scale |
-| 4 | 2.2 Contamination injection | Critical | 2 | 85% | FM2 correction mechanism validated |
-| 5 | 1.3 Layer sweep + Euclidean | High | 3 | 90% | Space vs similarity function disambiguation |
-| 6 | 3.3 Residual analysis | High | 2 | 70% | Identifies what FM1 misses |
-| 7 | 3.1 PCA-whitened attribution | High | 3 | 55% | Whitened MF theory rescued or buried |
-| 8 | 2.3 DDA ablation | Medium | 4 | 70% | CRA FM2 = DDA debias equivalence |
-| 9 | 3.2 Multi-method tournament | Medium | 8 | 40% | Framework predictive power |
-| **Total** | | | **33** | | |
+The distinction matters because:
+- A mixing strategy that reduces training loss may overfit to the validation distribution
+- Success rate on LIBERO's standard evaluation protocol (50 fixed initial configs) may not reflect robustness to novel configurations
+- The mixing optimization loop introduces its own overfitting risk: if mixing weights are tuned to maximize validation SR, they exploit validation-specific statistics
 
-### Minimum Viable Experiment Set (if time-constrained)
+#### Hypothesis (Pre-Registered)
+**H3**: Influence-guided data mixing improves standard LIBERO evaluation success rate by $\geq 5\%$ absolute over uniform mixing, BUT the gap shrinks to $< 2\%$ on out-of-distribution evaluation configs (perturbed object positions, novel distractor objects). The apparent benefit is partially an artifact of evaluation protocol, not genuine policy robustness.
 
-Execute experiments 1-4 only (~13 GPU-hours, ~4h wall-clock on 4 GPUs). This produces:
-- FM1: Full-scale eigenspectrum + dimension sweep (the strongest part of the thesis).
-- FM2: Continuous metrics + contamination injection (filling the critical gap).
+#### Experimental Design: Mixing Strategy Comparison with OOD Generalization Test
 
-### Key Confounders to Control Across All Experiments
+**Training phase**: Use the best proxy from Idea 1 to derive mixing weights $w_1, \ldots, w_{10}$.
 
-1. **Sample size N.** Pilot N=100 is insufficient for covariance estimation, statistical testing, and generalization claims. All full-scale experiments must use N >= 2000.
+**4 mixing strategies** (each with 5 seeds):
+1. **Uniform**: $w_i = 1/10$ for all tasks
+2. **Influence-guided**: $w_i^{(j)} \propto \max(0, M_{ij})$ for task $j$'s data in joint training
+3. **Re-Mix (DRO)**: Distributionally robust optimization over task weights (arXiv 2408.14037)
+4. **Oracle**: LOO-derived optimal weights (upper bound, not practical)
 
-2. **Random seeds.** Report mean +/- std over 3 seeds (42, 123, 456) for any stochastic method (TRAK, bootstrap CI).
+**Evaluation on two protocols**:
+- **Standard (In-Distribution)**: LIBERO's default 50 initial configurations per task, 200 rollouts
+- **Perturbed (Out-of-Distribution)**: 50 *novel* initial configurations with:
+  - Object positions shifted by 2-5 cm from training distribution
+  - Camera viewpoint rotated by 5-10 degrees
+  - (If LIBERO supports it) adding 1-2 distractor objects not seen in training
 
-3. **Rank vs continuous metrics.** Always report both. The FM2 fiasco (zero gain on rank metrics) demonstrates that metric choice determines what you can detect.
+**Analysis**:
+1. Compare success rates across 4 strategies $\times$ 2 evaluation protocols $\times$ 10 tasks
+2. Two-way ANOVA: strategy $\times$ evaluation protocol, with seed as random effect
+3. **Key test**: Is the strategy $\times$ protocol interaction significant? If yes, influence-guided mixing is exploiting in-distribution statistics. If no, the improvement is genuine.
+4. Report per-task breakdown: influence-guided mixing likely helps tasks with detected negative transfer but may hurt tasks that benefited from diverse co-training data (the "positive transfer tax").
 
-4. **Task heterogeneity.** Report per-task results. Never average across tasks. DATE-LM's three tasks have qualitatively different characteristics (toxicity is a gradient-norm task; counterfact is a lexical-retrieval task; ftrace is intermediate).
+#### Confounders Controlled
+- **Hyperparameter tuning**: All strategies use the same model architecture, learning rate, and total training steps. Only the data mixture changes.
+- **Data volume**: All strategies see the same total number of training samples per epoch (upsampled/downsampled to match)
+- **Evaluation**: Same rollout seeds across strategies for paired comparison
+- **Mixing overfitting**: Mixing weights are derived from the proxy (fixed, not tuned on validation) to avoid validation overfitting
 
-5. **BM25 baseline.** Include on every task. If BM25 matches or beats attribution methods, the task may not require model-internal attribution -- which limits the scope of CRA's claims but is essential intellectual honesty.
+#### Computational Cost
+| Step | Time | Notes |
+|------|------|-------|
+| Training (4 strategies $\times$ 5 seeds) | 100 min | 20 runs $\times$ 5 min |
+| Standard eval (20 $\times$ 10 $\times$ 200) | ~3 hours | Depends on rollout speed |
+| OOD eval (20 $\times$ 10 $\times$ 200) | ~3 hours | Same |
+| **Total** | **~7 hours** | Split across ~14 experiment tasks |
 
-6. **Compute budget tracking.** Report wall-clock time and peak GPU memory for every experiment. Reviewers will want to know whether CRA's diagnostic methods are more expensive than the methods they diagnose.
+#### Falsification Criterion
+If influence-guided mixing does NOT outperform uniform mixing by $\geq 5\%$ on standard eval, AND does not outperform on OOD eval either, then influence-guided mixing is **not practically useful** at this scale. The contrarian's prediction (architecture > data mixing) is supported.
 
----
+If influence-guided mixing wins on standard eval but NOT on OOD eval, then the benefit is **evaluation-protocol-specific** -- a cautionary finding for the entire data mixing literature.
 
-## Negative Results to Report Honestly
+#### Success Probability: 45%
+This is the hardest test. The contrarian's CORAL baseline (per-task LoRA, no mixing needed) will likely be competitive. The influence-guided mixing needs to beat not just uniform mixing but also show robustness to distribution shift. I estimate the approach has a genuine ~45% chance of demonstrating a practically significant and robust improvement.
 
-The following negative results from the pilot are real and should be reported in the paper, not explained away:
-
-1. **Toxicity reversal.** TRAK > RepSim by 24pp on toxicity. This defines a clear scope boundary: FM1 diagnosis applies to attribution tasks (where semantic similarity matters), not detection tasks (where gradient norm is directly informative). Framing this as a "task-type boundary" is acceptable if supported by analysis of what gradient norms capture on toxicity data.
-
-2. **BM25 competitiveness.** BM25 achieves R@50=1.0 on counterfact at pilot scale. At full scale, this may degrade (lexical overlap is less reliable with more candidates), but if it persists, CRA must acknowledge that model-internal attribution adds no value over lexical retrieval for factual attribution tasks.
-
-3. **H9 isotropy falsification.** Representation covariance is NOT near-isotropic. If this persists at N >> d, the theoretical justification for M=I in representation space collapses. The paper must either (a) find an alternative explanation for why M=I works despite anisotropy, or (b) show that whitening helps at proper N/d ratios.
-
-4. **30.8pp TRAK-PCA gap.** FM1 is necessary but not sufficient. The paper must explicitly quantify what fraction of the rep-vs-param gap FM1 explains and what fraction remains unexplained.
-
----
-
-## Specific Risks and What Would Falsify the Entire CRA Thesis
-
-### Risk 1: FM1 and FM2 are not independent defects but aspects of the same phenomenon (P=30%)
-
-If the full-scale 2x2 ANOVA shows strong negative interaction (fixing FM1 substantially reduces the FM2 effect), the "two independent defects" narrative collapses. The paper would need to be restructured as "a single defect with two manifestations."
-
-**Mitigation:** The 2x2 factorial with continuous metrics (Experiment 2.1) directly tests this. Report the interaction term with bootstrap CI.
-
-### Risk 2: The bilinear framework is vacuously universal (P=40%)
-
-If the multi-method tournament (Experiment 3.2) shows no systematic pattern predictable from phi/psi/M configuration, the framework adds no explanatory power beyond taxonomy.
-
-**Mitigation:** Identify at least one non-trivial, *a priori* prediction that validates at full scale. The strongest candidate: TRAK-PCA at k=r_eff should outperform TRAK-random at k=r_eff (PCA uses the signal subspace; random projection wastes capacity on noise). If this prediction fails, present the framework as taxonomy, not theory.
-
-### Risk 3: The entire rep-vs-param gap is explainable by cosine similarity being a better proxy for semantic relatedness (P=25%)
-
-This is the contrarian's core challenge. If RepSim-Euclidean degrades catastrophically while RepSim-cosine succeeds, and if BM25 (lexical similarity) performs comparably to RepSim on all tasks, then the CRA thesis reduces to "cosine similarity of LLM representations is a good semantic similarity measure" -- which is trivially known and not publishable.
-
-**Mitigation:** Experiment 1.3 (layer sweep + Euclidean) directly tests this. Also, the toxicity task (where RepSim *fails*) provides a natural control: on tasks where semantic similarity is not the signal, RepSim underperforms, confirming that the advantage is task-dependent, not space-dependent.
+#### Key References
+- Re-Mix (arXiv 2408.14037): DRO-based data mixing baseline -- +38% on Open X-Embodiment, but evaluated only on in-distribution
+- DUET (arXiv 2502.00270): Influence function + Bayesian optimization for data mixture -- but no OOD evaluation
+- AC-ODM (arXiv 2505.23878): Actor-critic online data mixing for LLMs -- captures intra-domain interactions
+- LIBERO (arXiv 2306.03310, NeurIPS 2023): Standard evaluation protocol uses fixed initial configs -- no OOD test
+- MTBench (RLJ 2025): Massively parallelized multi-task robot benchmark -- provides broader evaluation infrastructure
 
 ---
 
-## Literature-Informed Methodological Recommendations
+## Synthesis: An Experiment-First Research Plan
 
-### From Hu et al. (2602.10449) -- Unified Random Projection Theory
+The three ideas form a logical chain:
 
-Their key result: unregularized projection preserves influence iff m >= rank(F). For CRA, this means the TRAK dimension sweep should show a **hard threshold** at k = rank(F_effective), not a gradual saturation. If the pilot's gradual curve (peak at k=256, non-monotonic after) persists at full scale, it contradicts the sharp threshold prediction and suggests regularization effects (TRAK uses ridge regularization internally) dominate the rank structure.
+```
+Idea 2 (Detection)     → "Does negative transfer exist at all?"
+         ↓ (If yes)
+Idea 1 (Measurement)   → "Can we measure it cheaply and reliably?"
+         ↓ (If yes)
+Idea 3 (Application)   → "Does the measurement actually help?"
+```
 
-**Recommendation:** Report whether TRAK's internal regularization strength affects the saturation curve shape. Sweep lambda_TRAK in {0.01, 0.1, 1.0, 10.0} at fixed k=256 and k=2048.
+This chain is the **only honest way** to build this paper. Starting with Idea 3 (as most perspectives implicitly recommend) puts the cart before the horse -- you can't optimize data mixing based on influence if you haven't first verified that (a) influence exists and (b) you can measure it.
 
-### From Tong et al. (2602.01312) -- TRAK Preserves Rankings
+### Recommended Execution Order
 
-Their result that TRAK preserves *rankings* despite large absolute errors supports using rank metrics. But it also means that rank-invariant transformations (like contrastive scoring) cannot be detected by rank metrics -- exactly the FM2 evaluation failure. CRA must use continuous metrics (LDS, Kendall tau) to escape this trap.
+**Phase 0: Pilot Feasibility (1 experiment task, 15 min)**
+- Train 10-task model and 5-task subset
+- Quick SR comparison: is there any measurable performance difference when removing half the tasks?
+- **Gate**: If $|\Delta| < 3\%$ for all tasks, switch benchmark to Meta-World MT10 or a deliberately heterogeneous LIBERO subset
 
-### From Quanda (Bareeva et al., 2410.07158) -- TDA Evaluation Toolkit
+**Phase 1: Does Negative Transfer Exist? (Idea 2, 32 experiment tasks, ~16 hours)**
+- Fractional factorial design, 64 configs $\times$ 3 seeds
+- ANOVA analysis with Bonferroni correction
+- **Gate**: Proceed to Phase 2 only if $\geq 3$ task pairs show significant negative transfer
 
-Quanda provides a unified evaluation framework with multiple metrics. Consider using their toolkit to ensure metric consistency and reproducibility. Their "meta-evaluation" approach (evaluating evaluation metrics themselves) could help validate whether continuous metrics actually detect FM2 effects.
+**Phase 2: Can We Measure It? (Idea 1, 22 experiment tasks, ~11 hours)**
+- C-LOTO ground truth (5 seeds, 200 rollouts, volume-controlled)
+- 5 proxy computations + blinded evaluation
+- **Gate**: Proceed to Phase 3 only if best proxy achieves $\rho > 0.6$
 
-### From DATE-LM (Jiao et al., 2507.09424) -- Benchmark Design
+**Phase 3: Does It Help? (Idea 3, 14 experiment tasks, ~7 hours)**
+- 4 mixing strategies $\times$ 5 seeds
+- Standard + OOD evaluation
+- Statistical analysis of strategy $\times$ protocol interaction
 
-DATE-LM's finding that "no single method dominates" is exactly what CRA explains. But DATE-LM also found that method performance is "sensitive to task-specific evaluation design" -- which means CRA's task-independent FM1/FM2 narrative may be too ambitious. CRA should explicitly characterize which tasks are "FM1-dominated" (attribution tasks) vs "FM1-irrelevant" (detection tasks like toxicity).
+### Total Budget
+| Phase | Experiment Tasks | Wall-Clock |
+|-------|-----------------|------------|
+| Pilot | 1 | 15 min |
+| Phase 1 (Detection) | 32 | ~16 hrs |
+| Phase 2 (Measurement) | 22 | ~11 hrs |
+| Phase 3 (Application) | 14 | ~7 hrs |
+| **Total** | **69** | **~34 hrs** |
 
-### From DDA (Pang et al., 2410.01285) -- Contrastive Scoring
+This is ~4x larger than the pragmatist's estimate. The difference is entirely due to **statistical rigor**: multiple seeds, adequate evaluation rollouts, volume controls, and Bonferroni correction. Cutting corners on any of these produces results that a hostile reviewer can dismiss.
 
-DDA's 55pp improvement from debias uses *base model subtraction*, not simple mean subtraction. The CRA thesis equates these, but they are different operations:
-- CRA mean subtraction: score_contrastive(z) = phi(z) - E[phi(z')]
-- DDA debias: score_debias(z) = IF_finetuned(z) - IF_base(z)
-
-The DDA ablation (Experiment 2.3) tests whether these are empirically equivalent. If DDA-debias >> CRA-mean-subtraction, the FM2 model needs refinement.
+Note: The spec allocates "Pilot ~1-2 GPU-days, mid-scale ~10-15 GPU-days." Our full plan uses ~34 GPU-hours $\approx$ 1.4 GPU-days for the pilot phase and ~34 hours total, well within the mid-scale budget on a single A6000. With 4 GPUs available, wall-clock time can be reduced to ~9 hours.
 
 ---
 
-## Final Recommendation
+## Confounder Registry
 
-**Lead with the empirical findings, not the theory.** The CRA paper's strongest contribution is the first systematic 2x2 factorial on DATE-LM with mechanistic eigenspectrum evidence. The bilinear framework is valuable as taxonomy but risky as theory (3/3 distinctive predictions failed at pilot scale). I recommend:
+Every experiment must control for these variables. I flag this because none of the other perspectives explicitly lists confounders:
 
-1. **Core paper:** 2x2 factorial + eigenspectrum + TRAK dimension sweep + FM2 continuous metrics. This is a strong empirical contribution regardless of the theoretical framework's fate.
-2. **Framework as organization, not prediction:** Present phi^T M psi as a way to organize existing methods, with the 2x2 factorial as the empirical contribution. Do not overclaim predictive power unless whitened attribution or contrastive scoring show clear gains at full scale.
-3. **Honest reporting of failures:** H7 failure, H9 reversal, toxicity reversal, and BM25 competitiveness all belong in the paper. They strengthen credibility and define scope.
-4. **Compute budget:** ~33 GPU-hours for all experiments, ~13 GPU-hours for the minimum viable set. Well within the 4x RTX 4090 budget over 2-3 weeks.
+| Confounder | Mechanism | Control |
+|-----------|-----------|---------|
+| **Random seed** | Different initialization → different loss landscape basin → different task interactions | 5 seeds per config, report CI |
+| **Data volume** | Removing a task reduces total data → performance drops from less data, not from removing influence | Volume-controlled LOTO (proportional upsampling) |
+| **Data ordering** | Multi-task training is sequential within batches → order effects | Consistent shuffling seed across configs |
+| **Evaluation stochasticity** | LIBERO rollouts have random initial configs | 200 rollouts, paired evaluation seeds |
+| **Task difficulty** | Hard tasks are more sensitive to any perturbation → false positives for "influence" | Normalize $\Delta_j^{(i)}$ by single-task variance |
+| **Optimization convergence** | Different configs converge at different rates → early stopping bias | Fixed epoch count (not early stopping) |
+| **Gradient accumulation** | Batch composition changes when tasks are removed → different effective gradient signal | Fixed batch size; oversample remaining tasks to maintain batch composition |
 
-The difference between a rejected paper and a strong publication is not whether the theory is beautiful -- it is whether the experiments are airtight. Design experiments that leave no room for ambiguity, report what the data shows (not what you hoped it would show), and let the narrative follow the evidence.
+---
+
+## What I Would NOT Do
+
+1. **Compute influence on a 7B VLA** (too expensive for proper statistical controls; defer to after the small-model story is complete and validated)
+2. **Use custom toy datasets** (no external validity; LIBERO-10 and Meta-World MT10 are the established benchmarks)
+3. **Report single-seed results** (this is the #1 sin in robot learning papers; see Henderson et al. (arXiv 1709.06560) "Deep Reinforcement Learning that Matters")
+4. **Skip the detection phase** (jumping straight to mixing optimization assumes the conclusion)
+5. **Tune mixing weights on the validation set** (this introduces mixing overfitting and inflates reported gains)
+6. **Trust gradient cosine as ground truth** (it's a proxy, not a measurement of actual performance change)
+
+---
+
+## Risk Assessment
+
+### Risk 1: LIBERO-10 Is Too Homogeneous (No Detectable Negative Transfer)
+**Probability**: 35%
+**Mitigation**: Pre-screen in Pilot Phase 0. If no signal, switch to:
+- **Meta-World MT10**: 10 tasks spanning reach, push, pick-place, drawer, window operations. Known to have significant task interference in MTL (CMTA, arXiv 2311.01075 showed 30%+ gaps).
+- **Heterogeneous LIBERO subset**: Hand-pick 5 tasks with maximal visual/action diversity (e.g., tasks from different LIBERO suites: LIBERO-Spatial, LIBERO-Object, LIBERO-Goal).
+
+### Risk 2: Ground Truth Is Too Noisy to Discriminate Proxies
+**Probability**: 25%
+**Mitigation**: The factorial design (Idea 2) provides ~4x more statistical power than LOTO. If even the factorial cannot detect effects, we conclude negative transfer is below the detection threshold -- itself a publishable finding.
+
+### Risk 3: All Proxies Fail ($\rho < 0.4$)
+**Probability**: 30%
+**Mitigation**: This validates the contrarian's thesis and produces a strong negative result paper: "Cheap Proxies for Task Affinity Are Unreliable in Robot Policy Learning." Redirect to instance-level curation (CUPID path) or architecture-based isolation (CORAL path).
+
+### Risk 4: Budget Overrun
+**Probability**: 20%
+**Mitigation**: Phases are gated. If Phase 1 fails the detection gate, we save ~18 hours by skipping Phases 2-3 and writing a detection-focused paper. If Phase 2 fails the proxy quality gate, we save ~7 hours and write a "proxy benchmark + negative result" paper.
+
+---
+
+## Falsification Summary
+
+| Idea | Hypothesis | What Would Falsify It | Consequence If Falsified |
+|------|-----------|----------------------|-------------------------|
+| 1 | At least one proxy achieves $\rho > 0.6$ | All proxies $\rho < 0.4$ | Task-level influence estimation is impractical for robot MTL |
+| 2 | $\geq 3$ task pairs show significant negative transfer | $< 3$ significant pairs after Bonferroni | Negative transfer is too weak to be a research target at this scale |
+| 3 | Influence-guided mixing improves SR by $\geq 5\%$ | Improvement $< 2\%$ on both ID and OOD | Influence-guided mixing is not practically useful |
+
+**Every falsification outcome is itself a publishable finding.** This is the hallmark of a well-designed research program -- heads we learn something useful, tails we learn something useful.
+
+---
+
+## Key References (Consolidated)
+
+### Ground Truth / Evaluation Methodology
+- Henderson et al. (arXiv 1709.06560): "Deep RL That Matters" -- seed sensitivity, evaluation protocol rigor
+- Basu et al. (arXiv 2006.14651, ICLR 2021): Influence function fragility in deep networks
+- Li et al. (arXiv 2512.09103): 0% Euclidean certification for TRAK attribution scores
+- LIBERO (arXiv 2306.03310, NeurIPS 2023): Benchmark definition and standard evaluation protocol
+
+### Task Affinity Estimation
+- Grad-TAG (arXiv 2409.06091): Gradient-based task affinity at 3% FLOPs
+- ETAP (arXiv 2602.18591): Ensemble task affinity predictor with gradient + learned estimators
+- Zhang et al. (arXiv 2602.03783): Kernel surrogate models -- 25% higher correlation than linear surrogates, second-order task interactions
+- LESS (arXiv 2402.04333, ICML 2024): Gradient projection for efficient influence
+- "It's a Match!" (arXiv 2301.02873): Pairwise affinity scores predict MTL performance poorly
+
+### Negative Transfer in Robot/MTL
+- CORAL (arXiv 2603.09298, March 2026): Per-task LoRA isolates interference -- our head-to-head baseline
+- Ortho-LoRA (arXiv 2601.09684): Orthogonal gradient projection for multi-task LoRA
+- CMTA (arXiv 2311.01075): Contrastive modules with temporal attention on Meta-World -- prior evidence of significant task interference in robot MTL
+- PiKE (arXiv 2502.06244): Large-scale pretraining shows low gradient conflict
+- Kang (arXiv 2512.22740): Empirical study of negative transfer -- gradient misalignment from mismatched functional forms
+
+### Data Mixing
+- Re-Mix (arXiv 2408.14037): DRO data mixing for imitation learning
+- AC-ODM (arXiv 2505.23878): Actor-critic online data mixing for LLM pretraining
+- CUPID (arXiv 2506.19121): Per-demonstration influence for robot data curation
+- MISS (arXiv 2409.18153): Set influence is non-additive

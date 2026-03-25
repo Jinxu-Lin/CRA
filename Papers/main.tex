@@ -1,0 +1,52 @@
+\documentclass{article}
+
+\usepackage{sty/neurips_2026}
+% Camera-ready: \usepackage[main, final]{sty/neurips_2026}
+% Preprint:     \usepackage[preprint]{sty/neurips_2026}
+
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{hyperref}
+\usepackage{url}
+\usepackage{booktabs}
+\usepackage{amsfonts}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{nicefrac}
+\usepackage{microtype}
+\usepackage{xcolor}
+\usepackage{graphicx}
+
+\title{Your Paper Title Here}
+
+\author{%
+  Author One \\
+  Affiliation \\
+  \texttt{email@example.com} \\
+  % \And
+  % Author Two \\
+  % Affiliation \\
+  % \texttt{email@example.com} \\
+}
+
+\begin{document}
+
+\maketitle
+
+\input{sec/00_abstract}
+\input{sec/01_introduction}
+\input{sec/02_related_work}
+\input{sec/03_methodology}
+\input{sec/04_experiment}
+\input{sec/05_conclusion}
+\input{sec/06_acknowledgments}
+
+\bibliographystyle{plainnat}
+\bibliography{main}
+
+\input{sec/0X_appendix}
+
+\newpage
+\input{sec/checklist}
+
+\end{document}

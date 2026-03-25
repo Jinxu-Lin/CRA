@@ -1,354 +1,271 @@
-# Pragmatist Perspective: CRA Research Proposal
+# Pragmatist Perspective: Cross-Task Influence in Multi-Task VLA
 
-## Executive Summary
+## Engineering Reality Check
 
-The CRA proposal is scientifically compelling but carries serious engineering risks that could derail timelines. Below I propose three practical angles that maximize the probability of producing publishable results within the compute budget (4x RTX 4090, ~2-3 weeks), each designed so that even partial success yields a clear contribution. My overarching recommendation: **strip the project to its empirical core first, build the theory around what the data actually shows, and keep every experiment under 1 GPU-hour.**
+The innovator's three angles (Temporal Influence Tomography, Coalition Influence Probing, RepFinger) are intellectually exciting, but as a practitioner I need to ask: **what can we actually build and validate on a single A6000 GPU within 1-hour experiment budgets, using small models, and produce reliable enough signals to write a paper?**
 
----
-
-## Angle 1: Minimal Viable Factorial -- The 2x2 Ablation on DATE-LM with Off-the-Shelf Code
-
-### The Pragmatic Insight
-
-The core novelty of CRA is the 2x2 factorial {parameter-space, representation-space} x {standard, contrastive scoring}. This experiment has *never been done* on a standard LLM benchmark. If executed cleanly on DATE-LM, it is publishable regardless of the theoretical framework. The bilinear unification and signal processing theory are valuable but secondary -- they can be retrofitted to whatever the data shows.
-
-### Why This Should Be Priority #1
-
-- **DATE-LM** provides pre-trained checkpoints, standardized evaluation protocols, and a public leaderboard ([OpenReview](https://openreview.net/forum?id=e2cD5xuHix), [GitHub](https://github.com/DataAttributionEval/DATE-LM)). This eliminates the most dangerous engineering risk: custom training pipelines.
-- **TRAK** has a mature PyTorch implementation ([GitHub: MadryLab/trak](https://github.com/MadryLab/trak)) with CUDA-optimized JL projection kernels. Single-GPU attribution for ~10K training examples on a 1B model is tractable.
-- **RepSim** is trivially implementable: extract last-layer hidden states, compute cosine similarity. No external library needed.
-- **Contrastive scoring** (mean subtraction) is a 3-line operation on pre-computed attribution scores.
-
-### Concrete Implementation Plan
-
-**Step 1: Environment setup (2 hours)**
-```
-- Clone DATE-LM repo, verify checkpoint loading on RTX 4090
-- Install TRAK (pip install traker[fast]) with CUDA kernels
-- Verify RepSim baseline: extract hidden states for 500 test + 10K train examples
-```
-
-**Step 2: Representation extraction (30 min per task x 3 tasks = 1.5 hours)**
-```
-- For each DATE-LM task (data selection, toxicity filtering, factual attribution):
-  - Extract last-layer representations for all train + test examples
-  - Save as .npy files (~80 MB per task at d=2048)
-  - Compute RepSim scores (cosine similarity matrix)
-```
-
-**Step 3: TRAK attribution (45 min per task x 3 tasks = 2.25 hours)**
-```
-- Use TRAK with k=2048 (matching representation dimension d)
-  - 1 model checkpoint, standard random projection
-  - DATE-LM provides the fine-tuned checkpoints
-- Compute TRAK scores for same train/test pairs
-```
-
-**Step 4: Contrastive scoring (15 min total)**
-```
-- For both RepSim and TRAK scores:
-  - Compute mean attribution vector across all training examples
-  - Subtract mean to get contrastive scores
-  - This is DDA's "debias" step, stripped to its essence
-```
-
-**Step 5: Evaluation (30 min)**
-```
-- Compute DATE-LM metrics: LDS (data selection), auPRC (toxicity), P@K (factual)
-- Run 2x2 ANOVA with bootstrap CI (B=1000) for each task
-- Include BM25 baseline (DATE-LM provides this) and k-NN control
-```
-
-**Total wall-clock time: ~6 hours on 1x RTX 4090.** Can be parallelized to ~2 hours on 4 GPUs.
-
-### Engineering Risks and Mitigations
-
-| Risk | P(occur) | Impact | Mitigation |
-|------|----------|--------|------------|
-| DATE-LM checkpoint won't load on 4090 (VRAM) | 20% | High | Use Pythia-1B (2.6 GB in fp16, fits in 24 GB with room for activations) |
-| TRAK CUDA kernel compilation fails | 15% | Medium | Fall back to `traker` CPU/basic GPU mode; slower but functional |
-| TRAK OOM on 10K training examples | 25% | Medium | Subsample to 5K; or compute in batches (TRAK supports chunked computation) |
-| RepSim scores saturate (all near 1.0) | 10% | High | Use CKA or centered cosine similarity; try layer -2 instead of last layer |
-| Contrastive scoring hurts performance | 15% | Low | This is a valid finding (falsifies H2); report honestly |
-
-### Computational Cost
-
-- GPU memory: ~16 GB peak (Pythia-1B in fp16 + batch of representations)
-- Storage: ~500 MB for all representations and score matrices
-- Wall-clock: 6 hours total, each sub-experiment under 1 hour
-
-### Success Probability: 90%
-
-This angle has the highest success probability because it uses only off-the-shelf code on a standard benchmark. Even if the results are "boring" (e.g., RepSim always wins, contrastive scoring helps uniformly), it is the first systematic 2x2 comparison on DATE-LM and fills a clear gap identified in the DATE-LM paper itself ("no single method dominates").
-
-### Failure Mode
-
-The only true failure: DATE-LM evaluation code is broken or undocumented, forcing us to re-implement the evaluation protocol from scratch. Mitigation: the paper describes the protocol in detail, and it uses standard metrics (LDS, auPRC, P@K) available in scikit-learn.
+Below I propose three practical research directions that prioritize computational feasibility, reproducibility, and clear experimental protocols. Each is designed to produce publishable results even if partial hypotheses fail.
 
 ---
 
-## Angle 2: Gradient Eigenspectrum as a Diagnostic Tool -- Measuring FM1 Directly
+## Angle 1: LOO-Proxy Influence Matrix via Cheap Gradient Features (Improve Existing)
 
-### The Pragmatic Insight
+### Core Insight
+Full influence functions (Hessian-based) are too expensive for iterative experimentation. LESS (arXiv 2402.04333) showed that random-projected gradients + cosine similarity is a surprisingly effective proxy for influence in LLMs. The question is: **does this cheap proxy work for multi-task policy learning?** Nobody has validated it in the VLA/robot setting.
 
-H4 (r_eff ~ d) is the "smoking gun" for FM1. If we can directly show that the gradient covariance has effective rank ~d (representation dimension) rather than ~B (parameter count), the entire FM1 narrative becomes data-driven rather than theoretical. The key engineering insight: **this measurement is tractable on Pythia-70M (d=512, B=70M) using Lanczos iteration, and does NOT require computing full gradients.**
+### Method: Gradient-Projected Task Affinity (GPTA)
+1. **Train a small base policy** on all tasks jointly (ResNet-18 encoder + 2-layer MLP action head, or Qwen-0.5B with LoRA rank=8).
+2. **Collect per-sample gradient features**: For each training sample $z$, compute $\nabla_\theta \ell(z; \theta^*)$ and project via a fixed random matrix $R \in \mathbb{R}^{d \times k}$ (k=256-512). This is the LESS/LoGra trick — O(k) storage per sample.
+3. **Task-level influence matrix**: For each task pair $(i, j)$, compute $M_{ij} = \frac{1}{|\mathcal{D}_j|} \sum_{z' \in \mathcal{D}_j} \max_{z \in \mathcal{D}_i} \cos(Rg_z, Rg_{z'})$. This measures how well task $i$'s training data "covers" task $j$'s gradient directions.
+4. **Validate against ground truth**: Run actual LOO retraining (drop task $i$, measure task $j$ performance) for all $T(T-1)$ pairs. Compute Spearman correlation between $M_{ij}$ and actual LOO effect.
+5. **Data mixing application**: Use $M_{ij}$ to define a simple mixing rule: $w_i^{(j)} \propto \max(0, M_{ij})$ for task $j$'s training. Compare vs. uniform mixing and Re-Mix (DRO).
 
-### Why This Is Feasible
+### Why This Is Practical
+- **Gradient collection**: Single backward pass per sample. For 500 samples × 10 tasks = 5000 samples on a small model, this takes ~10 min.
+- **Random projection**: O(nk) total, fits in memory even for k=512.
+- **LOO validation**: With a small model (training ~5 min per run), 10-task LOO costs 10 × 5 min = 50 min. Parallelizable with careful GPU scheduling.
+- **No Hessian computation**: Avoids the main computational bottleneck of classical influence functions.
 
-- **Pythia-70M** fits entirely in 4 GB GPU memory. Full gradient computation for a single example costs ~280 MB (70M params x 4 bytes).
-- **Lanczos iteration** for top-k eigenvalues of Sigma_g requires only matrix-vector products (gradient x vector), not explicit covariance matrix construction. The `scipy.sparse.linalg.eigsh` or PyTorch's `torch.lobpcg` can compute top-500 eigenvalues with ~50 Lanczos iterations.
-- **Effective rank** from eigenspectrum: r_eff(95%) = min k such that sum(lambda_1..k) / sum(lambda_all) >= 0.95. If r_eff ~ 512 (= d for Pythia-70M), FM1 is confirmed.
-
-### Concrete Implementation Plan
-
-**Step 1: Gradient extraction (30 min)**
-```
-- Fine-tune Pythia-70M on DATE-LM data selection task (or use pre-existing checkpoint)
-- For 1000 training examples, compute per-example gradients using backprop
-- Store as [1000 x 70M] matrix (or use implicit matrix-vector products)
-```
-
-**Step 2: Lanczos eigendecomposition (20 min)**
-```
-- Compute top-500 eigenvalues of gradient covariance using Lanczos
-- Plot eigenvalue decay curve (log scale)
-- Compute r_eff(90%), r_eff(95%), r_eff(99%)
-```
-
-**Step 3: Representation covariance comparison (10 min)**
-```
-- Compute eigenvalues of representation covariance (d=512, cheap)
-- Compare condition numbers: gradient (expected >10^4) vs representation (expected <100)
-- This simultaneously tests H9 (isotropy)
-```
-
-**Step 4: Cross-validation on Pythia-160M (30 min, optional)**
-```
-- Repeat eigenspectrum on Pythia-160M (d=768)
-- Check if r_eff scales with d, not B
-```
-
-### Engineering Risks
-
-| Risk | P(occur) | Impact | Mitigation |
-|------|----------|--------|------------|
-| Lanczos convergence too slow | 15% | Medium | Use randomized SVD (sklearn.utils.extmath.randomized_svd) instead; less precise but faster |
-| Per-example gradients OOM on 70M model | 10% | Low | Use gradient accumulation; compute matrix-vector products without storing full gradient matrix |
-| Eigenspectrum shows r_eff >> 2d | 20% | High | FM1 narrative weakens; but report as evidence against signal dilution hypothesis |
-| r_eff(95%) is ambiguous (depends heavily on threshold) | 25% | Medium | Report multiple thresholds (80%, 90%, 95%, 99%); plot full spectrum for visual inspection |
+### Experimental Plan (<=1hr per experiment task)
+- **Dataset**: LIBERO-10 (10 tasks, ~50 demos each, readily available)
+- **Model**: ResNet-18 + MLP action head (~5M params) — trains in ~5 min on single A6000
+- **Pilot** (15 min): Train base model, collect gradient features for 2 tasks, sanity-check cosine similarity distribution
+- **Main experiment** (45 min): Full 10×10 influence matrix + 3 LOO validation runs
+- **Samples**: Use all 50 demos per task (500 total) — config says pilot_samples=100, so use 100 for pilot, full set for main
 
 ### Computational Cost
+| Step | Time | GPU Memory |
+|------|------|-----------|
+| Base model training (10 tasks) | 5 min | ~4 GB |
+| Gradient feature collection (5000 samples) | 10 min | ~6 GB |
+| Influence matrix computation | 2 min | CPU only |
+| LOO validation (3 pairs) | 15 min | ~4 GB |
+| **Total pilot** | **~30 min** | **~6 GB peak** |
 
-- GPU memory: ~8 GB (Pythia-70M + gradients for 1 batch)
-- Storage: ~20 MB (eigenvalues only, not eigenvectors)
-- Wall-clock: 1 hour total on single RTX 4090
+### Success Probability: 70%
+High because the LESS proxy is well-validated for LLMs and the method is simple. Main risk: policy loss landscapes may be qualitatively different from language modeling loss.
 
-### Success Probability: 65%
+### Failure Modes
+- Gradient features may be too noisy for small robot datasets (50 demos per task)
+- Cosine similarity may not capture directional conflicts in action space
+- LOO effect may be too small to detect with limited data
 
-The measurement itself will succeed (eigenspectrum computation is well-understood). The question is whether r_eff falls in the predicted [0.5d, 2d] range. Prior work (Park et al., TRAK paper) implicitly observes that random projection dimension matters, but nobody has directly measured the effective rank. Even if r_eff is outside the predicted range, the measurement itself is novel and informative.
+### Fallback
+If gradient proxy fails, switch to representation-based proxy (see Angle 3) — the experimental infrastructure (LOO validation) is reusable.
 
-### Key References for Implementation
-
-- `torch.lobpcg` for large-scale eigenvalue computation in PyTorch
-- `functorch.vmap` + `functorch.grad` for efficient per-example gradient computation
-- Pythia checkpoints: [HuggingFace EleutherAI/pythia-70m](https://huggingface.co/EleutherAI/pythia-70m) with 154 intermediate checkpoints
+### Key References
+- LESS (arXiv 2402.04333, ICML 2024): gradient projection for efficient influence — [code available](https://github.com/princeton-nlp/LESS)
+- LoGra/LogIX (ICLR 2025): efficient gradient logging for TDA — [code available](https://github.com/logix-project/logix)
+- ETAP (arXiv 2602.18591, 2026): ensemble task affinity prediction combining gradient-based + learned estimators
+- DUET (arXiv 2502.00270, 2025): influence function + Bayesian optimization for data mixture
+- DataMIL (arXiv 2505.09603): datamodels for robot data selection — closest prior work in robotics
 
 ---
 
-## Angle 3: TRAK Dimension Sweep as Empirical FM1 Test
+## Angle 2: Task Affinity via Leave-One-Task-Out with Efficient Proxies (Cross-Domain Transfer)
 
-### The Pragmatic Insight
+### Core Insight
+The MTL task grouping literature (ETAP, DMTG, RMB-CLE) has developed cheap affinity estimation methods, but **none have been applied to robot policy learning**. The key engineering question: which cheap proxy best predicts actual multi-task performance in the VLA setting? This is an empirical horse-race that the field needs.
 
-H5 (TRAK dimension saturation) is the most practically impactful experiment. If TRAK performance saturates at k ~ d (representation dimension), this directly tells practitioners: "don't waste compute on k > 2d projections." It also provides the most accessible FM1 evidence -- no eigenspectrum computation needed, just run TRAK seven times with different k values.
+### Method: Affinity Proxy Benchmark for Robot MTL
+Compare 4 cheap affinity estimation methods on the same benchmark:
 
-### Why This Is Both Novel and Easy
+1. **Gradient cosine** (GradCos): Average cosine similarity of per-task gradient vectors $\cos(\bar{g}_i, \bar{g}_j)$. Cost: 1 forward + backward pass per task.
+2. **Loss-based LOO proxy** (LossLOO): Train on all tasks, evaluate task $j$ loss, then remove task $i$ data and retrain. Approximate with early stopping at 20% of full training budget. Cost: $T$ partial retraining runs.
+3. **Representation CKA** (RepCKA): Compute CKA similarity between task-conditioned activations at the penultimate layer. Cost: 1 forward pass per task. (This is a simplified version of the innovator's RepFinger.)
+4. **GPTA** (from Angle 1): Gradient-projected task affinity.
 
-- **TRAK's `traker` library** accepts projection dimension as a hyperparameter. Sweeping k is literally changing one integer.
-- **Nobody has published a systematic dimension sweep** on LLMs. The TRAK paper shows sweeps on CIFAR-10 and ImageNet, but not on language models where d << B is most extreme.
-- **The saturation curve shape is diagnostic**: if it saturates at k ~ d, FM1 is confirmed; if it keeps improving log-linearly, FM1 is refuted; if it saturates at k << d, something more interesting is happening.
+### Ground Truth
+Full LOO retraining: for each of the 45 task pairs in LIBERO-10, train without task $i$ and measure task $j$'s success rate. This is expensive (~50 min × 10 = 8+ hours total) but can be distributed across multiple experiment tasks.
 
-### Concrete Implementation Plan
+### Why This Is Practical
+- Each proxy computation takes <15 min
+- Ground truth collection is embarrassingly parallel (10 independent training runs)
+- The benchmark structure makes partial results publishable — even comparing 2 proxies is informative
+- Directly useful for any future work on robot data mixing
 
-**Step 1: TRAK sweep (45 min per k x 7 values = 5.25 hours; parallelizable to 1.5 hours on 4 GPUs)**
-```
-- Model: Pythia-1B (d=2048) on DATE-LM data selection task
-- k values: {64, 128, 256, 512, 1024, 2048, 4096}
-- For each k:
-  - Run TRAK with random projection to R^k
-  - Compute LDS on DATE-LM test set
-  - Record wall-clock time and peak GPU memory
-```
-
-**Step 2: PCA-TRAK comparison (45 min, optional but high-value)**
-```
-- Compute top-2048 eigenvectors of gradient covariance (from Angle 2)
-- Run TRAK with PCA projection (deterministic, onto top-k eigenvectors)
-  for k in {64, 128, 256, 512, 1024, 2048}
-- If PCA-TRAK saturates at smaller k than random-TRAK, this is the "smoking gun":
-  directed projection captures signal more efficiently
-```
-
-**Step 3: Visualization and analysis (30 min)**
-```
-- Plot LDS vs log(k) for random-TRAK and PCA-TRAK
-- Mark d=2048 on x-axis
-- Compute "knee point" using Kneedle algorithm
-- Estimate r_eff indirectly from saturation point
-```
-
-### Engineering Risks
-
-| Risk | P(occur) | Impact | Mitigation |
-|------|----------|--------|------------|
-| TRAK at k=4096 OOM on RTX 4090 | 30% | Medium | Use gradient checkpointing; or cap at k=2048 and extrapolate |
-| LDS computation is noisy (large variance) | 20% | Medium | Run each k with 3 random seeds; report mean +/- std |
-| No clear saturation (keeps improving) | 20% | High | This falsifies H5 but is informative; report as negative result |
-| PCA eigenvector computation infeasible at Pythia-1B scale | 40% | Medium | Skip PCA-TRAK; random-TRAK sweep alone is still novel |
+### Experimental Plan
+- **Phase 1 — Ground truth** (10 experiment tasks × 5 min each = 50 min total, can run as batch):
+  - 10 LOO training runs (drop task $i$, evaluate all other tasks)
+  - 1 baseline training (all tasks)
+  - Record per-task success rates → build ground-truth influence matrix
+- **Phase 2 — Proxy computation** (1 experiment task, ~30 min):
+  - Compute all 4 proxies from the all-task model
+  - Measure Spearman/Kendall-tau correlation with ground truth
+- **Phase 3 — Mixing application** (3 experiment tasks × 15 min):
+  - Take the best proxy, derive mixing weights
+  - Compare: uniform / proxy-guided / Re-Mix (DRO) / oracle (LOO-based)
 
 ### Computational Cost
-
-- GPU memory: ~20 GB peak at k=4096 (Pythia-1B + projection matrices)
-- Storage: ~100 MB per k (score matrices)
-- Wall-clock: 5.25 hours sequential, ~1.5 hours with 4-GPU parallelism
+| Step | Time | Notes |
+|------|------|-------|
+| Ground truth LOO (10 runs) | 50 min total | Parallelizable to ~5 min with 10 GPUs, but single-GPU = sequential |
+| 4 proxy computations | 30 min | Sequential on single GPU |
+| 3 mixing experiments | 45 min | Sequential |
+| **Total** | **~2 hours** | Split across 3-4 experiment tasks |
 
 ### Success Probability: 75%
+This is primarily an empirical benchmark — something useful comes out regardless of which proxy wins. Even a negative result ("no cheap proxy works for robot MTL") is publishable.
 
-High confidence the experiment runs successfully (TRAK is mature software). Moderate confidence the saturation curve shows a clear knee at k ~ d. The Wang et al. (2505.24261) hyperparameter sensitivity study confirms that TRAK is sensitive to projection dimension -- our sweep systematically characterizes this sensitivity for the first time on LLMs.
+### Failure Modes
+- All proxies may correlate poorly with ground truth (→ finding itself is the contribution)
+- LOO effects may be uniformly small in LIBERO-10 (tasks may be similar enough that removing one has negligible impact)
+- Small model results may not transfer to larger VLAs
 
----
-
-## Synthesis: Practical Execution Roadmap
-
-### Phase 0: Infrastructure Validation (Day 0, 2 hours)
-```
-1. Verify DATE-LM checkpoint loading on RTX 4090 (Pythia-1B)
-2. Verify TRAK installation with CUDA kernels
-3. Run RepSim on 100 examples as smoke test
-4. Confirm DATE-LM evaluation script works end-to-end
-```
-**Gate**: If any step fails, debug for max 2 hours, then fall back to Pythia-410M or smaller model.
-
-### Phase 1: Core 2x2 Factorial (Day 1, 6 hours) -- Angle 1
-```
-- Execute the full 2x2 ablation on all 3 DATE-LM tasks
-- Compute ANOVA + bootstrap CI
-- This alone is sufficient for a workshop paper or short paper
-```
-**Gate**: If RepSim < TRAK by >5pp, stop and investigate before proceeding.
-
-### Phase 2: Mechanistic Evidence (Day 2, 2 hours) -- Angle 2
-```
-- Eigenspectrum on Pythia-70M (1 hour)
-- Representation covariance comparison (30 min)
-- Analysis and visualization (30 min)
-```
-**Gate**: If r_eff > 10d, reconsider FM1 narrative.
-
-### Phase 3: Dimension Sweep (Day 2-3, 5 hours) -- Angle 3
-```
-- TRAK sweep on Pythia-1B (parallelized across 4 GPUs)
-- Optional PCA-TRAK comparison
-```
-
-### Phase 4: Framework Validation (Day 3-4, 4 hours)
-```
-- Whitened attribution (Ledoit-Wolf regularized) on RepSim
-  - scikit-learn's LedoitWolf estimator is battle-tested and O(n*d^2)
-  - For d=2048 and n=10K, covariance estimation takes <1 min
-  - Apply whitening: scores = phi^T @ Sigma_inv @ psi
-- Multi-method comparison: add RepT, AirRep if code is available
-  - RepT: https://github.com/plumprc/RepT (public)
-  - AirRep: https://github.com/sunnweiwei/AirRep (public, NeurIPS 2025)
-```
-
-### Total Budget
-
-| Phase | GPU-hours | Wall-clock (4 GPUs) | Critical? |
-|-------|-----------|---------------------|-----------|
-| Phase 0 | 2 | 2h | Yes -- gate for everything |
-| Phase 1 | 6 | 2h | Yes -- core contribution |
-| Phase 2 | 1 | 1h | Yes -- mechanistic evidence |
-| Phase 3 | 5.25 | 1.5h | High priority |
-| Phase 4 | 4 | 2h | Nice to have |
-| **Total** | **18.25** | **8.5h** | |
-
-This is well within the 2-3 week budget. Remaining time is for:
-- Debugging and re-runs (~2x buffer)
-- Additional methods (DDA, LoGra, Concept Influence)
-- Theoretical write-up
-- Paper drafting
+### Key References
+- ETAP (arXiv 2602.18591): ensemble task affinity predictor — gradient + learned estimators
+- Efficient Task Grouping (arXiv 2412.04413): samplewise optimization landscape for task similarity
+- DMTG (arXiv 2407.05082): differentiable multi-task grouping — [code](https://github.com/ethanygao/DMTG)
+- RMB-CLE (arXiv 2602.14231): cross-task error clustering for robust MTL
+- Principled Task Grouping (arXiv 2402.15328): theoretical framework for transfer gain
 
 ---
 
-## Critical Engineering Warnings
+## Angle 3: Representation Geometry Diagnostic (New, Low-Cost Method)
 
-### Warning 1: DATE-LM Task Heterogeneity
+### Core Insight
+The innovator proposed RepFinger (CKA + linear probe direction). I agree this is the highest-value practical tool, but I'd simplify and harden it for reliability:
 
-DATE-LM's three tasks have *very different characteristics*:
-- **Data selection** (LDS): Counterfactual metric, requires retraining. This is expensive -- verify DATE-LM provides pre-computed counterfactual scores, or we need to retrain ~100 models.
-- **Toxicity filtering** (auPRC): Binary classification of training data. Cheapest to evaluate.
-- **Factual attribution** (P@K): Retrieval task. BM25 may be surprisingly competitive here (DATE-LM found this).
+**Don't compute CKA across all layers — focus on the action-prediction bottleneck layer.** In a VLA, the representation conflict that matters is at the layer where visual features get mapped to action predictions. Earlier layers (vision encoder) are likely shared and non-conflicting; the conflict lives in the policy head.
 
-**Recommendation**: Start with toxicity filtering (cheapest, cleanest signal), then data selection, then factual attribution. If time is tight, two tasks are sufficient for a NeurIPS submission.
+### Method: Bottleneck Conflict Score (BCS)
+1. **Identify the bottleneck**: The last shared layer before task-specific heads (or the LoRA-adapted layers in a VLA).
+2. **Extract task-conditioned features**: For each task, run validation data through the model, collect the bottleneck activations $H_i \in \mathbb{R}^{n_i \times d}$.
+3. **Compute subspace overlap**: For each task, compute the top-$k$ principal components $U_i \in \mathbb{R}^{d \times k}$. The subspace overlap is $O_{ij} = \|U_i^T U_j\|_F^2 / k$ (normalized Grassmann distance).
+4. **Compute readout conflict**: Fit a linear probe $W_i$ from bottleneck features to actions for each task. Conflict score: $C_{ij} = O_{ij} \cdot (1 - |\cos(W_i, W_j)|)$. High overlap + low readout alignment = conflict.
+5. **BCS matrix**: $BCS_{ij} = O_{ij} \cdot \text{sign}(\cos(W_i, W_j))$. Positive = positive transfer potential, negative = conflict.
 
-### Warning 2: Contrastive Scoring Is Not Trivial
+### Simplifications vs. RepFinger
+- **Single layer** instead of all layers → 10x faster, easier to interpret
+- **PCA subspace overlap** instead of CKA → more interpretable, no kernel choice
+- **Focus on action prediction** instead of full representation → directly relevant to policy quality
 
-DDA's "debias" step is more nuanced than simple mean subtraction:
-- They subtract the *task-conditional* mean, not the global mean
-- They also apply a "denoise" step (matrix regularization)
-- Their 55pp improvement from debias may not replicate with naive mean subtraction
+### Experimental Plan (<=1hr)
+- **Step 1** (5 min): Load a pre-trained multi-task model (from Angle 1/2 base training)
+- **Step 2** (10 min): Forward pass all validation data, cache bottleneck activations
+- **Step 3** (5 min): PCA per task, compute subspace overlap matrix
+- **Step 4** (10 min): Fit linear probes per task (least squares, ~seconds each), compute readout cosines
+- **Step 5** (5 min): Compute BCS matrix, visualize as heatmap
+- **Step 6** (15 min): Validate against LOO ground truth (reuse from Angle 2)
 
-**Recommendation**: Implement both (a) global mean subtraction and (b) task-conditional mean subtraction. If (a) fails, (b) is the fallback. If both fail, this is actually interesting (FM2 is more complex than a simple bias term).
+### Computational Cost
+| Step | Time | GPU Memory |
+|------|------|-----------|
+| Feature extraction (forward pass) | 5 min | ~4 GB |
+| PCA + overlap | 1 min | CPU only |
+| Linear probes (10 tasks) | 2 min | CPU only |
+| BCS computation | <1 min | CPU only |
+| **Total** | **~10 min** | **~4 GB peak** |
 
-### Warning 3: Whitened Attribution May Fail Silently
+This is **the cheapest diagnostic** in the entire proposal. If it works, it's a plug-and-play tool for any multi-task robot learning pipeline.
 
-Sigma_noise^{-1} estimation is fragile when d > n (more features than samples). For d=2048 and typical DATE-LM training set sizes:
-- If n < 2048: raw inverse is singular; MUST use Ledoit-Wolf or ridge regularization
-- Even with regularization, the condition number of Sigma_noise may be too high for meaningful whitening
+### Success Probability: 60%
+The theoretical grounding is solid (Hiratani 2405.20236 proved high feature overlap + low readout alignment is catastrophic). Risk is that the single-layer approximation loses important information.
 
-**Recommendation**: Always compare whitened attribution against ridge-regularized attribution (M = (Sigma + lambda*I)^{-1}) with lambda tuned on held-out data. Report regularization strength alongside performance.
+### Failure Modes
+- Single-layer focus may miss conflicts that emerge from cross-layer interactions
+- PCA may not capture the relevant subspace structure (non-linear manifolds)
+- Linear probes may be too simple for multi-modal action spaces (7-DOF + gripper)
+- The bottleneck layer may not be well-defined in transformer architectures
 
-### Warning 4: Pythia-1B Is Not Typical of Production LLMs
+### Fallback
+If single-layer BCS fails, progressively add layers (2-3 key layers) until signal emerges. If PCA fails, switch to CKA (more robust to non-linearity). The infrastructure is identical.
 
-Pythia-1B has d=2048, which is relatively small. Production LLMs (Llama-2-7B: d=4096, Llama-2-70B: d=8192) have larger d but also much larger B. The d/B ratio changes, which could affect FM1 severity.
-
-**Recommendation**: Run the core 2x2 on Pythia-1B as the main experiment. If time permits, replicate one task on a 7B model (Llama-2-7B or Qwen-2-7B) to check scaling. DATE-LM supports multiple model architectures.
+### Key References
+- Hiratani (arXiv 2405.20236): analytical proof that feature similarity + readout divergence = catastrophic transfer
+- AirRep (arXiv 2505.18513, NeurIPS 2025): representation-based TDA for single-task data valuation
+- CKA (Kornblith et al., ICML 2019): centered kernel alignment — gold standard for representation comparison
+- MINT (arXiv 2506.02308): multimodal interaction grouping — uses task interaction type for MTL grouping
 
 ---
 
-## Risk Assessment Summary
+## Practical Synthesis: Recommended Execution Order
 
-| Angle | Novelty | Engineering Risk | P(success) | Time (GPU-h) | Fallback Value |
-|-------|---------|-----------------|------------|--------------|---------------|
-| 1. 2x2 Factorial | Medium | Low | 90% | 6 | First systematic comparison on DATE-LM -- publishable as-is |
-| 2. Eigenspectrum | Medium-High | Medium | 65% | 1 | Direct measurement of gradient rank -- informative even if r_eff != d |
-| 3. Dimension Sweep | Medium | Low | 75% | 5.25 | Practical guide for TRAK hyperparameter selection on LLMs |
+The three angles are **not independent** — they share infrastructure and ground truth. Here's the optimal execution plan for a single-GPU setup:
 
-**Expected value**: At least two angles succeed with P = 1 - (0.10)(0.35)(0.25) = 99.1%. The paper has strong empirical foundations with very high probability.
+### Phase 1: Foundation (2 experiment tasks, ~1hr total)
+1. **Train base multi-task model** on LIBERO-10 (ResNet-18 + MLP, ~5 min)
+2. **Collect gradient features** for all samples (LESS-style projection, ~10 min)
+3. **Collect bottleneck activations** for all validation data (~5 min)
+4. **Compute all proxies**: GPTA, GradCos, RepCKA, BCS (~15 min)
 
-**My strong recommendation**: Execute Angles 1-3 in order before touching any theory. The bilinear framework and matched filter theory are only as valuable as the empirical evidence supporting them. If the 2x2 factorial shows clear FM1/FM2 separation, the theory writes itself. If it doesn't, no amount of elegant math will save the paper.
+### Phase 2: Ground Truth (10 experiment tasks, ~50 min total)
+5. **LOO retraining**: 10 independent runs, each ~5 min
+6. **Build ground-truth influence matrix**: $M^{GT}_{ij}$ = success rate change
+
+### Phase 3: Validation & Application (3 experiment tasks, ~45 min total)
+7. **Proxy benchmark**: Correlate all proxies with ground truth
+8. **Best-proxy mixing**: Apply top proxy to data mixing optimization
+9. **Compare**: uniform / proxy-guided / Re-Mix / oracle
+
+### Phase 4: Mechanism Analysis (2 experiment tasks, ~30 min total)
+10. **Identify top-3 negative transfer pairs** from ground truth
+11. **Diagnose mechanism** via BCS decomposition: is it subspace overlap + readout conflict?
+12. **Targeted intervention**: Remove conflicting data for top negative pair, measure improvement
+
+**Total: ~15 experiment tasks, ~3 hours wall-clock on single A6000.**
+
+### What We Get
+- **Contribution 1**: First systematic proxy benchmark for task affinity in robot manipulation
+- **Contribution 2**: BCS — a 10-minute, gradient-free diagnostic for multi-task conflicts
+- **Contribution 3**: Evidence-based data mixing strategy with measured improvement over uniform/DRO baselines
+- **Contribution 4**: Mechanism-level understanding of negative transfer in specific task pairs
 
 ---
 
-## Key Resources and Implementation References
+## Risk Assessment
 
-### Off-the-Shelf Code
-- **DATE-LM**: [GitHub](https://github.com/DataAttributionEval/DATE-LM) -- benchmark, checkpoints, evaluation scripts
-- **TRAK**: [GitHub (MadryLab/trak)](https://github.com/MadryLab/trak) -- CUDA-optimized random projection attribution
-- **AirRep**: [GitHub (sunnweiwei/AirRep)](https://github.com/sunnweiwei/AirRep) -- learned representation attribution (NeurIPS 2025)
-- **RepT**: [GitHub (plumprc/RepT)](https://github.com/plumprc/RepT) -- representation gradient tracking
-- **Pythia**: [HuggingFace (EleutherAI)](https://huggingface.co/EleutherAI/pythia-1b) -- 154 checkpoints per model size
+### Critical Risk: Signal Strength
+The biggest practical risk is that LIBERO-10 tasks are too similar to produce strong negative transfer signals. If all LOO effects are within noise margin:
 
-### Libraries
-- **Ledoit-Wolf**: `sklearn.covariance.LedoitWolf` -- battle-tested shrinkage estimator, O(n*d^2)
-- **Per-example gradients**: `torch.func.vmap` + `torch.func.grad` (PyTorch 2.0+)
-- **Eigendecomposition**: `torch.lobpcg` for large-scale; `scipy.sparse.linalg.eigsh` for Lanczos
-- **Bootstrap CI**: `scipy.stats.bootstrap` or manual implementation
+**Plan B — Switch to heterogeneous task set:**
+- Create a custom 5-task subset mixing LIBERO tasks with deliberately conflicting demands (e.g., "push left" + "push right" on same object type)
+- Or use Meta-World MT10 where tasks are more diverse (reach, push, pick-place, drawer, window, etc.)
+- 5 tasks reduce LOO cost to 5 × 5 min = 25 min
 
-### Key Papers Informing This Perspective
-- Park et al. (2303.14186): TRAK -- establishes random projection methodology and dimension sensitivity
-- Ma & Nyarko (2511.19803): Forward-only attribution -- complementary efficiency approach, validates scalability concerns
-- Wang et al. (2505.24261): Hyperparameter sensitivity in TDA -- confirms projection dimension matters
-- Daunce / Pan et al. (2505.23223): Uncertainty-based attribution -- alternative scalable approach if gradient methods fail
-- DATE-LM / Jiao et al. (2507.09424): Benchmark design -- "no single method dominates" motivates systematic comparison
-- Li et al. (2409.19998): RepSim >> IF on LLMs -- the core observation that CRA explains
+### Critical Risk: Small Model ≠ Large VLA
+Results on ResNet-18 + MLP may not transfer to 7B VLA models.
+
+**Mitigation:**
+- Run one validation experiment on a frozen OpenVLA backbone with LoRA (rank=8): forward pass + BCS computation only (~20 min, no retraining needed)
+- If BCS rankings are consistent between small and large models, the diagnostic generalizes
+- This is a cheap "transferability check" that doesn't require full LOO on the large model
+
+### What I Would NOT Do
+- **Coalition influence probing** (innovator's Angle 2): With only 10 tasks, $\binom{10}{3}=120$ triplets are too many to validate and the signal is likely dominated by pairwise effects. Defer to a later stage when the pairwise story is solid.
+- **Full Hessian-based influence functions**: Too expensive for iterative experimentation on single GPU. The gradient proxy is sufficient for the diagnostic and mixing applications.
+- **Training large VLAs from scratch**: We need fast iteration cycles. Small models trained in 5 min allow 10+ experiments per hour.
+
+---
+
+## Implementation Checklist
+
+### Required Software
+- [ ] LIBERO benchmark: `pip install libero` ([GitHub](https://github.com/Lifelong-Robot-Learning/LIBERO))
+- [ ] PyTorch (already available)
+- [ ] LogIX/LESS for gradient projection: `pip install logix` ([GitHub](https://github.com/logix-project/logix))
+- [ ] scikit-learn for PCA/CKA computation
+
+### Required Data
+- [ ] LIBERO-10 dataset (~2 GB download)
+- [ ] No external pre-trained weights needed for small model experiments
+
+### Key Metrics
+| Metric | Purpose |
+|--------|---------|
+| Spearman $\rho$ (proxy vs. LOO) | Proxy quality |
+| Success rate (task $j$ | mixing strategy) | Mixing effectiveness |
+| Subspace overlap $O_{ij}$ | Representation sharing |
+| Readout cosine $\cos(W_i, W_j)$ | Action alignment |
+| BCS vs. gradient proxy correlation | Method agreement |
+
+### Time Budget Summary
+| Phase | Experiment Tasks | Wall-Clock |
+|-------|-----------------|------------|
+| Foundation | 2 | ~1 hr |
+| Ground Truth | 10 | ~50 min |
+| Validation | 3 | ~45 min |
+| Mechanism | 2 | ~30 min |
+| **Total** | **17** | **~3 hr** |
+
+This is achievable within 1-2 iteration cycles of the Sibyl pipeline.

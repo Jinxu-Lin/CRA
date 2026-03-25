@@ -5,44 +5,62 @@
 
 ## 评审意见
 
-### 1. 被忽视的风险（盲点）
+### 1. Overall Assessment (7/10)
 
-- **因果过度声明风险**: 标题和论点（"Signal Dilution, Not Hessian Error"）相对于自身证据过于强硬——FM1 不充分（TRAK-PCA@k=d 与 RepSim 之间仍存在 30.8pp 的持续性缺口）。团队有证据反驳一种机制，但并未给出完整的诊断。
-- **特征质量混淆未被充分解决**: 团队承认"维度 vs 特征质量"未解决，但实验计划仍以 FM1 重型诊断为中心。如果表示特征更好地编码了语义，那么谱集中度可能是表观现象而非根因。
-- **Benchmark 有效性风险**: BM25 在 counterfact 上 R@50=1.0 表明某些任务可能作为检索而非归因来解决。如果任务信号是词汇/近重复密集的，方法对比的有效性部分存疑。
-- **泛化风险**: 毒性任务逆转（TRAK 0.926 > RepSim 0.685）表明强烈的任务依赖性。这不仅仅是"范围限制"；除非任务体制被正式表征，否则会威胁到核心论断。
-- **计算预算现实性风险**: 在 4x RTX 4090 上 24 GPU 小时完成五个实验包（包括机制分解和检索基线）对于稳健的重复实验、消融和不确定性量化来说可能过于紧张。
+Well-conceived as a staged, falsification-first program with clear decision gates. Main issue: the causal claims may outrun what the proposed proxies and budget can support.
 
-### 2. 方法论缺陷
+### 2. Strengths
 
-- **评估协议失败已经发生**: H2 依赖于对均值平移不变的 rank 指标，产生了保证为零的效果。这是严重的设计有效性失误，而非小 bug。
-- **统计可靠性不明确**: 未提及置信区间、配对显著性检验、基于查询的 bootstrap、或多重假设校正——尽管存在大量方法-任务比较。
-- **潜在的泄漏/重叠检查缺失**: 鉴于检索基线如此强大，需要明确的训练-测试词汇和语义重叠审计；否则关于"归因"的结论是薄弱的。
-- **病态协方差处理本可预见**: H7 在 N/d=0.049 下使用白化并灾难性失败（-8 至 -11pp）。这应该通过条件数诊断和预先设计的收缩/PCA 方案来预防。
-- **机制识别是薄弱的**: P4"缺口分解 + 层扫描"是相关性的，除非包含干预手段（如特征置乱、受控投影扰动、因果中介风格测试）。
+- Strong phase-gated design (detect -> measure -> intervene) with pre-registered thresholds.
+- Good balance of cheap diagnostics (BCS), stronger proxy (GPTA), and actionable optimizer (LP mixing).
+- Explicit attention to negative transfer, significance control, and ID/OOD evaluation.
+- Debate surfaces real failure modes (influence fragility, architecture confounds, non-additivity).
 
-### 3. 新颖性评估
+### 3. Weaknesses and Blind Spots (underweighted by all six perspectives)
 
-- **最强新颖性**: 系统性诊断框架 + 参数空间 vs 表示空间 TDA 的受控 benchmark 对比是有用的，可能可发表。
-- **中等新颖性**: 双线性形式 phi^T M psi 主要是统一符号/分类学，除非它产生可证伪的预测和具有实际优势的新方法类别。
-- **对于 NeurIPS/ICML 的当前水平**: 处于边界。目前看起来更像是一个具有尖锐阴性发现的扎实实证研究，而非高影响力的方法论进展。要获得 NeurIPS/ICML 接受，可能需要 (a) 超越 FM1 的经验证新机制，或 (b) 能够弥合 30.8pp 缺口的显著部分的新方法。
+- **Causality gap**: correlations between proxy scores and LOTO outcomes do not establish mechanism.
+- **Pairwise bias**: framework is largely pairwise; MISS-style higher-order effects can dominate.
+- **Task heterogeneity confounding**: differences in data quality, reward sparsity, horizon, and success metric may masquerade as "interaction."
+- **Training dynamics/path dependence**: interaction may depend on task order, optimizer state, and curriculum, not just dataset mix.
+- **External validity risk**: LIBERO-10 + small backbone may not transfer to real large-scale VLA regimes despite frozen OpenVLA check.
 
-### 4. 逻辑一致性
+### 4. Methodological Concerns
 
-- 修订后的内部逻辑部分一致（"FM1 真实但不充分"），但框架表述仍然过度延伸。
-- **矛盾**: 论证 FM1 为主要失败模式，但毒性逆转和大残差缺口表明 FM1 无法可靠地预测跨任务的结果。
-- **矛盾**: 将 phi^T M psi 作为核心呈现，但同时承认预测能力不确定；这削弱了"理论"声明。
+- Bonferroni may be too conservative for many pairwise tests, increasing false negatives; power analysis is missing.
+- 5 seeds may still be underpowered for small transfer effects in RL-style variance regimes.
+- Proxy validation target (rho > 0.6) is useful but incomplete; calibration/error bars and rank stability (Kendall-tau) are also needed.
+- LP intervention assumes stable influence estimates; estimation noise can make optimized weights brittle.
+- Architecture-vs-data confound is not isolated early enough; should be front-loaded as a blocking factor.
 
-### 5. 具体改进建议（可操作）
+### 5. Novelty Assessment
 
-1. **降低论点声明**: 重新框定为"FM1 是经验证的贡献因素，而非完整解释"，并将 30.8pp 残差作为首要研究问题。
-2. **修复评估统计**: 添加 Kendall/Spearman（已计划），加上 bootstrap 置信区间、配对置换检验、以及所有方法-任务假设的 FDR 校正。
-3. **强化 Benchmark 有效性**: 添加重叠诊断（n-gram、嵌入最近邻重叠），去重受污染样本，并按重叠程度分层报告性能。
-4. **直接测试特征质量 vs 维度**: 运行维度匹配但语义不同的受控实验（随机旋转、保语义投影、逐层特征交换）。
-5. **强化白化研究**: 用收缩 + PCA 截断白化 + 样本量缩放曲线替代朴素逆协方差；基于条件数和 N/d 阈值预注册失败标准。
+- **Component novelty**: moderate (BCS/representation geometry, gradient affinity, and LP mixing each have precedents).
+- **System novelty**: stronger; the multi-resolution integration plus falsification gates is the genuinely new contribution.
+- Overall novelty: **6.5/10**.
+
+### 6. Feasibility Assessment
+
+- **14 GPU-hours**: feasible for pilot and partial phase completion, not for statistically credible end-to-end claims.
+- **~34 GPU-hours** estimate is more realistic for full rigor (seeds, rollouts, ablations, and intervention comparisons).
+- If budget stays 14h, scope must be reduced to "feasibility + directional evidence," not definitive conclusions.
+
+### 7. Missing Perspectives
+
+- Statistical design perspective: formal power analysis, hierarchical/mixed-effects modeling, and multiplicity strategy beyond Bonferroni.
+- Robustness/reproducibility perspective: sensitivity to seeds, hyperparameters, and implementation variance.
+- Evaluation-theory perspective: whether task success metrics are commensurate across tasks for interaction inference.
+- Data-centric reliability perspective: label/reward noise and demonstrator quality as first-order confounders.
+
+### 8. Specific Recommendations (actionable)
+
+1. Add a **pre-study power analysis** and switch to FDR or hierarchical testing for pairwise scans.
+2. Insert an explicit **architecture-vs-data factorial ablation in Phase 1** (shared backbone vs per-task adapters) before proxy benchmarking.
+3. Report **rank stability metrics** (Kendall-tau, top-k overlap) with confidence intervals, not only Spearman rho.
+4. Stress-test LP mixing with **bootstrap/noise perturbations** of affinity matrix; report robustness of chosen weights.
+5. Reserve a small budget for **higher-order checks** (at least triplet interactions on a subset) to test pairwise sufficiency assumptions.
 
 ## 评分
 
-**7.2/10**
+**6.8/10**
 
-**理由**: 强大的实证直觉、有用的阴性结果、以及相关的研究问题。但重大的协议失误（H2）、过强的因果框架表述、未解决的核心机制（30.8pp 残差）、以及 benchmark 有效性问题目前限制了影响力。如果将残差缺口问题转化为核心议题并加强统计和 benchmark 有效性的严谨性，可以成为一篇强有力的 NeurIPS/ICML 投稿。
+Promising and more rigorous than typical proposal drafts, but currently over-optimistic on compute and too reliant on pairwise/proxy assumptions for strong mechanistic claims. With stronger statistical design and confound isolation, this could become a high-quality, publishable study.

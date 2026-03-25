@@ -1,9 +1,12 @@
-- Li et al. 2025 (2409.19998) — RepSim vs IF 在 LLM 上的表现差异
-- DDA (2410.01285) — 对比打分使 IF 超越 BM25 (AUC 91.64%)
-- RepT (2510.02334) — 表示梯度追踪 (P@10=0.97-1.00)
-- DATE-LM (2507.09424) — LLM TDA 标准 benchmark (NeurIPS 2025)
-- Better Hessians Matter (2509.23437) — Hessian 层级证据（核心对手）
-- In-the-Wild (2602.11079) — DPO 场景下的表示空间 TDA
-- Concept Influence (2602.14869) — 概念级表示空间 TDA
-- AirRep (2501.12345) — 学习的表示空间 TDA
-- Episteme 知识库: ~/Research/Episteme (49 篇 TDA 论文深度分析)
+- QoQ: 2603.09056 (ICRA 2026) — VLA gradient TDA baseline
+- CUPID: 2506.19121 (CoRL 2025) — Robot IF data curation
+- SCIZOR: 2505.22626 — Self-supervised VLA data curation at scale
+- DataMIL: 2505.09603 — Datamodels for robot data selection
+- Re-Mix: 2408.14037 — DRO data mixing for IL
+- Diversity: 2507.06219 — VLA data scaling (AgiBot World)
+- MISS: 2409.18153 — Set influence is non-additive
+- LESS: 2402.04333 (ICML 2024) — LLM gradient data selection
+- IF-Diffusion: 2410.13850 — GGN^model framework for diffusion
+- TrackStar: 2410.17413 — Large-scale gradient TDA
+- AirRep: 2505.18513 (NeurIPS 2025) — Representation-based TDA
+- ASTRA: 2507.14740 — EKFAC-Preconditioned Neumann IF

@@ -10,11 +10,15 @@ language: zh
 ssh_server: default                       # SSH MCP connection name
 remote_base: /home/jinxulin/sibyl_system    # [CHANGE ME] remote GPU server path
 remote_env_type: conda                    # "conda" | "venv"
-remote_conda_path: ""                   # empty = auto
+remote_conda_path: /home/jinxulin/miniconda3/bin/conda  # explicit path (not under sibyl_system)
 remote_conda_env_name: ""              # empty = auto: sibyl_{project}
+# NOTE: Actual env is at /mnt/hdd_1/share/jinxulin_envs/sibyl_cross-task-influence
+# (prefix env, not named env) due to home quota constraints.
+# Use: conda run -p /mnt/hdd_1/share/jinxulin_envs/sibyl_cross-task-influence
+remote_conda_env_prefix: /mnt/hdd_1/share/jinxulin_envs/sibyl_cross-task-influence
 
 # ── GPU Scheduling ──────────────────────────────────────────────────
-max_gpus: 4
+max_gpus: 1
 gpus_per_task: 1
 
 # GPU polling (shared servers)

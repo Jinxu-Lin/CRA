@@ -1,35 +1,13 @@
 {
-  "last_sync_at": "2026-03-16T15:12:50+00:00",
+  "last_sync_at": "2026-03-17T00:00:00Z",
   "last_sync_success": false,
-  "last_trigger_stage": "pilot_experiments",
-  "last_synced_line": 4,
+  "last_trigger_stage": "literature_search",
   "history": [
     {
-      "at": "2026-03-16T12:15:01.943722+00:00",
+      "at": "2026-03-17T00:00:00Z",
       "success": false,
+      "error": "Feishu MCP servers (lark, feishu) not connected. Please run: claude mcp add lark ... && claude mcp add feishu ...",
       "stages_synced": [],
-      "error": "Feishu/Lark MCP servers not configured",
-      "duration_sec": 0
-    },
-    {
-      "at": "2026-03-16T13:03:24.958297+00:00",
-      "success": false,
-      "stages_synced": [],
-      "error": "Feishu/Lark MCP servers not configured",
-      "duration_sec": 0
-    },
-    {
-      "at": "2026-03-16T13:07:30.909364+00:00",
-      "success": false,
-      "stages_synced": [],
-      "error": "Feishu/Lark MCP servers not configured; also no data files exist yet (iteration 0, pilot_experiments stage)",
-      "duration_sec": 0
-    },
-    {
-      "at": "2026-03-16T15:12:50+00:00",
-      "success": false,
-      "stages_synced": [],
-      "error": "Feishu/Lark MCP servers not configured; no data files exist yet (iteration 0, pilot_experiments stage)",
       "duration_sec": 0
     }
   ]

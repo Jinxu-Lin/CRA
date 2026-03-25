@@ -1,48 +1,15 @@
-{"ts": 1773662799.112619, "event": "stage_start", "stage": "init", "iteration": 0, "action_type": "bash", "description": "项目初始化完成，推进到 literature_search 后再执行文献调研"}
-{"ts": 1773662809.029588, "event": "stage_end", "stage": "init", "iteration": 0, "duration_sec": 69.83652973175049, "score": null, "next_stage": "literature_search"}
-{"ts": 1773662814.167941, "event": "stage_start", "stage": "literature_search", "iteration": 0, "action_type": "skill", "description": "文献调研：arXiv 搜索 + Web 搜索，建立领域现状基础"}
-{"ts": 1773663196.774048, "event": "stage_end", "stage": "literature_search", "iteration": 0, "duration_sec": 387.7892632484436, "score": null, "next_stage": "idea_debate"}
-{"ts": 1773663206.167016, "event": "stage_start", "stage": "idea_debate", "iteration": 0, "action_type": "team", "description": "Agent Team: 6人辩论生成研究提案（恢复：已完成 0/6） + Codex 独立审查"}
-{"ts": 1773666141.7017229, "event": "stage_end", "stage": "idea_debate", "iteration": 0, "duration_sec": 2944.993865251541, "score": null, "next_stage": "planning"}
-{"ts": 1773666150.630315, "event": "stage_start", "stage": "planning", "iteration": 0, "action_type": "skill", "description": "Design experiment plan with pilot/full configs"}
-{"ts": 1773666407.4601011, "event": "stage_end", "stage": "planning", "iteration": 0, "duration_sec": 265.817440032959, "score": null, "next_stage": "pilot_experiments"}
-{"ts": 1773666442.642158, "event": "stage_start", "stage": "pilot_experiments", "iteration": 0, "action_type": "skill", "description": "[0/14] 并行 1 任务 (PILOT), 预计 30min: setup_env→GPU[1]"}
-{"ts": 1773667257.776198, "event": "stage_start", "stage": "pilot_experiments", "iteration": 0, "action_type": "skills_parallel", "description": "[1/14] 并行 3 任务 (PILOT), 预计 10min (校准×0.1): phase0_pipeline_pilot→GPU[1], phase0_kfac_control→GPU[2], phase2_eigenspectrum→GPU[3]"}
-{"ts": 1773670219.318135, "event": "main_wake_request", "stage": "pilot_experiments", "owner_id": "exp-supervisor-1773667269-40620", "kind": "resolution", "urgency": "high", "requires_main_system": false, "summary": "Phase0 complete: H6 confirmed (K-FAC IF gap 16.7pp on counterfact). H9 FALSIFIED: representation condition 3e10 >> gradient condition 400-3600, reversed from prediction. Phase1 factorial tasks now dispatching."}
-{"ts": 1773670557.5049422, "event": "main_wake_drain", "stage": "pilot_experiments", "event_count": 1, "requires_main_system": true}
-{"ts": 1773670676.045599, "event": "task_dispatch", "task_ids": ["phase1_baselines"], "gpu_ids": [1], "iteration": 0}
-{"ts": 1773671652.356341, "event": "task_dispatch", "task_ids": ["phase1_factorial_analysis"], "gpu_ids": [1], "iteration": 0}
-{"ts": 1773672237.924578, "event": "task_dispatch", "task_ids": ["phase2_repsim_dim_sweep"], "gpu_ids": [1], "iteration": 0}
-{"ts": 1773672856.589033, "event": "task_dispatch", "task_ids": ["phase3_contrastive_matrix"], "gpu_ids": [1], "iteration": 0}
-{"ts": 1773673917.6623821, "event": "stage_end", "stage": "pilot_experiments", "iteration": 0, "duration_sec": 7510.2546100616455, "score": null, "next_stage": "pilot_experiments"}
-{"ts": 1773673928.30736, "event": "stage_start", "stage": "pilot_experiments", "iteration": 0, "action_type": "skill", "description": "Run pilot experiments"}
-{"ts": 1773674086.2137432, "event": "main_wake_request", "stage": "pilot_experiments", "owner_id": "exp-supervisor-1773667269-40620", "kind": "resolution", "urgency": "high", "requires_main_system": true, "summary": "All 14/14 pilot tasks completed. Key findings: H1 confirmed (RepSim>TRAK 2/3 tasks), H6 confirmed (16.7pp gap), H9 falsified (condition reversed), H7 failed (whitened degrades -10pp), contrastive scoring zero gain on rank metrics. Pilot stage ready for analysis/transition."}
-{"ts": 1773674249.175092, "event": "stage_end", "stage": "pilot_experiments", "iteration": 0, "duration_sec": 331.60847306251526, "score": null, "next_stage": "idea_validation_decision"}
-{"ts": 1773674255.30198, "event": "stage_start", "stage": "idea_validation_decision", "iteration": 0, "action_type": "skill", "description": "Review pilot evidence and decide ADVANCE / REFINE / PIVOT"}
-{"ts": 1773674415.3913379, "event": "stage_end", "stage": "idea_validation_decision", "iteration": 0, "duration_sec": 166.28324580192566, "score": null, "next_stage": "idea_debate"}
-{"ts": 1773674421.801356, "event": "stage_start", "stage": "idea_debate", "iteration": 0, "action_type": "team", "description": "Agent Team: 6人辩论生成研究提案（恢复：已完成 0/6） + Codex 独立审查"}
-{"ts": 1773719774.659775, "event": "stage_end", "stage": "idea_debate", "iteration": 0, "duration_sec": 45359.323759794235, "score": null, "next_stage": "planning"}
-{"ts": 1773719779.488496, "event": "stage_start", "stage": "planning", "iteration": 0, "action_type": "skill", "description": "Design experiment plan with pilot/full configs"}
-{"ts": 1773720232.525315, "event": "stage_end", "stage": "planning", "iteration": 0, "duration_sec": 457.9289982318878, "score": null, "next_stage": "pilot_experiments"}
-{"ts": 1773720650.6547232, "event": "stage_start", "stage": "pilot_experiments", "iteration": 0, "action_type": "skill", "description": "[0/12] 并行 1 任务 (PILOT), 预计 60min: p1_fm2_continuous_metrics→GPU[2]"}
-{"ts": 1773721407.451555, "event": "task_dispatch", "task_ids": ["p1_fm2_contamination_injection"], "gpu_ids": [2], "iteration": 0}
-{"ts": 1773721952.758967, "event": "task_dispatch", "task_ids": ["p1_fm2_interaction_analysis"], "gpu_ids": [2], "iteration": 0}
-{"ts": 1773722217.351988, "event": "task_dispatch", "task_ids": ["p2_eigenspectrum_fullscale"], "gpu_ids": [2], "iteration": 0}
-{"ts": 1773725930.530541, "event": "task_dispatch", "task_ids": ["p2_trak_dim_sweep_fullscale"], "gpu_ids": [2], "iteration": 0}
-{"ts": 1773727946.1830919, "event": "task_dispatch", "task_ids": ["p2_repsim_dim_sweep_fullscale"], "gpu_ids": [2], "iteration": 0}
-{"ts": 1773728703.935437, "event": "task_dispatch", "task_ids": ["p3_retrieval_baselines"], "gpu_ids": [2], "iteration": 0}
-{"ts": 1773729423.2632818, "event": "task_dispatch", "task_ids": ["p4_gap_decomposition"], "gpu_ids": [2], "iteration": 0}
-{"ts": 1773732318.154538, "event": "task_dispatch", "task_ids": ["p4_layer_sweep"], "gpu_ids": [2], "iteration": 0}
-{"ts": 1773733131.968363, "event": "task_dispatch", "task_ids": ["p4_cosine_vs_euclidean"], "gpu_ids": [2], "iteration": 0}
-{"ts": 1773734110.443769, "event": "task_dispatch", "task_ids": ["p5_pca_whitened_attribution"], "gpu_ids": [2], "iteration": 0}
-{"ts": 1773734595.8047512, "event": "task_dispatch", "task_ids": ["final_analysis"], "gpu_ids": [2], "iteration": 0}
-{"ts": 1773734882.117731, "event": "stage_end", "stage": "pilot_experiments", "iteration": 0, "duration_sec": 14649.652028083801, "score": null, "next_stage": "pilot_experiments"}
-{"ts": 1773734888.487367, "event": "stage_start", "stage": "pilot_experiments", "iteration": 0, "action_type": "skill", "description": "Run pilot experiments"}
-{"ts": 1773734978.949131, "event": "stage_end", "stage": "pilot_experiments", "iteration": 0, "duration_sec": 96.92950296401978, "score": null, "next_stage": "idea_validation_decision"}
-{"ts": 1773734984.490442, "event": "stage_start", "stage": "idea_validation_decision", "iteration": 0, "action_type": "skill", "description": "Review pilot evidence and decide ADVANCE / REFINE / PIVOT"}
-{"ts": 1773735156.186496, "event": "stage_end", "stage": "idea_validation_decision", "iteration": 0, "duration_sec": 177.28570103645325, "score": null, "next_stage": "experiment_cycle"}
-{"ts": 1773741021.163769, "event": "stage_start", "stage": "experiment_cycle", "iteration": 0, "action_type": "bash", "description": "实验任务被依赖阻塞"}
-{"ts": 1773741038.564885, "event": "stage_end", "stage": "experiment_cycle", "iteration": 0, "duration_sec": 5882.430340051651, "score": null, "next_stage": "experiment_cycle"}
-{"ts": 1773741075.9761128, "event": "stage_end", "stage": "experiment_cycle", "iteration": 0, "duration_sec": 37.46835517883301, "score": null, "next_stage": "experiment_cycle"}
-{"ts": 1773741084.0265548, "event": "stage_start", "stage": "experiment_cycle", "iteration": 0, "action_type": "bash", "description": "实验任务被依赖阻塞"}
-{"ts": 1773741115.1157188, "event": "stage_start", "stage": "experiment_cycle", "iteration": 0, "action_type": "skill", "description": "Run full experiments"}
+{"ts": 1773671943.7158709, "event": "stage_start", "stage": "init", "iteration": 0, "action_type": "bash", "description": "项目初始化完成，推进到 literature_search 后再执行文献调研"}
+{"ts": 1773671982.534838, "event": "stage_end", "stage": "init", "iteration": 0, "duration_sec": 76.03184485435486, "score": null, "next_stage": "literature_search"}
+{"ts": 1773671993.29576, "event": "stage_start", "stage": "literature_search", "iteration": 0, "action_type": "skill", "description": "文献调研：arXiv 搜索 + Web 搜索，建立领域现状基础"}
+{"ts": 1773672258.466492, "event": "stage_end", "stage": "literature_search", "iteration": 0, "duration_sec": 275.99346685409546, "score": null, "next_stage": "idea_debate"}
+{"ts": 1773672379.950377, "event": "stage_start", "stage": "idea_debate", "iteration": 0, "action_type": "team", "description": "Agent Team: 6人辩论生成研究提案（恢复：已完成 0/6） + Codex 独立审查"}
+{"ts": 1773674444.104649, "event": "stage_end", "stage": "idea_debate", "iteration": 0, "duration_sec": 2185.6838278770447, "score": null, "next_stage": "planning"}
+{"ts": 1773674457.910492, "event": "stage_start", "stage": "planning", "iteration": 0, "action_type": "skill", "description": "Design experiment plan with pilot/full configs"}
+{"ts": 1773674730.711645, "event": "stage_end", "stage": "planning", "iteration": 0, "duration_sec": 286.6663990020752, "score": null, "next_stage": "pilot_experiments"}
+{"ts": 1773674815.698727, "event": "stage_start", "stage": "pilot_experiments", "iteration": 0, "action_type": "skill", "description": "[0/19] 并行 1 任务 (PILOT), 预计 20min: setup_env→GPU[1]"}
+{"ts": 1773717515.153795, "event": "stage_start", "stage": "pilot_experiments", "iteration": 0, "action_type": "skill", "description": "[0/19] 并行 1 任务 (PILOT), 预计 20min: setup_env→GPU[1]"}
+{"ts": 1773717642.5644228, "event": "main_wake_request", "stage": "pilot_experiments", "owner_id": "exp-supervisor-1773717574-80179", "kind": "needs_main_system", "urgency": "high", "requires_main_system": true, "summary": "setup_env从未在远程服务器启动(无PID/DONE/PROGRESS文件), 已requeue为pending; 4张RTX4090全部被其他项目占用(faithcomp GPU0-1 ~15GB, test-time-compute GPU2-3 ~15GB), 无法dispatch"}
+{"ts": 1773724028.982857, "event": "main_wake_request", "stage": "pilot_experiments", "owner_id": "exp-supervisor-1773717574-80179", "kind": "needs_main_system", "urgency": "high", "requires_main_system": true, "summary": "GPU等待已超1.5小时(15轮轮询); 4张RTX4090持续被faithcomp(GPU0-1)和test-time-compute(GPU2-3)占用~15GB; setup_env无法dispatch; 建议考虑是否可以在共享GPU上运行环境setup(不需要大量显存)"}
+{"ts": 1773732819.880966, "event": "main_wake_request", "stage": "pilot_experiments", "owner_id": "exp-supervisor-1773717574-80179", "kind": "resolution", "urgency": "high", "requires_main_system": false, "summary": "setup_env和pilot_phase0均已完成; pilot_phase0结果: GO (强正迁移信号, 10-task模型比5-task好20.6%); 注意: 用MSE代替rollout评估(无mujoco), 单seed, 简单CNN模型"}
+{"ts": 1773732940.2327108, "event": "stage_start", "stage": "pilot_experiments", "iteration": 0, "action_type": "skill", "description": "[2/19] 并行 1 任务 (PILOT), 预计 27min (校准×0.93): cloto_baseline→GPU[0]"}
+{"ts": 1773735283.978086, "event": "main_wake_request", "stage": "pilot_experiments", "owner_id": "exp-supervisor-1773734510-98431", "kind": "resolution", "urgency": "normal", "requires_main_system": false, "summary": "cloto_baseline pilot completed successfully: PASS, mean_loss=0.62266, CV=0.0891, 21.4min. All 5 seeds converged. No pending tasks can dispatch - all 4 GPUs occupied by other users."}

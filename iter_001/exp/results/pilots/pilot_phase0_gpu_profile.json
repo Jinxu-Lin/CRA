@@ -1,0 +1,6 @@
+{
+  "gpu_name": "NVIDIA GeForce RTX 4090",
+  "vram_total_mb": 25386.35264,
+  "max_batch_size": 512,
+  "used_batch_size": 256
+}

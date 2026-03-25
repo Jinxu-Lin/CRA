@@ -1,4 +1,13 @@
-- **攻击角度 A（核心）**: 2×2 消融矩阵 {参数空间, 表示空间} × {标准打分, 对比打分}，在 DATE-LM + Li et al. 两套 benchmark 上评估
-- **攻击角度 B（可选升维）**: Fixed-IF — 用理论预测设计参数空间修复（projected IF + contrastive gradient），验证诊断框架的预测力
-- **统一框架**: 所有表示空间方法可表达为 φ(z_test)^T · ψ(z_train) 双线性形式
-- **信号处理理论类比**: 匹配滤波（维度约化 → 修复 FM1）⊥ 差分检测（对比打分 → 修复 FM2），70+ 年正交性理论基础
+### 核心方法
+
+1. **Task-to-Task Influence 矩阵**：定义 $M_{ij} = \mathbb{E}_{z \in \mathcal{D}_i, z' \in \mathcal{D}_j} [\mathcal{I}(z, z')]$，量化任务 $i$ 的训练数据对任务 $j$ 性能的平均影响。
+   - 正值 → 互助（正迁移）
+   - 负值 → 互害（负迁移）
+   - 近零 → 独立
+
+2. **负迁移机制诊断**：对识别出的负迁移任务对，进一步分析其机制：
+   - **Representation conflict**：相似 state 但不同最优 action（e.g., 同一个物体在不同任务中需要不同操作）
+   - **Optimization conflict**：梯度方向系统性矛盾
+   - **Action distribution mismatch**：训练分布的 action space 不兼容
+
+3. **Influence-guided data mixing**：基于 influence 矩阵优化数据配比——对互助任务对增加共训权重，对互害任务对降低或分离。与 Re-Mix (DRO) 和均匀混合做正面对比。

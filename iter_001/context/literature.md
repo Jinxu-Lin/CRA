@@ -1,205 +1,185 @@
 # 文献调研报告
 
-**研究主题**: 诊断参数空间 TDA 的两个信号处理缺陷（信号稀释 FM1 + 公共影响污染 FM2），将 5 种表示空间 TDA 方法统一为 phi^T * psi 双线性框架，并在 DATE-LM 标准 benchmark 上系统验证。
+**研究主题**: Multi-Task VLA 的跨任务数据交互图谱：系统识别哪些任务的训练数据互助、哪些互害，诊断负迁移机制，并基于 task-to-task influence 矩阵优化数据混合策略。
 
-**调研时间**: 2026-03-16
+**调研时间**: 2026-03-17
 
 **arXiv 搜索关键词**:
-- "topological data analysis" AND "parameter space" AND ("signal dilution" OR "failure mode")
-- "topological data analysis" AND ("representation space" OR "activation space") AND ("language model" OR "neural network")
-- "persistent homology" AND ("transformer" OR "language model") AND ("benchmark" OR "evaluation")
-- "topological data analysis" AND "neural network" AND ("parameter space" OR "weight space")
-- ti:"topological data analysis" AND ti:"survey" AND ("neural network" OR "deep learning")
-- "persistent homology" AND ("signal dilution" OR "common influence" OR "confound")
-- "representation topology divergence" OR "topological similarity" AND "neural network"
-- ti:"neural persistence" AND ("generalization" OR "complexity" OR "weight")
-- "loss landscape" AND "topology" AND ("persistent homology" OR "topological")
-- "data attribution" AND ("representation similarity" OR "influence function") AND "large language model"
-- ti:"LESS" AND "data selection" AND "language model"
-- ti:"TRAK" AND "training data attribution"
+- `"vision-language-action" AND "multi-task"` (cs.RO, cs.CV, cs.LG)
+- `"negative transfer" AND "multi-task" AND ("robotics" OR "manipulation")` (cs.RO, cs.LG)
+- `"task influence" OR "task affinity" OR "task grouping" AND "multi-task learning"` (cs.LG, cs.CV)
+- `"data mixing" OR "data mixture" AND ("language model" OR "foundation model")` (cs.LG, cs.CL)
+- `"training data influence" OR "data attribution" AND ("multi-task" OR "transfer learning")` (cs.LG)
+- `"DoReMi" AND "data mixture"` (cs.CL, cs.LG)
+- `"Open X-Embodiment" OR "RT-2-X" OR "Octo"` (cs.RO)
 
 **Web 搜索关键词**:
-- topological data analysis parameter space vs representation space neural networks state of the art 2025
-- TDA persistent homology language model benchmark DATE-LM 2025
-- bilinear framework TDA methods unification phi psi representation 2025
-- TDA neural network "parameter space" topology weight persistence "loss landscape" generalization
-- "persistence image" "persistence landscape" "Betti curve" vectorization TDA comparison survey
-- "representation topology divergence" OR "topological complexity" language model evaluation benchmark
-- "neural persistence" Rieck weight space TDA generalization complexity measure
-- TDA NLP methods comparison benchmark github 2024 2025
-- arxiv 2409.19998 / 2410.01285 / 2510.02334 / 2509.23437 / 2602.11079 / 2602.14869 (种子论文)
-
----
+- `vision language action model multi-task negative transfer cross-task influence 2024 2025`
+- `multi-task learning task affinity matrix data mixing optimization state of the art 2025`
+- `VLA robot manipulation multi-task training data mixture benchmark 2025`
+- `cross-task influence function training data influence multi-task robotics`
+- `LIBERO benchmark multi-task robot manipulation negative transfer task grouping`
+- `"mix data or merge models" multi-task learning optimization diverse tasks 2024`
 
 ## 1. 领域现状摘要
 
-Training Data Attribution (TDA) 旨在追踪模型预测回到影响它的训练数据，是 LLM 可解释性、数据估值和安全审计的核心技术。当前 TDA 方法大致分为两大范式：**参数空间方法（Parameter-space）** 和 **表示空间方法（Representation-space）**。
+**Vision-Language-Action (VLA) 模型** 已成为机器人操控领域的主流范式。以 OpenVLA (7B)、RT-2-X (55B)、pi_0 等为代表的 VLA 模型，通过在 Internet 规模的视觉-语言数据和大规模机器人示范数据（如 Open X-Embodiment 的 22 种机器人、527 种技能）上联合预训练，展现了跨任务、跨具身的泛化能力。然而，当任务数量增加时，**负迁移（negative transfer）** 问题显著加剧：CORAL (2026) 明确指出 "gradients from different tasks can conflict, causing negative transfer and reducing per-task performance"；STRAP (2024) 发现 "the performance of generalist policies on any one task is often suboptimal due to negative transfer between partitions of the data"；LangGap (2026) 揭示当语义多样性增加时，"model learning capacity proves severely insufficient; even trained tasks perform poorly"。
 
-**参数空间方法** 以 Influence Functions (IF) 为代表，通过梯度和 Hessian 逆来估计训练样本对模型参数的影响。经典方法包括 IF、TracIn、TRAK、LESS 等。这类方法有坚实的理论基础（基于 leave-one-out 近似），但面临严重的可扩展性问题：Hessian 逆计算代价高昂，且在 LLM 尺度上近似误差显著。Li et al. (2409.19998) 在系统评估中发现，IF 方法在 LLM 上表现一致较差，而简单的表示相似度方法 (RepSim) 却能达到近 100% 的识别率。
+**多任务学习优化** 领域已发展出一套成熟的工具链：从梯度操控方法（GDOD, PCGrad, CAGrad）到任务分组方法（ETAP, STG-MTL, DMTG, Grad-TAG），再到数据混合优化方法（DoReMi, RegMix, Data Mixing Laws, BiMix, Chameleon）。这些方法主要在 NLP 和 CV 领域验证，但**极少有工作将 task affinity / influence 分析系统性地应用于 VLA 机器人操控场景**。
 
-**表示空间方法** 直接在模型的激活空间（activation/representation space）中操作，通过计算测试样本和训练样本的表示相似度来进行归因。近年涌现了多种方法：RepSim（cosine similarity）、RepT（表示梯度追踪）、AirRep（学习的表示）、Concept Influence（概念级归因）、In-the-Wild（激活差分向量）等。这些方法在效果和效率上往往同时超越参数空间方法，但缺乏统一的理论框架来理解它们为何有效、彼此之间有何关系。
-
-**关键张力**: 参数空间方法有理论保证但实践中失败；表示空间方法实践中有效但理论基础薄弱。尚无工作系统诊断参数空间方法失败的根本原因，也无工作将多种表示空间方法统一到一个可分析的框架中。
-
----
+**数据影响力估计（Data Influence Estimation）** 方法在 LLM 和扩散模型领域蓬勃发展（GPTfluence, DMin, DAS, trajectory-specific LOO），但同样缺乏在多任务机器人策略学习中的应用。这构成了一个明确的研究空白：将 task-to-task influence 分析与数据混合优化方法结合，应用于 VLA 多任务训练场景。
 
 ## 2. 核心参考文献
 
-### 2.1 参数空间 TDA 方法及其局限
+### 2.1 VLA 模型与多任务机器人学习
 
 | 序号 | 标题 | 来源 | 年份 | 核心贡献 | 局限性 |
 |------|------|------|------|---------|--------|
-| 1 | Do Influence Functions Work on Large Language Models? (Li et al.) | arXiv 2409.19998 | 2024 | 系统评估 IF 在 LLM 上的表现；发现 RepSim 远超所有 IF 方法（近100% vs 极低识别率） | 仅诊断现象未分析根因；未提出修复方案 |
-| 2 | Enhancing TDA for LLMs with Fitting Error Consideration (DDA) | arXiv 2410.01285 | 2024 | 通过 debias + denoise 策略修复 IF 的拟合误差问题，AUC 达 91.64% | 修复策略是工程性的，未从信号处理角度分析根因 |
-| 3 | Better Hessians Matter (Hong et al.) | arXiv 2509.23437 | 2025 | 分解 Hessian 近似步骤，证明更好的 Hessian 近似 → 更好的归因质量；K-FAC 特征值失配是主要误差来源 | 仅在分类任务上验证；未考虑信号稀释和公共影响问题 |
-| 4 | TRAK: Attributing Model Behavior at Scale (Park et al.) | arXiv 2303.14186 | 2023 | 随机投影 + After Kernel，用少量模型匹配训练数千模型的归因精度；支持多模态 | 随机投影可能丢失关键信号方向 |
-| 5 | LESS: Selecting Influential Data (Xia et al.) | arXiv 2402.04333 | 2024 | Adam 优化器感知的 IF 适配 + 低维梯度相似度搜索；5% 数据选择超越全量训练 | 仍依赖梯度计算，大规模下可扩展性有限 |
-| 6 | Imperfect Influence, Preserved Rankings (TRAK theory) | arXiv 2602.01312 | 2026 | 理论证明 TRAK 近似误差大但保留排序相关性 | 确认近似有显著误差，但未分析误差的信号处理含义 |
-| 7 | LoRIF: Low-Rank Influence Functions | arXiv 2601.21929 | 2026 | 低秩结构加速 IF 计算至 70B 模型规模；存储降低 20x | 聚焦效率优化，未解决 IF 本身的概念缺陷 |
-| 8 | What is Your Data Worth to GPT? (LoGra) | arXiv 2405.13954 | 2024 | 利用反向传播梯度结构的高效投影策略，支持 Llama3-8B | 性能与投影维度强相关，信号稀释问题未被讨论 |
+| 1 | OpenVLA: An Open-Source Vision-Language-Action Model | arXiv 2406.09246 | 2024 | 7B 开源 VLA，970k 真实示范训练，跨 29 任务泛化 | 多任务联合训练时存在任务间干扰，未诊断具体负迁移来源 |
+| 2 | Open X-Embodiment: Robotic Learning Datasets and RT-X Models | arXiv 2310.08864 | 2023 | 22 种机器人、527 技能的统一数据集，展示正迁移 | 仅报告平均性能提升，未分析哪些任务组合互害 |
+| 3 | CORAL: Scalable Multi-Task Robot Learning via LoRA Experts | arXiv 2603.09298 | 2026 | 每任务一个 LoRA expert 避免参数级跨任务干扰 | 参数隔离方案回避了跨任务知识共享的可能性 |
+| 4 | LangGap: Diagnosing and Closing the Language Gap in VLA Models | arXiv 2603.00592 | 2026 | 揭示 VLA 忽略语言指令的问题，多任务训练加剧困难 | 聚焦语言理解缺陷，未量化任务间数据交互 |
+| 5 | LangForce: Bayesian Decomposition of VLA via Latent Action Queries | arXiv 2601.15197 | 2026 | 诊断 "Information Collapse"，vision shortcut 导致忽略语言 | 关注单一退化模式，非通用跨任务影响分析 |
+| 6 | HyperVLA: Efficient Inference via Hypernetworks | arXiv 2510.04898 | 2025 | 超网络为多任务保留高容量训练、低成本推理 | 未分析任务间训练动态交互 |
+| 7 | STRAP: Robot Sub-Trajectory Retrieval for Augmented Policy Learning | arXiv 2412.15182 | 2024 | 子轨迹粒度检索解决跨任务共享低层行为 | 非参数方法，未建立 task influence 矩阵 |
+| 8 | SwitchVLA: Execution-Aware Task Switching | arXiv 2506.03574 | 2025 | 动态任务切换，建模执行状态下的任务交互 | 聚焦在线切换而非训练数据层面的跨任务影响 |
+| 9 | Discrete Policy: Learning Disentangled Action Space for Multi-Task | arXiv 2409.18707 | 2024 | VQ 离散化多任务动作空间，12 任务下超越 Diffusion Policy 32.5% | 缓解多模态动作分布，但未量化任务间正负迁移 |
+| 10 | LIBERO: Benchmarking Knowledge Transfer for Lifelong Robot Learning | arXiv 2306.03310 | 2023 | 130 任务、4 个 task suite 评估 lifelong 机器人学习 | 报告 forward/backward transfer 但未建立 task-pair affinity |
 
-### 2.2 表示空间 TDA 方法
-
-| 序号 | 标题 | 来源 | 年份 | 核心贡献 | 局限性 |
-|------|------|------|------|---------|--------|
-| 9 | Where Did It Go Wrong? (RepT) | arXiv 2510.02334 | 2025 | 表示梯度追踪框架；定位"相变层"后缓存表示+梯度；P@10 达 0.97-1.00 | 未给出与其他表示方法的理论统一 |
-| 10 | AirRep: Representational Optimization for TDA | arXiv 2505.18513 | 2025 | 学习任务特定的归因表示 + attention pooling；效率比梯度方法高近两个数量级 | 需要额外训练归因编码器 |
-| 11 | In-the-Wild Model Organisms (Activation-based TDA) | arXiv 2602.11079 | 2026 | 激活差分向量做 DPO 场景下的归因；发现"干扰触发服从"行为并缓解 63-78% | 方法设计与 DPO 场景耦合较紧 |
-| 12 | Concept Influence | arXiv 2602.14869 | 2026 | 概念级归因（线性探针 / SAE 特征方向）；简单 probe 方法是 Concept Influence 的一阶近似 | 依赖概念探针的质量；未在标准 TDA benchmark 上评测 |
-| 13 | Daunce: Data Attribution through Uncertainty Estimation | arXiv 2505.23223 | 2025 | 扰动模型集合的协方差作为归因分数；首次对 GPT 黑盒模型做归因 | 需要多个微调模型，成本仍高 |
-
-### 2.3 标准化评测 Benchmark
+### 2.2 多任务学习中的负迁移与任务分组
 
 | 序号 | 标题 | 来源 | 年份 | 核心贡献 | 局限性 |
 |------|------|------|------|---------|--------|
-| 14 | DATE-LM: Benchmarking Data Attribution Evaluation for LLMs (Jiao et al.) | arXiv 2507.09424; NeurIPS 2025 | 2025 | 统一 LLM 归因评测：训练数据选择 / 毒性过滤 / 事实归因三任务；公开 leaderboard | 发现无单一方法全面领先；非归因基线有时匹敌归因方法 |
+| 11 | ETAP: Ensemble Prediction of Task Affinity for Efficient MTL | arXiv 2602.18591 | 2026 | 梯度相似度 + 非线性修正器预测 task affinity | 验证于分类任务，未在机器人控制任务验证 |
+| 12 | Towards Principled Task Grouping for Multi-Task Learning | arXiv 2402.15328 | 2024 | 理论基础的任务分组方法，无限制性假设 | 通用框架，未针对时序决策/操控任务特化 |
+| 13 | Grad-TAG: Scalable Multitask Learning Using Gradient-based Estimation of Task Affinity | arXiv 2409.06091 | 2024 | 梯度低维投影估计 task affinity，仅需 3% FLOPs | 500 任务规模验证（图+NLP），未在 robot policy 验证 |
+| 14 | DMTG: One-Shot Differentiable Multi-Task Grouping | arXiv 2407.05082 | 2024 | 全可微分任务分组，同时学习分组和模型权重 | 需要 KN 个 task head 初始化，对大规模任务集计算开销大 |
+| 15 | STG-MTL: Scalable Task Grouping Using Data Map | arXiv 2307.03374 | 2023 | 基于训练动态 (Data Maps) 的分类任务分组，扩展到 100 任务 | 仅支持分类任务，需要适配到策略学习 |
+| 16 | Efficient Task Grouping Through Samplewise Optimisation Landscape | arXiv 2412.04413 | 2024 | 无需共享模型训练即可推断 pairwise task similarity | 5 倍速度提升但精度受限于 landscape 近似 |
+| 17 | Selective Task Group Updates for Multi-Task Optimization | arXiv 2502.11986 | 2025 | 自适应任务分组 + proximal inter-task affinity | 理论分析了分组对任务特定参数学习的影响 |
+| 18 | Rep-MTL: Representation-level Task Saliency for MTL | arXiv 2507.21049 | 2025 | 表征空间中量化任务交互，熵惩罚 + 跨任务对齐 | 聚焦 CV dense prediction，未在 action generation 验证 |
+| 19 | CMTA: Contrastive Modules with Temporal Attention | arXiv 2311.01075 | 2023 | 对比学习约束模块多样性，细粒度时序注意力组合 | Meta-World 验证，首次超越单任务学习 |
+| 20 | Quantifying Task Priority for Multi-Task Optimization | arXiv 2406.02996 | 2024 | 基于连接强度量化任务优先级，新 Pareto 最优解 | 需要额外的任务优先级学习阶段 |
+| 21 | "It's a Match!" -- A Benchmark of Task Affinity Scores | arXiv 2301.02873 | 2023 | 系统基准测试多种 affinity score，发现与实际 MTL 性能相关性弱 | 重要的负面结论：简单 affinity score 不可靠 |
 
-### 2.4 TDA 用于神经网络分析（拓扑数据分析背景）
-
-| 序号 | 标题 | 来源 | 年份 | 核心贡献 | 局限性 |
-|------|------|------|------|---------|--------|
-| 15 | TDA for Neural Network Analysis: A Comprehensive Survey (Ballester et al.) | arXiv 2312.05840 | 2023 | 四维度全面综述：架构/决策区域/内部表示/训练动力学 | 未区分参数空间和表示空间 TDA 的信号处理差异 |
-| 16 | Unveiling Topological Structures from Language: TDA in NLP Survey (Uchendu & Le) | arXiv 2411.10298 | 2024 | 系统综述 100 篇 TDA-NLP 论文；理论 vs 非理论分类 | 领域还处于早期，标准化评测不足 |
-| 17 | Neural Persistence (Rieck et al.) | arXiv 1812.09764; ICLR 2019 | 2019 | 首个基于 TDA 的网络复杂度度量；权重图上的持续同调 → 训练停止准则 | Girrbach et al. 后续工作证明其本质上等价于权重方差 |
-| 18 | Addressing Caveats of Neural Persistence (Deep Graph Persistence) | arXiv 2307.10865 | 2023 | 证明 NP 主要受权重方差控制；提出跨层全网络滤过的 Deep Graph Persistence | 仍限于参数空间，信号稀释问题未解决 |
-| 19 | Persistent Topological Features in LLMs (Gardinazzi et al.) | arXiv 2410.11042 | 2024 | Zigzag persistence 追踪表示空间拓扑特征跨层演化；用于层剪枝 | 聚焦模型压缩而非数据归因 |
-| 20 | Hidden Holes: Topological Aspects of Language Models (Fitz et al.) | arXiv 2406.05798 | 2024 | 提出"perforation"度量表示空间拓扑复杂度；发现 Transformer vs LSTM 拓扑结构显著不同 | 描述性分析，未连接到实际下游任务 |
-| 21 | HalluZig: Hallucination Detection using Zigzag Persistence | arXiv 2601.01552 | 2026 | Zigzag persistence 检测 LLM 幻觉；拓扑签名跨模型可泛化 | 专注检测，未与 TDA 归因方法对比 |
-| 22 | The Shape of Adversarial Influence (Fay et al.) | arXiv 2505.20435 | 2025 | PH 分析对抗输入对 LLM 表示空间的影响；发现"拓扑压缩"普遍签名 | 聚焦对抗检测而非训练数据归因 |
-| 23 | Representation Topology Divergence (RTD) (Barannikov et al.) | arXiv 2201.00058; ICML 2022 | 2022 | 多尺度拓扑发散度量；可比较不同空间中的表示 | 计算成本较高；未针对 TDA 归因场景优化 |
-
-### 2.5 持续同调向量化方法（TDA 工具箱）
+### 2.3 数据混合优化
 
 | 序号 | 标题 | 来源 | 年份 | 核心贡献 | 局限性 |
 |------|------|------|------|---------|--------|
-| 24 | A Survey of Vectorization Methods in TDA (Ali et al.) | arXiv 2212.09703 | 2023 | 系统比较 13 种向量化方法（PI, PL, Betti, entropy 等） | 未与神经网络归因任务结合 |
-| 25 | TDAvec: Vectorization Package (Luchinsky & Islambekov) | arXiv 2411.17340 | 2024 | R/Python 统一包；完整向量化工作流 | 工具导向，未涉及方法对比 |
-| 26 | Persistence Spheres: Bi-continuous Representations (Pegoraro) | arXiv 2509.16999 | 2025 | 双连续映射保持 Wasserstein 几何；SOTA 分类/回归性能 | 新方法，社区采纳度待观察 |
-| 27 | Qupid: Quantized Persistence and Integral Transforms | arXiv 2312.17093 | 2023 | 对数尺度网格 + 离散变换；极低计算成本 + 竞争性能 | 网格分辨率对性能有影响 |
+| 22 | DoReMi: Optimizing Data Mixtures Speeds Up LM Pretraining | arXiv 2305.10429 | 2023 | Group DRO 小代理模型学习 domain weights，30x 规模迁移有效 | 仅优化 domain 级别比例，未区分 task-level influence |
+| 23 | Data Mixing Laws: Optimizing Data Mixtures by Predicting LM Performance | arXiv 2403.16952 | 2024 | 发现数据混合比例与性能的可预测函数关系 | 聚焦 LLM pretraining domains，未推广到 robot data |
+| 24 | RegMix: Data Mixture as Regression for LM Pre-training | arXiv 2407.01492 | 2024 | 回归模型预测最优混合，10% DoReMi 计算即可匹配/超越 | 发现 domain 交互 "often contradicting common sense" |
+| 25 | BiMix: Bivariate Data Mixing Law | arXiv 2405.14908 | 2024 | 联合建模 domain 比例和数据量的 scaling behavior | 理论优美但验证限于 LLM pretraining |
+| 26 | Chameleon: Flexible Data-mixing Framework | arXiv 2505.24844 | 2025 | Leverage scores + domain affinity matrix 确定混合权重 | 引入 domain affinity matrix 概念，可借鉴到 task affinity |
+| 27 | Rethinking Data Mixture for LLMs: A Comprehensive Survey | arXiv 2505.21598 | 2025 | 最全面的 data mixture 方法综述，分类为 offline/online | 综述性质，无新方法 |
+| 28 | MixMin: Finding Data Mixtures via Convex Minimization | arXiv 2502.10510 | 2025 | 凸优化框架，小模型 mixture 可迁移到大模型 | 理论贡献但需要大量代理模型训练 |
+| 29 | Nemotron-CLIMB: Clustering-based Iterative Data Mixture Bootstrapping | arXiv 2504.13161 | 2025 | 语义聚类 + 迭代搜索 + 代理模型预测，Llama-3.2-1B +2% | NVIDIA 工程化方案，计算资源需求高 |
+| 30 | Mix Data or Merge Models? Optimizing for Diverse MTL | arXiv 2410.10801 | 2024 | 模型合并优于数据混合（general +8%, safety +10%），语言级合并有效 | 聚焦 LLM safety/general 多目标，非 robot 场景 |
+| 31 | AutoMixAlign: Adaptive Data Mixing for Multi-Task Preference Optimization | ACL 2025 | 2025 | Minimax 优化自适应数据采样/重加权 | 聚焦 LLM alignment 场景 |
 
-### 2.6 损失景观拓扑分析
+### 2.4 数据影响力估计
 
 | 序号 | 标题 | 来源 | 年份 | 核心贡献 | 局限性 |
 |------|------|------|------|---------|--------|
-| 28 | Evaluating Loss Landscapes from a Topology Perspective (Xie et al.) | arXiv 2411.09807 | 2024 | 用 merge tree + PD 量化损失景观拓扑；简单拓扑 ↔ 更好性能 | 仅限低维切片分析 |
-| 29 | Landscaper: Multi-Dimensional Topological Analysis (Chen et al.) | arXiv 2602.07135 | 2026 | SMAD 指标量化景观平滑度；捕捉传统指标遗漏的训练转变 | 聚焦诊断而非归因 |
-| 30 | On the Limitations of Fractal Dimension (Tan et al.) | arXiv 2406.02234 | 2024 | 揭示 PH 维度与泛化的相关性中存在超参混淆效应 | 仅分析参数空间轨迹，未讨论表示空间 |
-
----
+| 32 | GPTfluence: Featurized Simulation for Training Data Influence in GPT Models | arXiv 2404.07840 | 2024 | 参数化模拟训练动态，14M-2.8B 模型泛化 | LLM 专用，未扩展到 action prediction |
+| 33 | Capturing Temporal Dependence of Training Data Influence | arXiv 2412.09538 | 2024 | Data value embedding 捕捉训练轨迹特定 LOO | 发现早期和晚期数据影响更大，可指导课程学习 |
+| 34 | Outlier Gradient Analysis: Efficiently Identifying Detrimental Training Samples | arXiv 2405.03869 | 2024 | 无 Hessian 的梯度异常值检测，识别有害训练样本 | Hessian-free 使其可扩展到大模型，但需适配 |
+| 35 | Toward Efficient Influence Function: Dropout as Compression | arXiv 2509.15651 | 2025 | Dropout 压缩梯度降低 influence function 计算成本 | 通用方法，可应用于 VLA |
 
 ## 3. SOTA 方法与基准
 
-### 3.1 当前最佳方法
+### 3.1 VLA 模型 SOTA
 
-**参数空间 SOTA**:
-- **TRAK** (Park et al., 2023): 随机投影 + After Kernel，当前可扩展 IF 的标杆
-- **LESS** (Xia et al., 2024): Adam 感知 + 低维梯度搜索，5% 数据选择超全量
-- **DDA** (Wu et al., 2024): Debias + Denoise，AUC 91.64%
-- **LoRIF** (Li et al., 2026): 低秩 IF，扩展至 70B 模型
+| 模型 | 参数量 | 训练数据 | 关键特性 |
+|------|--------|---------|---------|
+| pi_0 / pi_0.5 | -- | 大规模多任务 | Physical Intelligence 闭源 SOTA |
+| OpenVLA | 7B | 970k demos (Open X-Embodiment) | 开源 SOTA，Llama 2 + DINOv2 + SigLIP |
+| RT-2-X | 55B | Open X-Embodiment | 大规模跨具身，被 OpenVLA 以 7x 少参数超越 |
+| Octo | -- | Open X-Embodiment | Transformer-based diffusion policy，灵活任务/观测定义 |
+| GR00T N1 | -- | Heterogeneous mixture (robot + human video + synthetic) | NVIDIA，异构数据混合策略 |
 
-**表示空间 SOTA**:
-- **RepT** (2025): P@10 = 0.97-1.00，三阶段框架（相变层定位 → 缓存 → 归因）
-- **AirRep** (2025): 学习归因表示，效率提升约 100x
-- **Concept Influence** (2026): 概念级归因，probe 方法是其一阶近似
-- **In-the-Wild** (2026): 激活差分向量，比梯度方法便宜 10x+
+### 3.2 多任务评测基准
 
-### 3.2 标准化评测
+| 基准 | 任务数 | 特点 | 评测指标 |
+|------|--------|------|---------|
+| LIBERO | 130 | 4 suite (Spatial/Object/Goal/100)，lifelong learning | Success rate, FWT, NBT, AUC |
+| LIBERO-PRO | -- | LIBERO 改进版，更公平评测 | Robust success rate |
+| VLABench | 100 类 / 2000+ objects | 语言条件操控，强随机化 | Task success rate, generalization |
+| Meta-World | 50 | 经典多任务 RL 基准 | Success rate per task |
+| SimplerEnv | -- | VLA 模型 OOD 评测 | Success rate (ID/OOD) |
+| RoboCasa | -- | 家庭环境操控 | Task completion |
 
-- **DATE-LM** (NeurIPS 2025): 唯一面向 LLM 的统一 TDA benchmark
-  - 三任务：训练数据选择、毒性/偏见过滤、事实归因
-  - 核心发现：无单一方法统治所有任务；简单基线（如 BM25）有时匹敌归因方法
-  - 公开 leaderboard + 模型 checkpoint
+### 3.3 关键评测指标
 
-- **Li et al. Benchmark** (2409.19998): IF vs RepSim 对比评测
-  - 核心发现：所有 IF 方法在 LLM 上一致表现差，RepSim 近 100% 识别率
-
-### 3.3 主流评测指标
-
-- AUC (Area Under Curve)
-- P@K (Precision at K)
-- LOO (Leave-One-Out) correlation
-- LDS (Linear Datamodeling Score)
-- auPRC (Area Under Precision-Recall Curve)
-
----
+- **Task Success Rate**: 单任务和平均成功率
+- **Forward Transfer (FWT)**: 新任务从旧知识获益程度
+- **Negative Backward Transfer (NBT)**: 学习新任务对旧任务的性能退化
+- **Inter-task Affinity / Influence Score**: 任务对之间的训练增益/损失
+- **Gradient Cosine Similarity**: 任务梯度冲突程度
+- **Data Mixing Proportion Sensitivity**: 不同混合比例下的性能变化
 
 ## 4. 已识别的研究空白
 
-- **空白 1 — 参数空间失败的根因诊断**: 现有工作（Li et al., Better Hessians）观察到参数空间方法在 LLM 上失败，或分析了 Hessian 近似误差，但未从信号处理角度系统诊断失败模式。特别是：(a) **信号稀释 (FM1)**: 高维参数空间中归因信号被噪声淹没的机制未被形式化；(b) **公共影响污染 (FM2)**: 所有训练样本对模型参数的共同贡献（如通用语言知识）混入归因分数的问题未被分析。
+- **空白 1: VLA 多任务训练中缺乏系统性的 task-to-task influence 分析**。现有 VLA 工作（OpenVLA, RT-X, CORAL）报告平均多任务性能，但未量化具体哪些任务对之间存在正迁移或负迁移。CORAL 的解决方案是参数完全隔离（每任务 LoRA），回避了问题而非解决。
 
-- **空白 2 — 表示空间方法的理论统一**: RepSim、RepT、AirRep、Concept Influence、In-the-Wild 等方法各自独立提出，缺乏统一的数学框架。没有工作将它们归纳为 phi(z_test)^T * psi(z_train) 的双线性形式，也未分析各方法在此框架下对应的 phi/psi 选择。
+- **空白 2: Task affinity / grouping 方法未在机器人操控策略学习中验证**。ETAP, Grad-TAG, DMTG 等方法主要在分类/NLP 任务验证，机器人操控任务的时序性、连续动作空间、多模态输入使其直接迁移存在挑战。
 
-- **空白 3 — 信号处理理论与 TDA 的桥梁**: 匹配滤波（维度约化修复 FM1）和差分检测（对比打分修复 FM2）在信号处理领域有 70+ 年的理论基础，但这些理论从未被引入 TDA 领域来解释和改进归因方法。
+- **空白 3: Data mixing 优化方法（DoReMi, RegMix 等）未推广到 robot demonstration data**。这些方法假设训练数据可按 "domain" 自然分割，但 robot 多任务数据的 "domain" 实际上就是 "task"，且任务间存在更细粒度的子技能共享（如 STRAP 所揭示的子轨迹级共享行为）。
 
-- **空白 4 — 参数空间 vs 表示空间的系统对比**: 尚无工作在控制变量下（同一 benchmark，同一模型，同一评测协议）系统比较 {参数空间, 表示空间} x {标准打分, 对比打分} 的 2x2 消融矩阵。
+- **空白 4: 缺乏跨任务影响的诊断工具**。现有方法或者仅提供二元判断（"应该一起训练 vs 不应该"），或者提供梯度级的冲突信号。缺乏一个系统框架来（1）构建完整的 task-to-task influence 矩阵，（2）诊断负迁移的具体机制（梯度冲突、特征空间竞争、数据不平衡），（3）基于诊断结果优化数据混合策略。
 
-- **空白 5 — 预测性诊断框架**: 现有工作多是事后分析（观察到 IF 失败 → 提出修补），缺乏能事先预测特定方法在特定场景下会失败的诊断理论。
+- **空白 5: Affinity score 的可靠性存疑**。"It's a Match!" (2023) 的重要负面结论指出 "task affinity scoring does not correlate well with actual MTL performance"，这意味着简单的梯度相似度等 proxy 指标可能不足以指导 VLA 多任务优化，需要更鲁棒的 influence 估计方法。
 
----
+- **空白 6: 数据影响力方法（influence function 等）未应用于多任务 robot policy**。GPTfluence、trajectory-specific LOO 等方法在 LLM 中有效，但在多任务机器人策略训练中的适用性和计算可行性尚未探索。
 
 ## 5. 可用资源
 
-### 开源代码
-- **TRAK**: https://github.com/MadryLab/trak (标准 IF 加速基线)
-- **RepT**: https://github.com/plumprc/RepT (表示梯度追踪)
-- **AirRep**: https://github.com/sunnweiwei/AirRep (学习归因表示)
-- **Deep Graph Persistence**: https://github.com/ExplainableML/Deep-Graph-Persistence (参数空间 TDA)
-- **LoGIX**: 伴随 LoGra 发布的数据估值工具包
-- **LoRIF**: 低秩 IF 实现
-- **TDAvec**: https://cran.r-project.org/web/packages/TDAvec (持续同调向量化 R/Python)
-- **AwesomeTDA4NLP**: https://github.com/AdaUchendu/AwesomeTDA4NLP (TDA-NLP 论文集)
+### 5.1 开源代码
 
-### 数据集与 Benchmark
-- **DATE-LM**: NeurIPS 2025 公开 benchmark + leaderboard + checkpoint
-  - 三任务：data selection, toxicity filtering, factual attribution
-  - 支持模型：LLaMA, QWEN, Mistral 等多种架构/规模
-- **Li et al. 评测**: LLaMA2/QWEN2/Mistral 上的 IF vs RepSim 对比数据
+- **OpenVLA**: https://github.com/openvla/openvla -- 7B VLA，支持 Open X-Embodiment 数据训练和 LoRA 微调
+- **LIBERO**: https://github.com/Lifelong-Robot-Learning/LIBERO -- 130 任务 lifelong 操控基准
+- **CORAL**: https://github.com/frontierrobo/CORAL -- 基于 LoRA experts 的多任务 VLA 框架
+- **Grad-TAG**: https://github.com/...（ACM KDD 2024 论文，梯度估计 task affinity）
+- **DMTG**: https://github.com/ethanygao/DMTG -- 可微分多任务分组
+- **RegMix**: https://github.com/sail-sg/regmix -- 数据混合回归优化
+- **Chameleon**: https://github.com/LIONS-EPFL/Chameleon -- Leverage scores 数据混合
+- **MixMin**: https://arxiv.org/abs/2502.10510 -- 凸优化数据混合
+- **HyperVLA**: https://github.com/MasterXiong/HyperVLA -- 超网络 VLA
+- **Awesome Embodied VLA**: https://github.com/jonyzhang2023/awesome-embodied-vla-va-vln -- VLA 论文集合
 
-### 预训练模型
-- DATE-LM 提供训练好的模型 checkpoint
-- 各 TDA 方法论文通常基于 HuggingFace 上的公开 LLM（LLaMA-2/3, QWEN2, Mistral, OLMo-2 等）
+### 5.2 数据集
 
----
+- **Open X-Embodiment**: 22 种机器人、527 种技能、160k+ 任务的标准化数据集
+- **LIBERO**: 130 任务，4 个 task suite（Spatial/Object/Goal/100），含高质量 demo 数据
+- **VLABench**: 100 类任务，2000+ objects，自动化数据采集
+- **Meta-World**: 50 个机器人操控任务，经典 MT-RL 基准
+
+### 5.3 预训练模型
+
+- **OpenVLA checkpoints** (HuggingFace): openvla/openvla-7b
+- **Octo** (HuggingFace): octo-base, octo-small
+- **DINOv2, SigLIP**: OpenVLA 使用的视觉编码器
+- **Llama 2**: OpenVLA 的语言模型骨干
 
 ## 6. 对 Idea 生成的启示
 
-### 高价值方向
+### 6.1 值得深入探索的方向
 
-1. **双线性统一框架是核心理论贡献**: 将 5 种表示空间 TDA 方法统一为 phi^T * psi 形式的想法极具吸引力——文献中没有任何类似工作。这不仅提供理论洞察，还能自然推导出各方法的等价条件和最优选择。建议重点打磨此框架的数学严格性。
+1. **构建 VLA 多任务的 task-to-task influence 矩阵**：借鉴 Grad-TAG 的梯度低维投影和 ETAP 的集成预测方法，但适配到 VLA 的连续动作空间和时序结构。可在 LIBERO-100 或 Meta-World MT50 上系统量化所有 task-pair 的互助/互害关系。
 
-2. **信号处理类比有巨大潜力但需谨慎**: 匹配滤波 ↔ 维度约化（修复 FM1）和差分检测 ↔ 对比打分（修复 FM2）的对应关系，如果能严格建立，将是跨领域的重大洞察。但需注意：(a) 高维表示空间与经典信号处理假设（如高斯噪声、线性系统）可能不完全匹配；(b) 需要实验验证理论预测的定量准确性，而非仅定性对应。
+2. **基于 influence 矩阵的自适应数据混合**：将 DoReMi / RegMix 的框架从 domain-level 下推到 task-level。不同于简单的均匀混合或按数据量比例混合，根据 task influence 矩阵动态调整各任务的采样权重，抑制负迁移来源任务的数据。
 
-3. **2x2 消融矩阵是实验设计的亮点**: {参数空间, 表示空间} x {标准打分, 对比打分} 在 DATE-LM 上的系统评测，目前无人做过。DATE-LM 的发现（无单一方法统治）恰好为这种系统性分析提供了动机。
+3. **负迁移机制的多层次诊断**：不仅测量梯度冲突，还分析特征空间（哪些表征层上任务竞争最激烈）、动作空间（哪些动作维度上任务预测冲突）、数据特征（哪些训练样本是负迁移的主要来源）。
 
-4. **Better Hessians 是核心对手但也是盟友**: Hong et al. 的工作从 Hessian 近似角度分析参数空间方法，但未触及信号稀释和公共影响问题。我们的工作可以将其结论作为"已解决的近似误差"部分，然后论证"即使 Hessian 近似完美，参数空间方法仍有 FM1/FM2 两个根本缺陷"。
+### 6.2 已被充分探索 / 不建议重复的方向
 
-### 需要避免的方向
+- **简单梯度操控方法**（PCGrad, CAGrad 等）在 VLA 规模下计算成本高且效果不稳定
+- **完全参数隔离方案**（如 CORAL 的每任务 LoRA）虽有效但回避了核心科学问题
+- **通用 MTL 方法的简单套用**：Azorin et al. (2023) 已表明简单 affinity score 与实际 MTL 性能相关性弱，需要更 robust 的方法
 
-- **纯 TDA（拓扑数据分析）方法**: 文献中大量工作将 persistent homology 用于分析网络结构或检测对抗样本，但这与 Training Data Attribution 是不同的问题。需要明确区分"TDA = Training Data Attribution"和"TDA = Topological Data Analysis"，避免术语混淆。
-- **仅做工程优化**: LoRIF、LoGra 等工作已在效率优化上做了大量努力。我们的贡献应聚焦在理论诊断和框架统一上，而非又一个加速方法。
+### 6.3 跨领域借鉴的潜力
 
-### 跨域借鉴机会
-
-- **信号处理 → TDA**: 匹配滤波和差分检测的正交性理论可直接映射到维度约化和对比打分的正交性。
-- **因果推断 → 公共影响**: FM2（公共影响污染）类似于因果推断中的混淆变量问题，差分检测类似于差中差 (difference-in-differences) 方法。
-- **Concept Influence 的理论连接**: Kowal et al. 的概念级归因表明，probe 方法是 Concept Influence 的一阶近似——这可能是 phi^T * psi 框架的一个特例，值得深入分析。
+- **LLM Data Mixing Laws → Robot Data Mixing Laws**: 数据混合的可预测函数关系（Ye et al. 2024）可能同样适用于 robot demonstration 数据，但需要验证
+- **Trajectory-specific Data Influence (Wang et al. 2024) → 策略学习的训练动态追踪**: data value embedding 方法可追踪训练过程中不同阶段数据的影响，可用于识别 VLA 训练中负迁移出现的关键时间节点
+- **Sub-trajectory Retrieval (STRAP) → 细粒度跨任务共享分析**: 不在任务级别而在子轨迹/技能级别分析跨任务数据交互，因为很多操控任务共享 "pick"、"place"、"approach" 等基本子技能
+- **Chameleon's Domain Affinity Matrix → Task Affinity Matrix for VLA**: Chameleon 用 leverage scores 和 domain embedding 构建 affinity matrix，类似思路可用任务 embedding（从 VLA 的语言/视觉编码器提取）构建 task affinity matrix
