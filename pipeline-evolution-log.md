@@ -57,4 +57,36 @@
 #### 边界 (Boundary)
 - [ ] **[Formalize <-> Probe] [高]** -- CRA 的 probe 在 Init Module（probe_design + probe_impl）中定义但从未执行。formalize 阶段的 RQ formulation 依赖 probe 结果（H4 假设完全无证据支撑）。当 probe 未执行时，formalize 的 gap assessment 存在系统性过度自信风险。建议：formalize 应有一个 gate 检查："probe_result.md 是否包含实际执行结果？"如果不包含，所有 empirical claims 必须标注 [UNVERIFIED]。
 
+## Entry 3 -- Formalize Review (Round 1) -- 2026-03-26
+
+**执行模式**: formalize_review round-1 → revise (3 mandatory issues)
+**时间分配**: 辩论 agents 并行执行占 ~50%，synthesis + report 占 ~40%，reflection ~10%
+
+### 观察
+
+#### 确认 (Confirm)
+- **[Formalize Review]** -- 4/4 共识的 P0 issues（MAGIC decision rule, Unified Attribution, LoRA vs full-FT）是精确且 actionable 的修订要求。产出质量取决于共识检测的准确性。
+- **[Formalize Review]** -- "Pass with mandatory revisions" 作为判定模式有效：方向无根本问题时，不需要重新审查整体方向，只需验证具体修订。这减少了 Round 2 的审查负担。
+
+#### 改进 (Improve)
+- [ ] **[Prompt: formalize-review] [中]** -- Round 1 的 3 个 P0 issues 和 4 个 P1 issues 之间的边界不够清晰。P1 #7（FM1 LoRA-specificity 升级为核心实验问题）实际上被 formalize 阶段处理为 P0 级别，说明 P0/P1 分类在 synthesis 中不够准确。
+
+## Entry 4 -- Formalize Review (Round 2) -- 2026-03-26
+
+**执行模式**: formalize_review round-2 → pass (revision verification)
+**时间分配**: 辩论 agents 并行执行占 ~40%，synthesis + report 占 ~50%，reflection ~10%
+
+### 观察
+
+#### 确认 (Confirm)
+- **[Formalize Review]** -- Round 2 作为 revision verification 高效运作。4/4 agents 确认 3 个 Round 1 issues 已解决，无新 blocking issues。审查焦点从"发现问题"转为"验证修复"，大幅减少审查时间。
+- **[跨阶段]** -- Codex 外部审查（non-blocking）也返回 Pass，提供独立验证。external + internal 共识增强判定可信度。
+
+#### 改进 (Improve)
+- [ ] **[Prompt: formalize-review] [中]** -- Round 2 revision verification 模式下，4 个 debaters 的完整辩论可能过重。当 Round 1 issues 明确且修订针对性强时，可考虑精简审查流程：仅运行 2 个最相关 agents（如 Contrarian + Comparativist）+ synthesizer，节省 ~50% token 成本。
+- [ ] **[跨阶段] [低]** -- Pragmatist 在 Round 2 识别出 2x2x2 compute expansion 的预算影响（72-144 GPU-days），这类信息对 design 阶段至关重要，但从 formalize_review synthesis 到 design prompt 的信息传递路径不明确。建议：design prompt 应自动读取最新 formalize_review synthesis 中的"建议改进"和"战略预判"部分。
+
+#### 边界 (Boundary)
+- [ ] **[Formalize Review <-> Design] [中]** -- 多个 agents 指出 probe 执行是 design 阶段第一优先。但 design prompt 目前不强制 probe-first 顺序。建议：当 probe_result.md 标记为"NOT YET EXECUTED"时，design prompt 应包含显式 gate："先执行 probe，再进行方法设计。"
+
 <!-- 后续 Entry 在此下方追加 -->
