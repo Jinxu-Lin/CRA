@@ -1,2 +1,0 @@
-{"ts": 1773729670.092604, "event": "task_dispatch", "task_ids": ["setup_env"], "gpu_ids": [1], "iteration": 0}
-{"ts": 1773731349.2975821, "event": "task_dispatch", "task_ids": ["pilot_phase0"], "gpu_ids": [0], "iteration": 0}
