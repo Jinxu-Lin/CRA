@@ -7,6 +7,18 @@
 
 ---
 
+## [1.2] -- 2026-03-26 -- Formalize Review Revisions
+
+- **触发**: formalize_review round-1 → revise (3 mandatory revisions)
+- **诊断层次**: N/A (review-driven revision, not failure)
+- **变更文档**: `research/problem-statement.md` v1.1 -> v1.2
+- **关键变更**:
+  1. **MAGIC invalidation decision rule** (§1.3): 添加三级决策规则——LDS >= 0.90 则 FM1 弱化并转向 cost-benefit 叙事；MAGIC 不可行则 FM1 默认成立但须声明局限；LDS 0.70-0.90 则混合证据，FM1 为次要瓶颈
+  2. **Towards Unified Attribution 竞争分析** (新增 §2.2): arXiv:2501.18887 是概念层统一，CRA 是 TDA-specific 实证诊断，互补而非竞争
+  3. **LoRA vs full-FT 升级为核心实验维度** (§1.5 RQ1): FM1 可能是 LoRA artifact，2×2 ablation 必须包含 LoRA 和 full-FT 两种条件
+- **排除方向**: None (revisions strengthen existing direction)
+- **关键洞察**: formalize_review 4/4 共识 MAGIC 威胁真实，decision rule 将模糊的"需要实验回应"转化为具体的叙事调整方案。LoRA vs full-FT 维度将 2×2 扩展为 2×2×2，需在 design 阶段评估计算成本。
+
 ## [1.1] -- 2026-03-25 -- Formalize Refinement
 
 - **触发**: `/praxis-r-formalize` -- 从 assimilated v1.0 精炼为正式问题陈述 v1.1

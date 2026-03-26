@@ -1,10 +1,10 @@
 ---
-version: "1.1"
+version: "1.2"
 created: "2026-03-16"
-last_modified: "2026-03-25"
-entry_mode: "first"
+last_modified: "2026-03-26"
+entry_mode: "fr_revise"
 iteration_major: 1
-iteration_minor: 1
+iteration_minor: 2
 ---
 
 # Problem Statement
@@ -67,6 +67,11 @@ Training Data Attribution (TDA) for LLMs computes "which training samples most i
 
 **Key unresolved tension**: MAGIC achieves LDS ~0.95-0.99 with exact IF in parameter space. If FM1 is truly a dominant bottleneck, why does MAGIC work so well? Possible resolutions: (a) MAGIC's deterministic training setting implicitly reduces FM1 (no stochastic gradient noise); (b) MAGIC experiments use Gemma-2B with LoRA where FM1 is artificially mild; (c) LDS itself may not capture the failure modes FM1 causes (H-RF1, H-DVEmb3). **This tension MUST be addressed experimentally, not argued away.**
 
+**MAGIC Invalidation Decision Rule** (added per formalize_review R1):
+- **If MAGIC achieves LDS >= 0.90 on DATE-LM toxicity at Pythia-1B with feasible compute (< 10 GPU-days)**: FM1 thesis is weakened. Paper pivots to "representation space as efficient approximation" -- a cost-benefit analysis rather than a fundamental diagnostic contribution.
+- **If MAGIC is infeasible at Pythia-1B scale (memory/time exceeds available hardware)**: FM1 thesis stands by default, but the paper must explicitly acknowledge that FM1 has not been tested against exact IF at this scale -- i.e., FM1's dominance is established relative to approximate IF only.
+- **If MAGIC achieves LDS 0.70-0.90 on DATE-LM toxicity at Pythia-1B**: Mixed evidence. FM1 is partially relevant -- exact IF closes most but not all of the gap. Paper frames FM1 as a secondary bottleneck behind Hessian error, with representation space offering a complementary advantage.
+
 ### 1.4 Gap Assessment
 
 | Dimension | Rating | Evidence |
@@ -82,6 +87,7 @@ Training Data Attribution (TDA) for LLMs computes "which training samples most i
 - *Operationalization*: Compare LDS across: (a) approximate IF (TRAK/EK-FAC), (b) improved IF (ASTRA-level), (c) MAGIC (exact IF, if feasible at scale), (d) RepSim/RepT (bypasses Hessian + FM1), (e) DDA/contrastive variants (addresses FM2). The gaps between (a)-(c) quantify Hessian contribution; gaps between (c)-(d) quantify FM1; gaps from adding contrastive scoring quantify FM2.
 - *Falsification*: If MAGIC (exact parameter-space IF) achieves LDS within 3pp of RepSim/RepT on all DATE-LM tasks, FM1 is negligible at this scale -- the "signal dilution" thesis fails.
 - *Prediction*: MAGIC will approach RepSim on tasks where FM2 is low (data selection), but RepSim + contrastive will outperform MAGIC on tasks where FM2 is high (toxicity filtering). The ordering of bottleneck contributions is: Hessian > FM1 > FM2 on small models, FM1 > FM2 > Hessian on large models.
+- *LoRA vs Full-FT dimension* (added per formalize_review R1): FM1 may be a LoRA artifact -- Li et al.'s strongest evidence for iHVP degeneracy is entirely under LoRA fine-tuning. The 2x2 ablation must include both LoRA and full fine-tuning conditions at Pythia-1B scale to test FM1 generality. If FM1 is severe under LoRA but negligible under full-FT, the paper reframes FM1 as a "LoRA-specific pathology" rather than a general LLM bottleneck. This is a core experimental dimension, not a secondary ablation.
 
 **RQ2 (Representation-Space Benchmark)**: How do representation-space TDA methods (RepSim, RepT) compare to parameter-space methods (TRAK, DDA, MAGIC) on the full DATE-LM benchmark across all three tasks (data selection, toxicity filtering, factual attribution)?
 
@@ -124,7 +130,11 @@ Training Data Attribution (TDA) for LLMs computes "which training samples most i
 (3) **Concurrent competition**: The field is moving fast (5 methods in 12 months). Someone may publish a similar unification during our research period.
 (4) **Ceiling risk**: Pure diagnostic + benchmark is poster-level at best. Without a novel method contribution, the impact ceiling is bounded.
 
-### 2.2 Attack Angle Limitations (Honest Assessment)
+### 2.2 Competitive Landscape Update
+
+**"Towards Unified Attribution in Explainable AI, Data-Centric AI, and Mechanistic Interpretability"** (arXiv:2501.18887, Jan 2026) proposes a conceptual framework unifying feature attribution, data attribution, and component attribution under a single umbrella. CRA differentiates from this work in three ways: (a) CRA is TDA-specific and empirically grounded -- we run systematic experiments on DATE-LM rather than proposing a conceptual taxonomy; (b) CRA provides the three-bottleneck diagnostic framework (Hessian error, FM1, FM2) that explains *why* different TDA methods fail, not just *how* attribution types relate; (c) CRA delivers concrete benchmark results (representation-space methods on DATE-LM) that practitioners can directly use. The Unified Attribution paper is complementary (big-picture conceptual map) rather than competitive (same-level empirical claims).
+
+### 2.3 Attack Angle Limitations (Honest Assessment)
 
 1. **FM1 may be a LoRA artifact.** Li et al.'s strongest evidence involves LoRA's extreme low-rank constraint. Under full fine-tuning, FM1 severity is unknown. If FM1 vanishes under full FT, the "three bottlenecks" reduces to "two bottlenecks" (Hessian + FM2), which is less novel (Hessian is well-studied, FM2 is DDA's contribution).
 
