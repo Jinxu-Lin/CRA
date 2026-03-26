@@ -89,4 +89,26 @@
 #### 边界 (Boundary)
 - [ ] **[Formalize Review <-> Design] [中]** -- 多个 agents 指出 probe 执行是 design 阶段第一优先。但 design prompt 目前不强制 probe-first 顺序。建议：当 probe_result.md 标记为"NOT YET EXECUTED"时，design prompt 应包含显式 gate："先执行 probe，再进行方法设计。"
 
+## Entry 5 -- Design -- 2026-03-26
+
+**执行模式**: 首次 (first entry, joint method + experiment design)
+**时间分配**: 探针信号消化 + 资源预算 ~20%, 方法框架设计 ~30%, 实验矩阵设计 ~35%, 风险/失败预案 ~15%
+
+### 观察
+
+#### 缺失 (Missing)
+- [ ] **[Prompt: design] [高]** -- Design prompt 要求"消化探针结果"，但 probe_result.md 标记为 "NOT YET EXECUTED"。当无探针结果时，prompt 未给出替代流程（如：基于间接证据的条件设计 + 探针作为 Experiment 0）。当前执行中自行发明了 "Experiment 0 probe + Experiment 0.5 mini pilot" 的两级门控，这应该成为 prompt 的标准模式。
+- [ ] **[Prompt: design] [中]** -- Prompt 要求检查 Episteme Methods Bank + Experimental Patterns，但 Episteme 没有这些子目录（知识存储在论文笔记中，非结构化）。要么 Logos 应产出结构化的 methods-bank/ 目录，要么 design prompt 应改为"搜索 Episteme 论文笔记中的相关方法"。
+
+#### 改进 (Improve)
+- [ ] **[Prompt: design] [中]** -- "解空间探索"（Step 4a）对于诊断型项目（CRA 不提出新方法，而是诊断框架）有些错位。CRA 的"方法组件"是已有方法的配置组合，不是新算法设计。Design prompt 应区分"novel method design"和"diagnostic framework design"两种模式，后者的重点是实验矩阵设计而非方法创新。
+- [ ] **[跨阶段] [中]** -- formalize_review synthesis 中的"建议改进"（CMRR metric, 2x2x2 compute budget, probe-first priority）是 design 的关键输入，但 design prompt 没有显式要求读取 formalize_review synthesis。当前依赖用户在 fork prompt 中注入这些信息。建议：runner 自动注入最近一次 formalize_review 的 synthesis 文档路径。
+
+#### 确认 (Confirm)
+- **[Design]** -- 方法和实验同步设计（"耦合原则"）在 CRA 中高度有效。每个方法组件（repr-space, contrastive, MAGIC, LoRA vs Full-FT）都直接映射到一个实验，反之亦然。映射表（§3）是 design 的核心交付物，确保无孤立组件或无支撑实验。
+- **[Design]** -- 资源预算前置（Step 2）有效约束了设计空间。在确定 60 GPU-day 总量后，每个实验的规模自然受限，避免了"先设计再砍"的低效循环。
+
+#### 边界 (Boundary)
+- [ ] **[Design <-> Blueprint] [中] [BOUNDARY]** -- Design 和 Blueprint 之间的边界在 CRA 项目中模糊。CRA 的"方法"是已有方法的组合配置，不需要复杂的实现蓝图。Blueprint 阶段对于 CRA 可能退化为"DATE-LM codebase 集成计划"——这更像是工程规划而非研究设计。建议：对于诊断型项目，考虑合并 design + blueprint 或简化 blueprint 为"实现检查清单"。
+
 <!-- 后续 Entry 在此下方追加 -->

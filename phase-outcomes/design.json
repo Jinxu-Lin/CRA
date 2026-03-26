@@ -1,0 +1,4 @@
+{
+  "outcome": "done",
+  "notes": "Joint design complete: method-design.md (4 components: repr-space, contrastive, MAGIC control, LoRA vs Full-FT) + experiment-design.md (6 experiments, 60 GPU-day budget, probe as P0 gate). 2x2(x2) ablation with per-sample permutation test. MAGIC feasibility capped at 5 GPU-days. All formalize_review recommendations integrated (CMRR metric, LoRA vs Full-FT dimension, probe-first priority)."
+}
