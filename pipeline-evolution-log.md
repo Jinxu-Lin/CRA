@@ -111,4 +111,22 @@
 #### 边界 (Boundary)
 - [ ] **[Design <-> Blueprint] [中] [BOUNDARY]** -- Design 和 Blueprint 之间的边界在 CRA 项目中模糊。CRA 的"方法"是已有方法的组合配置，不需要复杂的实现蓝图。Blueprint 阶段对于 CRA 可能退化为"DATE-LM codebase 集成计划"——这更像是工程规划而非研究设计。建议：对于诊断型项目，考虑合并 design + blueprint 或简化 blueprint 为"实现检查清单"。
 
+## Entry 6 -- Design Review (Round 1) -- 2026-03-26
+
+**执行模式**: 首次 (design_review round-1, 6 debaters + synthesizer)
+**时间分配**: 文档审读 ~15%, 辩论 agents 并行执行 ~45%, synthesis + report ~35%, reflection ~5%
+
+### 观察
+
+#### 改进 (Improve)
+- [ ] **[Prompt: design-review] [中]** -- 6 debaters 产出大量文本（each ~800-1200 words），synthesizer 需要整合 ~6000 words 的辩论记录。辩论质量高但存在冗余：Skeptic 和 Contrarian 在 TRAK projection confound 上几乎完全重合，Empiricist 和 Methodologist 在 representation extraction protocol 上也高度重叠。6 agents 对于 design review 是合理的（覆盖不同维度），但 synthesizer 应有显式的 dedup 策略。
+- [ ] **[Prompt: design-review] [中]** -- 审查维度中缺少"计算预算验证"作为独立维度。Pragmatist 发现的 LDS evaluation cost uncertainty 是本轮最严重的实际问题，但它不是 10 个审查维度中任何一个的核心（最接近的是"评估协议完整性"但重点不同）。建议：添加"计算可行性"作为第 11 个审查维度，或在"评估协议完整性"维度中显式包含 compute budget audit。
+
+#### 确认 (Confirm)
+- **[Design Review]** -- 6-agent 辩论有效覆盖了技术审查的多个层面。强信号问题（3+ agents 共识）确实是最重要的问题：representation extraction protocol、LDS cost uncertainty、TRAK projection confound。独立发现（单 agent）也有高信息价值：Theorist 的 Taylor expansion 建议、Skeptic 的 random-model control。
+- **[Design Review]** -- Pass 判定合理。所有 mandatory modifications 是 additions（增加控制实验、指定实现细节），不需要重新设计方法或实验框架。2x2 ablation 核心设计经受住了 6-agent 审查。
+
+#### 边界 (Boundary)
+- [ ] **[Design Review <-> Blueprint] [低] [BOUNDARY]** -- Pass 判定附带 4 个 mandatory additions。这些修改应在哪个阶段执行？Design 阶段（回写 method-design.md 和 experiment-design.md）还是 Blueprint 阶段（纳入实现计划）？当前 routing 是 Pass → Blueprint，但 Blueprint prompt 可能不知道这些 mandatory additions。建议：Runner 在 Pass with mandatory additions 时，将 additions 列表注入 Blueprint fork_prompt。
+
 <!-- 后续 Entry 在此下方追加 -->
