@@ -48,9 +48,25 @@ def spearman_correlation(
 
 def _rank(x: torch.Tensor) -> torch.Tensor:
     """Compute ranks (1-indexed, average for ties)."""
+    n = len(x)
     sorted_indices = x.argsort()
-    ranks = torch.zeros_like(x, dtype=torch.float)
-    ranks[sorted_indices] = torch.arange(1, len(x) + 1, dtype=torch.float, device=x.device)
+    sorted_x = x[sorted_indices]
+
+    # Assign base ranks 1..n
+    ranks = torch.zeros(n, dtype=torch.float, device=x.device)
+
+    # Handle ties by averaging ranks within each group of equal values
+    i = 0
+    while i < n:
+        j = i + 1
+        while j < n and sorted_x[j] == sorted_x[i]:
+            j += 1
+        # All elements from i to j-1 have the same value
+        avg_rank = (i + 1 + j) / 2.0  # average of ranks (i+1) through j
+        for k in range(i, j):
+            ranks[sorted_indices[k]] = avg_rank
+        i = j
+
     return ranks
 
 
