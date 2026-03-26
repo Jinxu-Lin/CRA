@@ -1,0 +1,12 @@
+{
+  "n_params": 1000000000,
+  "model_size_gb_fp16": 1.862645149230957,
+  "n_train": 10000,
+  "n_test": 5,
+  "n_steps": 200,
+  "estimated_checkpoint_storage_gb": 1117.5870895385742,
+  "estimated_time_per_test_hours": 4.0,
+  "estimated_total_time_hours": 20.0,
+  "estimated_total_time_gpu_days": 0.8333333333333334,
+  "feasible": false
+}

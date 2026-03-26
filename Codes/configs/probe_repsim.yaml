@@ -1,0 +1,13 @@
+# Probe: RepSim on toxicity filtering
+# Experiment 0 -- Critical Gate
+_base_: "base.yaml"
+
+attribution:
+  method: "repsim"
+  layer: "middle"        # L/2 = layer 12 for Pythia-1B
+  token_aggregation: "last_token"
+
+evaluation:
+  n_seeds: 1
+  task: "toxicity"
+  metrics: ["lds", "auprc", "pk"]

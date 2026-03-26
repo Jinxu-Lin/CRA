@@ -1,0 +1,14 @@
+# Experiment 4: MAGIC feasibility assessment
+_base_: "base.yaml"
+
+attribution:
+  method: "magic"
+
+evaluation:
+  n_seeds: 1
+  task: "toxicity"
+
+magic:
+  n_test_samples: 5      # Feasibility limit
+  deterministic_training: true
+  checkpoint_every_step: true

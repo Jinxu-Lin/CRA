@@ -1,0 +1,19 @@
+# Experiment 5: Llama-7B scale-up
+_base_: "base.yaml"
+
+model:
+  name: "llama-7b"
+  path: "~/Resources/Models/llama-7b/"
+  n_layers: 32
+  d_model: 4096
+
+fine_tuning:
+  mode: "lora"           # Full-FT infeasible at 7B on 48GB
+  lora_rank: 16
+
+evaluation:
+  n_seeds: 3
+
+scaleup:
+  methods: ["repsim", "trak"]
+  tasks: ["toxicity", "selection"]

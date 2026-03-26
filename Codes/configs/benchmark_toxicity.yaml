@@ -1,0 +1,7 @@
+# Experiment 1: Systematic benchmark on toxicity filtering
+_base_: "base.yaml"
+
+evaluation:
+  n_seeds: 3
+  task: "toxicity"
+  metrics: ["lds", "auprc", "pk"]

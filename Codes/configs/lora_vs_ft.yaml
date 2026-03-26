@@ -1,0 +1,12 @@
+# Experiment 3: LoRA vs Full-FT comparison
+_base_: "base.yaml"
+
+evaluation:
+  n_seeds: 3
+
+# Conditions iterated by run script:
+# {LoRA, Full-FT} x {RepSim, TRAK} x {toxicity, selection}
+comparison:
+  ft_modes: ["lora", "full"]
+  methods: ["repsim", "trak"]
+  tasks: ["toxicity", "selection"]

@@ -1,0 +1,12 @@
+# Pilot: RepSim contrastive on toxicity filtering
+# Experiment 0.5 -- 2x2 sanity check
+_base_: "base.yaml"
+
+attribution:
+  method: "repsim"
+  scoring: "contrastive"
+  layer: "middle"
+
+evaluation:
+  n_seeds: 1
+  task: "toxicity"

@@ -1,0 +1,13 @@
+# Experiment 2: 2x2(+) ablation for FM1/FM2 decomposition
+# {RepSim, TRAK, Grad-Sim} x {standard, contrastive}
+_base_: "base.yaml"
+
+evaluation:
+  n_seeds: 3
+
+# Methods and scorings are iterated by the run script
+# This config defines the shared base for all conditions
+ablation:
+  methods: ["repsim", "trak", "gradsim"]
+  scorings: ["standard", "contrastive"]
+  tasks: ["toxicity", "selection", "factual"]

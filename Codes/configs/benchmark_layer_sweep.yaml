@@ -1,0 +1,12 @@
+# Experiment 1: RepSim layer sweep across all layers
+_base_: "base.yaml"
+
+attribution:
+  method: "repsim"
+  layer: "all"           # Sweep all 24 layers
+  token_aggregation: "last_token"
+
+evaluation:
+  n_seeds: 1
+  task: "toxicity"
+  metrics: ["lds", "auprc", "pk"]

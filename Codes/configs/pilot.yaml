@@ -1,0 +1,15 @@
+# Pilot config: 1/10 scale, minimal logging
+# For quick verification before full experiments
+_base_: "base.yaml"
+
+data:
+  max_samples: 100       # ~1/10 of toxicity train set
+  batch_size: 16
+
+evaluation:
+  n_seeds: 1
+  task: "toxicity"
+
+reproducibility:
+  log_wandb: false
+  log_tensorboard: false

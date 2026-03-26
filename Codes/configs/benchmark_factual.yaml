@@ -1,0 +1,7 @@
+# Experiment 1: Systematic benchmark on factual attribution
+_base_: "base.yaml"
+
+evaluation:
+  n_seeds: 3
+  task: "factual"
+  metrics: ["lds", "recall", "mrr", "pk"]

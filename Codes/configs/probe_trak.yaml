@@ -1,0 +1,11 @@
+# Probe: TRAK on toxicity filtering
+# Experiment 0 -- Critical Gate
+_base_: "base.yaml"
+
+attribution:
+  method: "trak"
+
+evaluation:
+  n_seeds: 1
+  task: "toxicity"
+  metrics: ["lds", "auprc", "pk"]

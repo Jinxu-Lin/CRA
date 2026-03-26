@@ -1,0 +1,44 @@
+# CRA Base Config -- Shared defaults for all experiments
+# All experiment configs inherit from this via _base_
+
+model:
+  name: "pythia-1b"
+  path: "~/Resources/Models/pythia-1b/"
+  n_layers: 24
+  d_model: 2048
+
+fine_tuning:
+  mode: "lora"           # "lora" or "full"
+  lora_rank: 16
+  learning_rate: 5e-5
+  scheduler: "wsd"
+  decay_steps: 200
+
+attribution:
+  method: "repsim"       # repsim, rept, trak, gradsim, dda, bm25, magic, random
+  scoring: "standard"    # "standard" or "contrastive"
+  layer: "middle"        # "middle" (L/2), "last" (L-1), "all" (sweep), or int
+  token_aggregation: "last_token"  # "last_token" or "mean_pool"
+
+evaluation:
+  metrics: ["lds", "auprc", "pk"]
+  n_seeds: 3
+  task: "toxicity"       # toxicity, selection, factual
+
+data:
+  batch_size: 32
+  num_workers: 4
+  max_samples: null      # null = use all
+
+paths:
+  data: "~/Resources/Datasets/DATE-LM/"
+  base_model: "~/Resources/Models/pythia-1b/"
+  output: "_Results/"
+  cache: "_Data/"
+
+reproducibility:
+  seed: 42
+  deterministic: true
+  log_wandb: true
+  log_tensorboard: false
+  wandb_project: "CRA"

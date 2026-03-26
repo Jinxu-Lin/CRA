@@ -1,0 +1,13 @@
+# Experiment 3: Full fine-tuning LR sweep
+_base_: "base.yaml"
+
+fine_tuning:
+  mode: "full"
+  learning_rate: 5e-5    # Will be swept: {1e-5, 5e-5, 1e-4}
+  scheduler: "wsd"
+  decay_steps: 200
+  gradient_checkpointing: true
+
+evaluation:
+  n_seeds: 1
+  task: "toxicity"

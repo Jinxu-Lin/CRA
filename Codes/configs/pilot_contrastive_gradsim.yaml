@@ -1,0 +1,11 @@
+# Pilot: Grad-Sim contrastive on toxicity filtering
+# Experiment 0.5 -- Design-Review Mandatory #3
+_base_: "base.yaml"
+
+attribution:
+  method: "gradsim"
+  scoring: "contrastive"
+
+evaluation:
+  n_seeds: 1
+  task: "toxicity"

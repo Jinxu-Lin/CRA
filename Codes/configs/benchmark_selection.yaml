@@ -1,0 +1,7 @@
+# Experiment 1: Systematic benchmark on data selection
+_base_: "base.yaml"
+
+evaluation:
+  n_seeds: 3
+  task: "selection"
+  metrics: ["lds", "pk"]

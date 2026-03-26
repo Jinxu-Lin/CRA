@@ -1,0 +1,16 @@
+{
+  "effects": {
+    "fm1_effect": 0.08664935827255249,
+    "fm2_effect": 0.04732406139373779,
+    "interaction": -0.06500035524368286,
+    "interaction_ratio": 1.373515994387669
+  },
+  "assessment": "strong_interaction",
+  "gate_decision": "PASS: Both FM1 and FM2 effects positive",
+  "cell_means": {
+    "param_std": 0.13817767798900604,
+    "param_contr": 0.21800191700458527,
+    "repr_std": 0.25732722878456116,
+    "repr_contr": 0.2721511125564575
+  }
+}

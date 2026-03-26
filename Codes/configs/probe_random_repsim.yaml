@@ -1,0 +1,15 @@
+# Probe: RepSim with randomly initialized model (control)
+# Design-Review Mandatory #4: distinguish learned vs dimensionality reduction
+_base_: "base.yaml"
+
+attribution:
+  method: "repsim"
+  layer: "middle"
+  token_aggregation: "last_token"
+
+evaluation:
+  n_seeds: 1
+  task: "toxicity"
+  metrics: ["lds", "auprc", "pk"]
+
+# Note: use --random-init flag when running
