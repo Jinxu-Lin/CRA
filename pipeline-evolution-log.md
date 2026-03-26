@@ -129,4 +129,22 @@
 #### 边界 (Boundary)
 - [ ] **[Design Review <-> Blueprint] [低] [BOUNDARY]** -- Pass 判定附带 4 个 mandatory additions。这些修改应在哪个阶段执行？Design 阶段（回写 method-design.md 和 experiment-design.md）还是 Blueprint 阶段（纳入实现计划）？当前 routing 是 Pass → Blueprint，但 Blueprint prompt 可能不知道这些 mandatory additions。建议：Runner 在 Pass with mandatory additions 时，将 additions 列表注入 Blueprint fork_prompt。
 
+## Entry 7 -- Blueprint -- 2026-03-26
+
+**执行模式**: 首次 (code architecture + experiment execution plan)
+**时间分配**: 探针复用评估 ~5%, 组件-文件映射 + 架构设计 ~25%, experiment-todo 细化 ~40%, CLAUDE.md 编写 ~25%, reflection ~5%
+
+### 观察
+
+#### 确认 (Confirm)
+- **[Blueprint]** -- 深浅解耦原则（core/ vs experiments/）在 CRA 中非常自然。所有 attribution 方法是 core/，每个实验是 experiments/ 下的薄脚本。这验证了 Entry 5 的观察：CRA 的"方法"是已有方法的配置组合，blueprint 的核心价值是 config-driven 实验矩阵而非复杂架构。
+- **[Blueprint]** -- Design review 的 4 个 mandatory additions（token aggregation, LDS timing, Grad-Sim baseline, random-model RepSim）能无缝整合到 experiment-todo.md 中，因为它们都是"增加一个实验条件"而非"修改架构"。这印证了 design review Pass 判定的正确性。
+
+#### 改进 (Improve)
+- [ ] **[Prompt: blueprint] [中]** -- Blueprint prompt 要求"探针代码复用评估"（Step 1），但对 CRA 这种探针未执行、probe/ 目录为空的项目，此步骤退化为"确认无可复用代码"。更有价值的评估是"DATE-LM codebase 复用评估"——哪些功能 DATE-LM 已提供、哪些需自行实现。Prompt 应扩展 Step 1 为"已有代码资产评估"（探针代码 + 外部 codebase + 相关项目代码）。
+- [ ] **[Prompt: blueprint] [中]** -- Blueprint prompt 禁止编写实际 .py 文件，但同时要求建立目录结构。创建空目录（`mkdir -p`）是合理的，但创建的空子目录（如 `core/attribution/`, `experiments/probe/`）在 git 中不会被跟踪（git 不跟踪空目录）。建议：要么允许创建 `__init__.py` 占位文件，要么明确说明目录结构仅在 CLAUDE.md 中描述、implement 阶段创建。
+
+#### 边界 (Boundary)
+- [ ] **[Design Review -> Blueprint] [中] [BOUNDARY]** -- 再次出现 Entry 6 的观察：design review 的 mandatory additions 需要在 blueprint 中集成，但 blueprint prompt 不自动接收这些信息。本次执行依赖用户在 fork prompt 中显式注入 synthesis 文档路径。建议：Runner 在 design_review Pass with mandatory additions 后，自动将 additions 列表写入 `phase-outcomes/design_review.json` 的 `mandatory_additions` 字段，blueprint prompt 显式读取此字段。
+
 <!-- 后续 Entry 在此下方追加 -->
