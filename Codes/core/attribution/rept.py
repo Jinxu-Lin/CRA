@@ -14,6 +14,8 @@ Gradient component nabla_h L adds causal signal to correlational representation.
 WARNING: Most likely component to have bugs (design review prediction).
 """
 
+import warnings
+
 import torch
 import torch.nn.functional as F
 from typing import Optional, Union, Tuple, List
@@ -38,9 +40,17 @@ def detect_phase_transition_layer(
     assert gradient_norms.ndim == 1, f"Expected 1D tensor, got {gradient_norms.ndim}D"
     assert len(gradient_norms) >= 2, "Need at least 2 layers for transition detection"
 
-    # Compute ratio of consecutive layers
-    # Add eps to avoid division by zero
+    # If all gradient norms are near-zero (degenerate model), fall back to L/2
     eps = 1e-10
+    if gradient_norms.max() < eps:
+        fallback = len(gradient_norms) // 2
+        warnings.warn(
+            f"All gradient norms are near-zero (max={gradient_norms.max():.2e}). "
+            f"Falling back to middle layer {fallback}."
+        )
+        return fallback
+
+    # Compute ratio of consecutive layers
     ratios = gradient_norms[1:] / (gradient_norms[:-1] + eps)  # (n_layers - 1,)
 
     # l* is the layer WITH the max ratio (index in ratios corresponds to layer index + 1)
@@ -49,7 +59,6 @@ def detect_phase_transition_layer(
     return l_star
 
 
-@torch.no_grad()
 def compute_layer_gradient_norms(
     model: torch.nn.Module,
     dataloader: DataLoader,
@@ -188,7 +197,6 @@ def rept_score(
     return phi_test_norm @ phi_train_norm.T  # (n_test, n_train)
 
 
-@torch.no_grad()
 def extract_hidden_gradients(
     model: torch.nn.Module,
     dataloader: DataLoader,
@@ -250,6 +258,10 @@ def extract_hidden_gradients(
                 if h_l.requires_grad:
                     grad = torch.autograd.grad(loss, h_l, create_graph=False)[0]
                 else:
+                    warnings.warn(
+                        f"Layer {layer} hidden state has requires_grad=False; "
+                        "gradient will be zero. Check model forward pass."
+                    )
                     grad = torch.zeros_like(h_l)
 
             # Aggregate token dimension

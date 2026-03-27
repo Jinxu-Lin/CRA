@@ -19,6 +19,10 @@ from torch.utils.data import DataLoader, Dataset
 from typing import Optional, Dict, Any, Tuple, List
 from pathlib import Path
 
+import sys
+sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
+from seed_utils import seed_worker, get_generator
+
 
 class DateLMDataset(Dataset):
     """
@@ -98,6 +102,7 @@ def create_dataloader(
     batch_size: int = 32,
     max_samples: Optional[int] = None,
     num_workers: int = 0,
+    seed: Optional[int] = None,
 ) -> DataLoader:
     """
     Create a DataLoader for DATE-LM data.
@@ -109,18 +114,24 @@ def create_dataloader(
         batch_size: Batch size.
         max_samples: Maximum number of samples.
         num_workers: Number of data loading workers.
+        seed: Random seed for reproducible multi-worker loading.
 
     Returns:
         DataLoader yielding dicts with 'input_ids', 'attention_mask', 'labels'.
     """
     dataset = DateLMDataset(data_path, task, split, max_samples)
-    return DataLoader(
-        dataset,
+
+    kwargs = dict(
         batch_size=batch_size,
         shuffle=False,  # Attribution requires fixed ordering
         num_workers=num_workers,
         pin_memory=True,
     )
+    if seed is not None and num_workers > 0:
+        kwargs["worker_init_fn"] = seed_worker
+        kwargs["generator"] = get_generator(seed)
+
+    return DataLoader(dataset, **kwargs)
 
 
 def get_task_labels(

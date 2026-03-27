@@ -36,9 +36,9 @@ class TestForwardShape:
         assert "independence_assessment" in result
         assert "cell_means" in result
 
-    def test_cmrr_returns_float(self):
+    def test_cmrr_returns_scalar(self):
         result = compute_cmrr(torch.randn(100), torch.randn(100))
-        assert isinstance(result, float)
+        assert result.ndim == 0  # scalar tensor
 
 
 class TestGradientFlow:

@@ -19,6 +19,7 @@ Reports FM1 main effect, FM2 main effect, interaction term, and CMRR.
 import torch
 from typing import Dict, Tuple, Optional
 
+from core.attribution.contrastive import compute_cmrr
 from core.evaluation.statistical import permutation_test, bootstrap_ci, cohens_d
 
 
@@ -96,28 +97,6 @@ def assess_independence(interaction_ratio: float) -> str:
     else:
         return "strong_interaction"
 
-
-def compute_cmrr(
-    score_standard: torch.Tensor,
-    score_contrastive: torch.Tensor,
-    eps: float = 1e-8,
-) -> float:
-    """
-    Compute Common-Mode Rejection Ratio (CMRR) as secondary FM2 metric.
-
-    CMRR = mean(|standard - contrastive| / (|standard| + eps))
-
-    Args:
-        score_standard: (N,) or (n_test, n_train) standard scores.
-        score_contrastive: (N,) or (n_test, n_train) contrastive scores.
-        eps: Numerical stability.
-
-    Returns:
-        Mean CMRR value.
-    """
-    diff = (score_standard - score_contrastive).abs()
-    denom = score_standard.abs() + eps
-    return (diff / denom).mean().item()
 
 
 def full_ablation_analysis(
